@@ -1,9 +1,11 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/app.html" },
-    { "source": "/zh-TW", "destination": "/app.html" },
-    { "source": "/en", "destination": "/app.html" }
+    { "source": "/zh-TW", "destination": "/" },
+    { "source": "/en", "destination": "/" }
   ],
   "headers": [
     {
