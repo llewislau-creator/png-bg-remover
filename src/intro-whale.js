@@ -1,616 +1,75 @@
 const entry = document.getElementById('png-cutout-entry')
 
-if (entry && !document.getElementById('png-cutout-whale-style')) {
+if (entry && !document.getElementById('png-cutout-whale-art-style')) {
   const globeCanvas = entry.querySelector('.globe-canvas')
   if (globeCanvas) {
     const mobile = window.matchMedia('(max-width: 700px)').matches
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const DPR = Math.min(window.devicePixelRatio || 1, 1.75)
-    const ACID_RGB = '183,255,42'
+    const DPR = Math.min(window.devicePixelRatio || 1, 1.6)
+    const WHALE_SRC = 'data:image/webp;base64,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'
 
     const style = document.createElement('style')
-    style.id = 'png-cutout-whale-style'
+    style.id = 'png-cutout-whale-art-style'
     style.textContent = `
-      #png-cutout-entry .whale-canvas{position:absolute;inset:0;z-index:7;width:100%;height:100%;display:block;pointer-events:none;will-change:opacity;backface-visibility:hidden}
-      #png-cutout-entry .whale-caption{position:absolute;left:50%;top:86.5%;z-index:9;transform:translate(-50%,-50%);pointer-events:none;display:flex;align-items:center;gap:12px;font:7px/1.4 "SFMono-Regular",Consolas,"Liberation Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.30);opacity:0;transition:opacity 1.8s cubic-bezier(.22,1,.36,1) 1.6s;white-space:nowrap}
+      #png-cutout-entry .whale-art-layer{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden}
+      #png-cutout-entry .whale-art{position:absolute;left:50%;top:57%;width:min(38vw,430px);height:auto;transform:translate(-50%,-50%);transform-origin:50% 62%;mix-blend-mode:screen;opacity:0;filter:contrast(1.13) brightness(1.06) drop-shadow(0 0 12px rgba(255,255,255,.10));transition:opacity 1.8s ease 1s;will-change:transform,filter,opacity;-webkit-mask-image:radial-gradient(ellipse 70% 76% at 50% 54%,#000 48%,rgba(0,0,0,.94) 66%,transparent 100%);mask-image:radial-gradient(ellipse 70% 76% at 50% 54%,#000 48%,rgba(0,0,0,.94) 66%,transparent 100%)}
+      #png-cutout-entry.is-ready .whale-art{opacity:.92}
+      #png-cutout-entry .whale-fx-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:8;pointer-events:none}
+      #png-cutout-entry .whale-caption{position:absolute;left:50%;top:86%;z-index:9;transform:translate(-50%,-50%);pointer-events:none;font:7px/1.4 "SFMono-Regular",Consolas,"Liberation Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);opacity:0;transition:opacity 1.6s ease 1.7s;white-space:nowrap}
       #png-cutout-entry.is-ready .whale-caption{opacity:1}
-      #png-cutout-entry .whale-caption i{display:block;width:26px;height:1px;background:linear-gradient(90deg,rgba(${ACID_RGB},0),rgba(${ACID_RGB},.58));box-shadow:0 0 10px rgba(${ACID_RGB},.08)}
-      #png-cutout-entry .whale-caption i:last-child{transform:scaleX(-1)}
-      #png-cutout-entry .whale-index{position:absolute;left:24px;top:50%;z-index:9;transform:translateY(-50%);display:grid;gap:7px;pointer-events:none;font:7px/1.2 "SFMono-Regular",Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.20);opacity:0;transition:opacity 1.5s ease 2s}
-      #png-cutout-entry.is-ready .whale-index{opacity:1}
-      #png-cutout-entry .whale-index b{font-weight:500;color:rgba(255,255,255,.56)}
-      #png-cutout-entry .whale-index:before{content:"";width:1px;height:32px;background:linear-gradient(rgba(${ACID_RGB},.46),rgba(${ACID_RGB},0))}
-      #png-cutout-entry .entry-enter{transition:transform .45s cubic-bezier(.22,1,.36,1),opacity .35s ease!important}
-      #png-cutout-entry .entry-enter:hover{transform:translateX(-50%) translateY(-2px)!important}
-      #png-cutout-entry .entry-enter strong{letter-spacing:.20em!important}
-      @media(max-width:700px){
-        #png-cutout-entry .whale-caption{top:84%;font-size:6px;gap:8px}
-        #png-cutout-entry .whale-caption i{width:18px}
-        #png-cutout-entry .whale-index{display:none}
-      }
-      @media(prefers-reduced-motion:reduce){#png-cutout-entry .whale-caption,#png-cutout-entry .whale-index{transition:opacity .3s linear}}
+      #png-cutout-entry .whale-caption:before,#png-cutout-entry .whale-caption:after{content:"";display:inline-block;width:26px;height:1px;margin:0 10px 2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.24))}
+      #png-cutout-entry .whale-caption:after{background:linear-gradient(90deg,rgba(255,255,255,.24),transparent)}
+      #png-cutout-entry .whale-art.is-exiting{transition:none}
+      @media(max-width:980px){#png-cutout-entry .whale-art{width:min(46vw,390px);top:58%}}
+      @media(max-width:700px){#png-cutout-entry .whale-art{width:min(62vw,330px);top:58.5%;opacity:.9}#png-cutout-entry .whale-caption{top:83%;font-size:6px;letter-spacing:.14em}}
+      @media(prefers-reduced-motion:reduce){#png-cutout-entry .whale-art{transition:opacity .35s linear}#png-cutout-entry .whale-caption{transition:opacity .35s linear}}
     `
     document.head.appendChild(style)
 
-    const canvas = document.createElement('canvas')
-    canvas.className = 'whale-canvas'
-    canvas.setAttribute('aria-hidden', 'true')
+    const layer = document.createElement('div')
+    layer.className = 'whale-art-layer'
+    layer.setAttribute('aria-hidden', 'true')
+    layer.innerHTML = `<img class="whale-art" alt="" decoding="async" draggable="false"/><canvas class="whale-fx-canvas"></canvas><div class="whale-caption">CELESTIAL GUIDE / EARTH FIELD</div>`
     const systemLayer = entry.querySelector('.entry-system-layer')
-    entry.insertBefore(canvas, systemLayer || entry.querySelector('.entry-ui') || null)
+    entry.insertBefore(layer, systemLayer || entry.querySelector('.entry-ui') || null)
 
-    const caption = document.createElement('div')
-    caption.className = 'whale-caption'
-    caption.innerHTML = '<i></i><span>CELESTIAL GUIDE · EARTH FIELD</span><i></i>'
-    const index = document.createElement('div')
-    index.className = 'whale-index'
-    index.innerHTML = '<b>FIELD / 01</b><span>BREACH VECTOR</span><span>LIVE ORBIT</span>'
-    const ui = entry.querySelector('.entry-ui')
-    entry.insertBefore(caption, ui || null)
-    entry.insertBefore(index, ui || null)
-
-    const topMeta = entry.querySelector('.entry-top-meta')
-    const enterCopy = entry.querySelector('.entry-enter span')
-    if (topMeta) topMeta.textContent = 'EARTH / MOON / SUN · CELESTIAL GUIDE'
-    if (enterCopy) enterCopy.textContent = mobile ? 'MOVE · PINCH · ENTER' : 'MOVE · SCROLL · ENTER THE FIELD'
-
+    const whale = layer.querySelector('.whale-art')
+    whale.src = WHALE_SRC
+    const canvas = layer.querySelector('.whale-fx-canvas')
     const ctx = canvas.getContext('2d')
-    let width = Math.max(1, window.innerWidth)
-    let height = Math.max(1, window.innerHeight)
-    let pointerX = width * 0.5
-    let pointerY = height * 0.5
-    let pointerNX = 0
-    let pointerNY = 0
-    let smoothNX = 0
-    let smoothNY = 0
-    let lastPointerX = pointerX
-    let lastPointerY = pointerY
-    let pointerSpeed = 0
-    let lastTime = performance.now()
-    const startedAt = lastTime
-    let exitStartedAt = 0
-    let raf = 0
-    let lastTrailEmit = 0
-    let lastSplashEmit = 0
-    const trail = []
-    const splash = []
-    const motes = []
+    const caption = layer.querySelector('.whale-caption')
+    const topMeta = entry.querySelector('.entry-top-meta')
+    if(topMeta) topMeta.textContent='EARTH / MOON / SUN / WHALE · CELESTIAL FIELD'
 
-    const clamp = (v, a, b) => Math.max(a, Math.min(b, v))
-    const smoothstep = (a, b, x) => {
-      const t = clamp((x - a) / Math.max(0.0001, b - a), 0, 1)
-      return t * t * (3 - 2 * t)
-    }
-    const easeOut = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3)
-    const hash = (n) => {
-      const x = Math.sin(n * 73.173 + 17.91) * 43758.5453
-      return x - Math.floor(x)
-    }
+    let width=Math.max(1,innerWidth),height=Math.max(1,innerHeight),px=width*.5,py=height*.5,nx=0,ny=0,targetNx=0,targetNy=0,hover=0,exitAt=0,last=performance.now(),raf=0,lastEmit=0
+    const dust=[]
+    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v))
+    const smoothstep=(a,b,x)=>{const t=clamp((x-a)/Math.max(.0001,b-a),0,1);return t*t*(3-2*t)}
+    const easeOut=t=>1-Math.pow(1-clamp(t,0,1),3)
+    const hash=n=>{const x=Math.sin(n*91.713+8.13)*43758.5453;return x-Math.floor(x)}
 
-    const bodyParticles = Array.from({ length: mobile ? 58 : 138 }, (_, i) => {
-      const x = -0.48 + hash(i * 3.17) * 1.02
-      const taper = Math.max(0.05, Math.sqrt(Math.max(0, 1 - Math.pow((x + 0.015) / 0.57, 2))))
-      const y = (hash(i * 5.23) - 0.5) * taper * 0.27
-      return {
-        x,
-        y,
-        size: 0.35 + hash(i * 7.9) * 1.05,
-        alpha: 0.10 + hash(i * 9.11) * 0.38,
-        phase: hash(i * 12.37) * Math.PI * 2,
-        green: hash(i * 14.13) > 0.982,
-      }
-    })
+    function resize(){width=Math.max(1,innerWidth);height=Math.max(1,innerHeight);canvas.width=Math.floor(width*DPR);canvas.height=Math.floor(height*DPR);canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;ctx.setTransform(DPR,0,0,DPR,0,0)}
+    function getZoom(){const m=globeCanvas.style.transform?.match(/scale\(([-\d.]+)\)/);return m?clamp(Number(m[1])||1,.6,1.7):1}
+    function onPointerMove(e){px=e.clientX;py=e.clientY;targetNx=clamp((px/width-.5)*2,-1,1);targetNy=clamp((py/height-.5)*2,-1,1)}
+    function beginExit(){if(!exitAt){exitAt=performance.now();whale.classList.add('is-exiting')}}
+    function onKeydown(e){if(e.key==='Enter'||e.key===' '||e.key==='Escape')beginExit()}
+    function emitDust(cx,cy,time,intensity){if(reducedMotion||time-lastEmit<54/Math.max(1,intensity))return;lastEmit=time;const count=intensity>1.5?3:1;for(let i=0;i<count;i++){const s=time*.001+i*17.1;dust.push({x:cx+(hash(s*3.1)-.5)*24,y:cy+(hash(s*7.4)-.5)*16,vx:(hash(s*11.2)-.5)*10,vy:-8-hash(s*13.7)*22,life:1,size:.5+hash(s*17.3)*1.5,green:hash(s*23.8)>.975})}while(dust.length>(mobile?36:72))dust.shift()}
+    function updateDust(dt){for(const p of dust){p.life-=dt*.64;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=7*dt}for(let i=dust.length-1;i>=0;i--)if(dust[i].life<=0)dust.splice(i,1)}
+    function drawConstellation(seed,cx,cy,scale,alpha){const pts=[];for(let i=0;i<5;i++)pts.push({x:cx+(hash(seed*41+i*8.1)-.5)*scale,y:cy+(hash(seed*53+i*6.7)-.5)*scale*.72});ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);ctx.strokeStyle=`rgba(255,255,255,${alpha})`;ctx.lineWidth=.55;ctx.stroke();for(const p of pts){ctx.beginPath();ctx.fillStyle=`rgba(255,255,255,${alpha*2.6})`;ctx.arc(p.x,p.y,.75,0,Math.PI*2);ctx.fill()}}
+    function drawPortal(cx,cy,scale,time,alpha,exitP){const pulse=reducedMotion?1:1+Math.sin(time*.0007)*.015,glow=1+easeOut(clamp(exitP/.45,0,1))*.85;ctx.save();ctx.translate(cx,cy);ctx.rotate(-.035+nx*.022);for(let i=0;i<6;i++){const k=.58+i*.092;ctx.beginPath();ctx.ellipse(0,0,scale*.62*k*pulse,scale*.14*(.84+i*.055)*pulse,0,Math.PI*.08,Math.PI*1.92);ctx.strokeStyle=`rgba(255,255,255,${alpha*(i===2?.42*glow:.07+i*.012)})`;ctx.lineWidth=i===2?1.15:.5;ctx.stroke()}ctx.beginPath();ctx.ellipse(0,0,scale*.43,scale*.125,0,0,Math.PI*2);ctx.strokeStyle=`rgba(255,255,255,${alpha*.72*glow})`;ctx.lineWidth=1.1;ctx.shadowColor='rgba(255,255,255,.35)';ctx.shadowBlur=14*glow;ctx.stroke();ctx.shadowBlur=0;ctx.restore()}
 
-    const constellationSeeds = mobile
-      ? [[-0.35, 0.49, 0], [0.35, 0.51, 1]]
-      : [[-0.36, 0.48, 0], [0.36, 0.45, 1], [-0.40, 0.70, 2], [0.35, 0.73, 3]]
-
-    function resize() {
-      width = Math.max(1, window.innerWidth)
-      height = Math.max(1, window.innerHeight)
-      canvas.width = Math.floor(width * DPR)
-      canvas.height = Math.floor(height * DPR)
-      canvas.style.width = `${width}px`
-      canvas.style.height = `${height}px`
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0)
+    function frame(time){
+      if(!entry.isConnected){cancelAnimationFrame(raf);window.removeEventListener('resize',resize);style.remove();return}
+      const dt=Math.min(.033,Math.max(.001,(time-last)/1000));last=time;nx+=(targetNx-nx)*(reducedMotion?.025:.055);ny+=(targetNy-ny)*(reducedMotion?.025:.055)
+      const zoom=getZoom(),whaleBaseX=width*.5,whaleBaseY=height*(mobile?.575:.565),whaleWidth=Math.min(width*(mobile?.62:width<980?.46:.38),mobile?330:430),whaleHeight=whaleWidth*1.18,d=Math.hypot(px-whaleBaseX,py-whaleBaseY),targetHover=clamp(1-d/Math.max(160,whaleWidth*.8),0,1);hover+=(targetHover-hover)*.08
+      const exitP=exitAt?clamp((time-exitAt)/1180,0,1):0,leap=easeOut(clamp((exitP-.06)/.38,0,1)),fade=1-smoothstep(.54,1,exitP),sway=reducedMotion?0:Math.sin(time*.00045)*4,tx=nx*(mobile?12:28)-leap*(mobile?10:24),ty=ny*(mobile?7:16)+sway-leap*(mobile?28:58),scale=(1+(zoom-1)*.24)*(1+hover*.018+leap*.025),rotate=-1.2+nx*1.7-leap*2.8
+      whale.style.transform=`translate(calc(-50% + ${tx.toFixed(1)}px),calc(-50% + ${ty.toFixed(1)}px)) rotate(${rotate.toFixed(2)}deg) scale(${scale.toFixed(4)})`;whale.style.opacity=`${Math.max(0,.92*fade)}`;whale.style.filter=`contrast(${(1.13+hover*.08).toFixed(3)}) brightness(${(1.06+hover*.05+leap*.08).toFixed(3)}) drop-shadow(0 0 ${(12+hover*10+leap*12).toFixed(1)}px rgba(255,255,255,${(0.10+hover*.08+leap*.08).toFixed(3)}))`;caption.style.opacity=`${Math.max(0,(entry.classList.contains('is-ready')?1:0)*fade)}`
+      const portalX=width*.5+nx*(mobile?8:20),portalY=height*(mobile?.72:.725)+ny*(mobile?5:11),artScale=Math.min(width,height)*(mobile?.42:.47)*(0.96+(zoom-1)*.16);emitDust(whaleBaseX+tx-whaleWidth*.10,whaleBaseY+ty+whaleHeight*.27,time,1+hover*.8+leap*1.8);updateDust(dt)
+      ctx.clearRect(0,0,width,height);drawConstellation(1,width*.18,height*.48,mobile?72:110,.07*fade);drawConstellation(2,width*.82,height*.43,mobile?64:96,.055*fade);drawConstellation(3,width*.18,height*.74,mobile?58:84,.045*fade)
+      ctx.save();ctx.setLineDash([2,8]);ctx.beginPath();ctx.moveTo(width*.5,height*.21);ctx.lineTo(portalX,Math.min(height*.92,portalY+artScale*.34));ctx.strokeStyle=`rgba(255,255,255,${.075*fade})`;ctx.lineWidth=.55;ctx.stroke();ctx.restore();drawPortal(portalX,portalY,artScale,time,fade,exitP)
+      for(const p of dust){const a=p.life*p.life*.5*fade;ctx.beginPath();ctx.fillStyle=p.green?`rgba(183,255,42,${a*.55})`:`rgba(255,255,255,${a})`;ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()}raf=requestAnimationFrame(frame)
     }
 
-    function sceneState() {
-      const s = entry.__cosmicState
-      if (s) return s
-      const zoomMatch = globeCanvas.style.transform?.match(/scale\(([-\d.]+)\)/)
-      const zoom = zoomMatch ? clamp(Number(zoomMatch[1]) || 1, 0.7, 1.5) : 1
-      const shift = -height * (mobile ? .10 : .14)
-      return {
-        earthX: width * .5,
-        earthY: height * .465 + shift,
-        earthRadius: Math.min(width, height) * (mobile ? .235 : width < 1200 ? .25 : .268) * zoom,
-        zoom,
-        nx: smoothNX,
-        ny: smoothNY,
-      }
-    }
-
-    function worldPoint(cx, cy, rotation, unit, x, y) {
-      const c = Math.cos(rotation)
-      const s = Math.sin(rotation)
-      return { x: cx + (x * c - y * s) * unit, y: cy + (x * s + y * c) * unit }
-    }
-
-    function drawConstellations(formation, fade, parallaxX, parallaxY) {
-      const a = 0.11 * formation * fade
-      ctx.save()
-      ctx.translate(parallaxX * .25, parallaxY * .20)
-      ctx.lineWidth = 0.5
-      for (const [sx, sy, seed] of constellationSeeds) {
-        const cx = width * (0.5 + sx)
-        const cy = height * sy
-        const pts = []
-        for (let i = 0; i < 5; i++) {
-          pts.push({
-            x: cx + (hash(seed * 31 + i * 7.1) - 0.5) * (mobile ? 62 : 104),
-            y: cy + (hash(seed * 47 + i * 9.3) - 0.5) * (mobile ? 48 : 78),
-          })
-        }
-        ctx.beginPath()
-        ctx.moveTo(pts[0].x, pts[0].y)
-        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y)
-        ctx.strokeStyle = `rgba(255,255,255,${a})`
-        ctx.stroke()
-        for (let i = 0; i < pts.length; i++) {
-          ctx.beginPath()
-          ctx.fillStyle = `rgba(255,255,255,${a * (i === 0 ? 3.5 : 1.9)})`
-          ctx.arc(pts[i].x, pts[i].y, i === 0 ? 1.15 : 0.72, 0, Math.PI * 2)
-          ctx.fill()
-        }
-      }
-      ctx.restore()
-    }
-
-    function drawPortal(time, cx, cy, unit, formation, fade, exitP, hover) {
-      const pulse = reducedMotion ? 1 : 1 + Math.sin(time * 0.00048) * 0.014
-      const exitGlow = 1 + easeOut(clamp(exitP / 0.50, 0, 1)) * 0.72
-      const hoverGlow = 1 + hover * .16
-      const rx = unit * 0.73 * pulse
-      const ry = unit * 0.165 * pulse
-
-      ctx.save()
-      ctx.translate(cx, cy)
-      ctx.rotate(-0.024 + smoothNX * 0.018)
-      ctx.globalAlpha = formation * fade
-
-      const glow = ctx.createRadialGradient(0, 0, unit * 0.05, 0, 0, unit * 0.88)
-      glow.addColorStop(0, `rgba(255,255,255,${0.10 * exitGlow})`)
-      glow.addColorStop(0.22, `rgba(255,255,255,${0.038 * hoverGlow})`)
-      glow.addColorStop(0.52, `rgba(${ACID_RGB},.008)`)
-      glow.addColorStop(1, 'rgba(0,0,0,0)')
-      ctx.fillStyle = glow
-      ctx.beginPath()
-      ctx.ellipse(0, 0, rx * 1.2, ry * 2.8, 0, 0, Math.PI * 2)
-      ctx.fill()
-
-      for (let i = 0; i < 6; i++) {
-        const k = .58 + i * .105
-        const wobble = reducedMotion ? 0 : Math.sin(time * .00024 + i * 1.31) * .012
-        const start = Math.PI * (.06 + i * .024)
-        const end = Math.PI * (1.94 - i * .020)
-        ctx.beginPath()
-        ctx.ellipse(0, 0, rx * k, ry * (.78 + i * .065), wobble, start, end)
-        ctx.strokeStyle = i === 2
-          ? `rgba(255,255,255,${.38 * exitGlow})`
-          : `rgba(255,255,255,${.055 + i * .015})`
-        ctx.lineWidth = i === 2 ? 1.05 : .5
-        ctx.stroke()
-      }
-
-      ctx.beginPath()
-      ctx.ellipse(0, 0, rx * .72, ry * .94, 0, 0, Math.PI * 2)
-      ctx.strokeStyle = `rgba(255,255,255,${.78 * exitGlow})`
-      ctx.lineWidth = 1.15
-      ctx.shadowColor = `rgba(255,255,255,${.24 * hoverGlow})`
-      ctx.shadowBlur = 14 * exitGlow
-      ctx.stroke()
-      ctx.shadowBlur = 0
-
-      for (let i = 0; i < 18; i++) {
-        const angle = hash(i * 9.13) * Math.PI * 2
-        const r = rx * (.60 + hash(i * 5.71) * .43)
-        const x = Math.cos(angle) * r
-        const y = Math.sin(angle) * ry * (.74 + hash(i * 4.81) * .48)
-        ctx.beginPath()
-        ctx.fillStyle = `rgba(255,255,255,${.14 + hash(i * 7.17) * .28})`
-        ctx.arc(x, y, .48 + hash(i * 3.3) * .86, 0, Math.PI * 2)
-        ctx.fill()
-      }
-
-      // Broken technical tick ring: a restrained reference to instrument graphics.
-      ctx.save()
-      ctx.scale(1, ry / Math.max(1, rx))
-      for (let i = 0; i < 24; i++) {
-        if (i % 3 === 1) continue
-        const angle = (i / 24) * Math.PI * 2
-        const r0 = rx * 1.02
-        const r1 = r0 + (i % 6 === 0 ? 8 : 4)
-        ctx.beginPath()
-        ctx.moveTo(Math.cos(angle) * r0, Math.sin(angle) * r0)
-        ctx.lineTo(Math.cos(angle) * r1, Math.sin(angle) * r1)
-        ctx.strokeStyle = `rgba(255,255,255,${i % 6 === 0 ? .16 : .07})`
-        ctx.lineWidth = .5
-        ctx.stroke()
-      }
-      ctx.restore()
-      ctx.restore()
-    }
-
-    function emitSplash(cx, cy, unit, time, intensity = 1) {
-      const interval = (mobile ? 110 : 76) / Math.max(1, intensity)
-      if (time - lastSplashEmit < interval) return
-      lastSplashEmit = time
-      const count = intensity > 1.6 ? 4 : 2
-      for (let i = 0; i < count; i++) {
-        const seed = time * 0.001 + i * 17.3
-        const angle = -Math.PI * (.12 + hash(seed * 2.1) * .76)
-        splash.push({
-          x: cx + (hash(seed * 5.2) - .5) * unit * .42,
-          y: cy + (hash(seed * 7.7) - .5) * 8,
-          vx: Math.cos(angle) * (7 + hash(seed * 11.2) * 18),
-          vy: -13 - hash(seed * 13.4) * 34,
-          life: 1,
-          size: .36 + hash(seed * 17.7) * 1.25,
-          green: hash(seed * 23.9) > .985,
-        })
-      }
-      while (splash.length > (mobile ? 30 : 62)) splash.shift()
-    }
-
-    function emitTrail(tail, time, intensity) {
-      const every = (mobile ? 80 : 55) / Math.max(1, intensity)
-      if (time - lastTrailEmit < every) return
-      lastTrailEmit = time
-      const count = intensity > 1.8 ? 3 : intensity > 1.15 ? 2 : 1
-      for (let i = 0; i < count; i++) {
-        const seed = time * .001 + i * 13.7
-        trail.push({
-          x: tail.x + (hash(seed * 7.1) - .5) * 9,
-          y: tail.y + (hash(seed * 11.3) - .5) * 9,
-          life: 1,
-          size: .5 + hash(seed * 17.9) * 1.45,
-          green: hash(seed * 23.7) > .982,
-          phase: hash(seed * 31.1) * Math.PI * 2,
-        })
-      }
-      while (trail.length > (mobile ? 28 : 52)) trail.shift()
-    }
-
-    function updateParticles(dt, exitP) {
-      const trailDecay = (reducedMotion ? 1.8 : exitP > 0 ? .66 : .82) * dt
-      for (const p of trail) p.life -= trailDecay
-      for (let i = trail.length - 1; i >= 0; i--) if (trail[i].life <= 0) trail.splice(i, 1)
-
-      for (const p of splash) {
-        p.life -= dt * .62
-        p.x += p.vx * dt
-        p.y += p.vy * dt
-        p.vy += 11 * dt
-      }
-      for (let i = splash.length - 1; i >= 0; i--) if (splash[i].life <= 0) splash.splice(i, 1)
-
-      for (const p of motes) {
-        p.life -= dt * .5
-        p.x += p.vx * dt
-        p.y += p.vy * dt
-      }
-      for (let i = motes.length - 1; i >= 0; i--) if (motes[i].life <= 0) motes.splice(i, 1)
-    }
-
-    function drawParticles(exitP, fade) {
-      for (const p of trail) {
-        const age = 1 - p.life
-        const a = p.life * p.life * (exitP > 0 ? .76 : .36) * fade
-        ctx.beginPath()
-        ctx.fillStyle = p.green ? `rgba(${ACID_RGB},${a * .52})` : `rgba(255,255,255,${a})`
-        ctx.arc(p.x - age * 12, p.y + Math.sin(p.phase + age * 4) * 2.1, p.size, 0, Math.PI * 2)
-        ctx.fill()
-      }
-      for (const p of splash) {
-        const a = p.life * p.life * fade
-        ctx.beginPath()
-        ctx.fillStyle = p.green ? `rgba(${ACID_RGB},${a * .38})` : `rgba(255,255,255,${a * .48})`
-        ctx.arc(p.x, p.y, p.size * (.72 + p.life), 0, Math.PI * 2)
-        ctx.fill()
-      }
-      for (const p of motes) {
-        const a = p.life * p.life * fade
-        ctx.beginPath()
-        ctx.fillStyle = `rgba(255,255,255,${a * .52})`
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fill()
-      }
-    }
-
-    function drawWhale(time, cx, cy, rotation, unit, formation, hover, fade, exitP) {
-      const dissolve = smoothstep(.40, .92, exitP)
-      const leap = easeOut(clamp((exitP - .04) / .36, 0, 1))
-      const visible = formation * (1 - dissolve) * fade
-      if (visible <= .004) return
-
-      const tailWave = reducedMotion ? 0 : Math.sin(time * .00145) * (.042 + hover * .018)
-      const finWave = reducedMotion ? 0 : Math.sin(time * .00105 + 1.1) * .022
-      const lineAlpha = (.84 + hover * .10 + leap * .05) * visible
-
-      ctx.save()
-      ctx.translate(cx, cy)
-      ctx.rotate(rotation)
-      ctx.scale(unit, unit)
-      ctx.lineCap = 'round'
-      ctx.lineJoin = 'round'
-
-      // Low-opacity luminous underpass gives the silhouette depth without turning it into neon.
-      ctx.shadowColor = `rgba(255,255,255,${.12 + hover * .05 + leap * .07})`
-      ctx.shadowBlur = 8 + hover * 5 + leap * 6
-      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * .72})`
-      ctx.lineWidth = 1.55 / unit
-      ctx.beginPath()
-      ctx.moveTo(.54, -.034)
-      ctx.bezierCurveTo(.47, -.116, .30, -.160, .05, -.168)
-      ctx.bezierCurveTo(-.15, -.172, -.32, -.137, -.44, -.087)
-      ctx.bezierCurveTo(-.52, -.052, -.56, -.018, -.52, .014)
-      ctx.bezierCurveTo(-.44, .082, -.24, .138, .02, .143)
-      ctx.bezierCurveTo(.25, .145, .43, .095, .52, .034)
-      ctx.bezierCurveTo(.56, .008, .57, -.010, .54, -.034)
-      ctx.stroke()
-      ctx.shadowBlur = 0
-
-      // Crisp editorial silhouette pass.
-      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha})`
-      ctx.lineWidth = .88 / unit
-      ctx.beginPath()
-      ctx.moveTo(.54, -.034)
-      ctx.bezierCurveTo(.47, -.116, .30, -.160, .05, -.168)
-      ctx.bezierCurveTo(-.15, -.172, -.32, -.137, -.44, -.087)
-      ctx.bezierCurveTo(-.52, -.052, -.56, -.018, -.52, .014)
-      ctx.bezierCurveTo(-.44, .082, -.24, .138, .02, .143)
-      ctx.bezierCurveTo(.25, .145, .43, .095, .52, .034)
-      ctx.bezierCurveTo(.56, .008, .57, -.010, .54, -.034)
-      ctx.stroke()
-
-      // Jaw contour.
-      ctx.beginPath()
-      ctx.moveTo(.515, .008)
-      ctx.bezierCurveTo(.35, .035, .17, .066, -.08, .080)
-      ctx.bezierCurveTo(-.23, .087, -.35, .077, -.44, .052)
-      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * .70})`
-      ctx.lineWidth = .72 / unit
-      ctx.stroke()
-
-      // Characteristic throat pleats, spaced progressively for a hand-drawn feel.
-      for (let i = 0; i < 11; i++) {
-        const k = i / 10
-        ctx.beginPath()
-        ctx.moveTo(.47 - k * .030, .030 + k * .004)
-        ctx.bezierCurveTo(.29 - k * .060, .074 + k * .010, .05 - k * .082, .113 + k * .008, -.31 - k * .047, .073 + k * .018)
-        ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * (.16 + k * .016)})`
-        ctx.lineWidth = .46 / unit
-        ctx.stroke()
-      }
-
-      // Back contour accents.
-      ctx.beginPath()
-      ctx.moveTo(.38, -.096)
-      ctx.bezierCurveTo(.17, -.129, -.08, -.128, -.32, -.073)
-      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * .22})`
-      ctx.lineWidth = .5 / unit
-      ctx.stroke()
-
-      // Near pectoral fin.
-      ctx.save()
-      ctx.translate(.06, .107)
-      ctx.rotate(finWave)
-      ctx.beginPath()
-      ctx.moveTo(0, 0)
-      ctx.bezierCurveTo(.014, .10, -.008, .255, -.090, .365)
-      ctx.bezierCurveTo(-.015, .335, .092, .21, .16, .074)
-      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * .66})`
-      ctx.lineWidth = .72 / unit
-      ctx.stroke()
-      ctx.restore()
-
-      // Far pectoral fin.
-      ctx.beginPath()
-      ctx.moveTo(-.02, .095)
-      ctx.bezierCurveTo(-.11, .16, -.20, .206, -.28, .226)
-      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * .20})`
-      ctx.stroke()
-
-      // Tail flukes.
-      ctx.save()
-      ctx.translate(-.505, -.012)
-      ctx.rotate(tailWave)
-      ctx.beginPath()
-      ctx.moveTo(.01, 0)
-      ctx.bezierCurveTo(-.06, -.040, -.145, -.112, -.24, -.112)
-      ctx.bezierCurveTo(-.205, -.040, -.122, .008, -.01, .025)
-      ctx.bezierCurveTo(-.10, .040, -.19, .102, -.252, .160)
-      ctx.bezierCurveTo(-.15, .171, -.055, .10, .012, .032)
-      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * .84})`
-      ctx.lineWidth = .76 / unit
-      ctx.stroke()
-      ctx.restore()
-
-      // Eye / signal point.
-      ctx.beginPath()
-      ctx.fillStyle = `rgba(255,255,255,${visible * .94})`
-      ctx.arc(.405, -.062, 1.45 / unit, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.beginPath()
-      ctx.strokeStyle = `rgba(${ACID_RGB},${visible * (.22 + hover * .24)})`
-      ctx.lineWidth = .48 / unit
-      ctx.arc(.405, -.062, 4.8 / unit, 0, Math.PI * 2)
-      ctx.stroke()
-
-      // Particle field stays subordinate to the linework; nearby pointer gently disturbs it.
-      const pointerLocalX = clamp((pointerX - cx) / Math.max(1, unit), -.8, .8)
-      const pointerLocalY = clamp((pointerY - cy) / Math.max(1, unit), -.6, .6)
-      for (const p of bodyParticles) {
-        const pulse = .72 + Math.sin(time * .00078 + p.phase) * .28
-        const dx = p.x - pointerLocalX
-        const dy = p.y - pointerLocalY
-        const d2 = dx * dx + dy * dy
-        const repel = !reducedMotion && hover > 0 && d2 < .12 ? (1 - d2 / .12) * hover * .016 : 0
-        const len = Math.max(.001, Math.hypot(dx, dy))
-        const px = p.x + dx / len * repel
-        const py = p.y + dy / len * repel
-        const a = p.alpha * visible * (.54 + hover * .30) * pulse
-        ctx.beginPath()
-        ctx.fillStyle = p.green ? `rgba(${ACID_RGB},${a * .54})` : `rgba(255,255,255,${a})`
-        ctx.arc(px, py, p.size / unit, 0, Math.PI * 2)
-        ctx.fill()
-      }
-
-      ctx.restore()
-    }
-
-    function drawAxis(earthX, earthY, portalX, portalY, unit, formation, fade) {
-      ctx.save()
-      ctx.beginPath()
-      ctx.moveTo(earthX, earthY + 18)
-      ctx.lineTo(portalX, Math.min(height * .93, portalY + unit * .46))
-      ctx.setLineDash([2, 8])
-      ctx.strokeStyle = `rgba(255,255,255,${.070 * formation * fade})`
-      ctx.lineWidth = .5
-      ctx.stroke()
-      ctx.setLineDash([])
-      for (let i = 0; i < 6; i++) {
-        const k = .12 + i * .155
-        const y = earthY + (portalY - earthY) * k
-        ctx.beginPath()
-        ctx.fillStyle = i === 3
-          ? `rgba(${ACID_RGB},${.24 * formation * fade})`
-          : `rgba(255,255,255,${.15 * formation * fade})`
-        ctx.arc(earthX + (i % 2 ? 1.4 : -1.4), y, i === 3 ? 1.45 : .78, 0, Math.PI * 2)
-        ctx.fill()
-      }
-      ctx.restore()
-    }
-
-    function drawLowerInstrument(cx, cy, unit, formation, fade) {
-      ctx.save()
-      ctx.translate(cx, cy)
-      ctx.globalAlpha = formation * fade
-      for (let i = 0; i < 4; i++) {
-        ctx.beginPath()
-        ctx.arc(0, 0, unit * (.052 + i * .022), -Math.PI * .92, Math.PI * .78)
-        ctx.strokeStyle = `rgba(255,255,255,${.16 - i * .026})`
-        ctx.lineWidth = .5
-        ctx.stroke()
-      }
-      ctx.beginPath()
-      ctx.fillStyle = 'rgba(255,255,255,.66)'
-      ctx.arc(0, 0, 1.65, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.beginPath()
-      ctx.strokeStyle = `rgba(${ACID_RGB},.18)`
-      ctx.arc(0, 0, unit * .028, 0, Math.PI * 2)
-      ctx.stroke()
-      ctx.restore()
-    }
-
-    function beginExit() {
-      if (!exitStartedAt) exitStartedAt = performance.now()
-    }
-
-    function onPointerMove(e) {
-      pointerX = e.clientX
-      pointerY = e.clientY
-      pointerNX = clamp((pointerX / width - .5) * 2, -1, 1)
-      pointerNY = clamp((pointerY / height - .5) * 2, -1, 1)
-    }
-
-    function onPointerUp(e) {
-      if (e.defaultPrevented) return
-      beginExit()
-    }
-    function onKeydown(e) {
-      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') beginExit()
-    }
-
-    function frame(time) {
-      if (!entry.isConnected) {
-        cancelAnimationFrame(raf)
-        window.removeEventListener('resize', resize)
-        style.remove()
-        return
-      }
-
-      if (!exitStartedAt && entry.classList.contains('is-leaving')) beginExit()
-
-      const dt = Math.min(.033, Math.max(.001, (time - lastTime) / 1000))
-      lastTime = time
-      const dxp = pointerX - lastPointerX
-      const dyp = pointerY - lastPointerY
-      pointerSpeed += (Math.min(950, Math.hypot(dxp, dyp) / Math.max(dt, .001)) - pointerSpeed) * .085
-      lastPointerX = pointerX
-      lastPointerY = pointerY
-      smoothNX += (pointerNX - smoothNX) * (reducedMotion ? .024 : .048)
-      smoothNY += (pointerNY - smoothNY) * (reducedMotion ? .024 : .048)
-
-      const age = (time - startedAt) / 1000
-      const formation = smoothstep(.95, 2.75, age)
-      const scene = sceneState()
-      const exitP = exitStartedAt ? clamp((time - exitStartedAt) / 1220, 0, 1) : 0
-      const fade = 1 - smoothstep(.58, 1, exitP)
-      const leap = easeOut(clamp((exitP - .04) / .36, 0, 1))
-      const zoom = scene.zoom || 1
-
-      const earthX = scene.earthX ?? width * .5
-      const earthY = scene.earthY ?? height * (mobile ? .365 : .325)
-      const portalX = width * .5 + smoothNX * (mobile ? 8 : 20)
-      const portalY = height * (mobile ? .705 : .72) + smoothNY * (mobile ? 5 : 11)
-      const unit = Math.min(width, height) * (mobile ? .37 : width < 1200 ? .415 : .445) * (.95 + (zoom - 1) * .36)
-
-      // Reference-led composition: the whale breaches upward through a luminous data basin while Earth remains the visual anchor above.
-      const baseRotation = mobile ? -1.77 : -1.90
-      const idleFloat = reducedMotion ? 0 : Math.sin(time * .00034) * 6
-      const rotation = baseRotation + smoothNX * .042 + (reducedMotion ? 0 : Math.sin(time * .00027) * .014) - leap * .095
-      const whaleX = width * .50 + smoothNX * (mobile ? 11 : 25) - leap * (mobile ? 7 : 18)
-      const whaleY = height * (mobile ? .575 : .565) + smoothNY * (mobile ? 7 : 14) + idleFloat - leap * (mobile ? 26 : 48)
-
-      const pointerDistance = Math.hypot(pointerX - whaleX, pointerY - whaleY)
-      const hoverRadius = unit * .58
-      const hover = clamp(1 - pointerDistance / Math.max(1, hoverRadius), 0, 1)
-
-      const tail = worldPoint(whaleX, whaleY, rotation, unit, -.62, .015)
-      emitTrail(tail, time, 1 + hover * .9 + clamp(pointerSpeed / 1150, 0, .55) + leap * 1.15)
-      emitSplash(portalX, portalY, unit, time, 1 + hover * .45 + leap * 1.5)
-
-      if (!reducedMotion && hover > .72 && motes.length < 16 && hash(time * .013) > .72) {
-        motes.push({
-          x: whaleX + (hash(time * .021) - .5) * unit * .75,
-          y: whaleY + (hash(time * .037) - .5) * unit * .35,
-          vx: (hash(time * .043) - .5) * 10,
-          vy: -4 - hash(time * .051) * 9,
-          life: 1,
-          size: .45 + hash(time * .067),
-        })
-      }
-
-      updateParticles(dt, exitP)
-      ctx.clearRect(0, 0, width, height)
-
-      drawConstellations(formation, fade, smoothNX * 9, smoothNY * 6)
-      drawAxis(earthX, earthY, portalX, portalY, unit, formation, fade)
-      drawPortal(time, portalX, portalY, unit, formation, fade, exitP, hover)
-      drawParticles(exitP, fade)
-      drawWhale(time, whaleX, whaleY, rotation, unit, formation, hover, fade, exitP)
-      drawLowerInstrument(portalX, portalY + unit * .43, unit, formation, fade)
-
-      raf = requestAnimationFrame(frame)
-    }
-
-    entry.addEventListener('pointermove', onPointerMove, { passive: true })
-    entry.addEventListener('pointerup', onPointerUp)
-    entry.addEventListener('keydown', onKeydown)
-    window.addEventListener('resize', resize, { passive: true })
-    resize()
-    raf = requestAnimationFrame(frame)
+    entry.addEventListener('pointermove',onPointerMove,{passive:true});entry.addEventListener('pointerup',beginExit,true);entry.addEventListener('keydown',onKeydown,true);window.addEventListener('resize',resize,{passive:true});resize();raf=requestAnimationFrame(frame)
   }
 }
