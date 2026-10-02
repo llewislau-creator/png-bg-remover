@@ -14,6 +14,8 @@ const state = {
   zoom: 1,
   panX: 0,
   panY: 0,
+  fitWidth: 0,
+  fitHeight: 0,
   dragging: false,
   dragStartX: 0,
   dragStartY: 0,
@@ -30,7 +32,7 @@ const text = {
     toolTitle: 'REMOVE BACKGROUND / 去背工具',
     uploadTitle: 'UPLOAD IMAGE.',
     uploadDesc: '點一下選擇照片、拖曳圖片到這裡，或使用 Ctrl / Cmd + V 貼上。第一次使用需要下載模型，之後會使用瀏覽器快取。',
-    zoomHint: '滑鼠滾輪縮放；放大後拖曳；手機雙指縮放；雙擊回到 100%。',
+    zoomHint: '100% = 完整顯示整張圖片；滑鼠滾輪縮放；放大後拖曳；手機雙指縮放；雙擊回到完整顯示。',
     tooLarge: '圖片超過 20MB，請先縮小檔案。',
     processing: '正在去背',
     failed: '處理失敗。請重新整理頁面後再試一次。',
@@ -40,7 +42,7 @@ const text = {
     toolTitle: 'REMOVE BACKGROUND / TOOL',
     uploadTitle: 'UPLOAD IMAGE.',
     uploadDesc: 'Choose a photo, drag it here, or paste with Ctrl / Cmd + V. The model downloads on first use and is cached by the browser.',
-    zoomHint: 'Mouse wheel to zoom; drag when zoomed; pinch on mobile; double-click to reset to 100%.',
+    zoomHint: '100% = fit the entire image; mouse wheel to zoom; drag when zoomed; pinch on mobile; double-click to fit.',
     tooLarge: 'Image exceeds 20MB. Please use a smaller file.',
     processing: 'Removing background',
     failed: 'Processing failed. Reload the page and try again.',
@@ -74,7 +76,50 @@ function setStatus(kind, label) {
 
 function clamp(v, min, max) { return Math.min(max, Math.max(min, v)) }
 
+function fitImagesToStage() {
+  const stage = $('#stage')
+  const original = $('#originalImg')
+  if (!stage || !original?.naturalWidth || !original?.naturalHeight) return false
+
+  const inset = 18
+  const availableWidth = Math.max(1, stage.clientWidth - inset * 2)
+  const availableHeight = Math.max(1, stage.clientHeight - inset * 2)
+  const fitScale = Math.min(
+    availableWidth / original.naturalWidth,
+    availableHeight / original.naturalHeight,
+  )
+
+  state.fitWidth = Math.max(1, Math.floor(original.naturalWidth * fitScale))
+  state.fitHeight = Math.max(1, Math.floor(original.naturalHeight * fitScale))
+
+  for (const img of [$('#originalImg'), $('#resultImg')]) {
+    img.style.width = `${state.fitWidth}px`
+    img.style.height = `${state.fitHeight}px`
+    img.style.maxWidth = 'none'
+    img.style.maxHeight = 'none'
+    img.style.objectFit = 'fill'
+  }
+  return true
+}
+
+function constrainPan() {
+  if (state.zoom <= 1 || !state.fitWidth || !state.fitHeight) {
+    state.panX = 0
+    state.panY = 0
+    return
+  }
+
+  const stage = $('#stage')
+  const scaledWidth = state.fitWidth * state.zoom
+  const scaledHeight = state.fitHeight * state.zoom
+  const maxX = Math.max(0, (scaledWidth - stage.clientWidth) / 2)
+  const maxY = Math.max(0, (scaledHeight - stage.clientHeight) / 2)
+  state.panX = clamp(state.panX, -maxX, maxX)
+  state.panY = clamp(state.panY, -maxY, maxY)
+}
+
 function applyViewTransform() {
+  constrainPan()
   const transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`
   $('#originalImg').style.transform = transform
   $('#resultImg').style.transform = transform
@@ -92,6 +137,7 @@ function setZoom(next, keepPan = true) {
 }
 
 function resetView() {
+  fitImagesToStage()
   state.zoom = 1
   state.panX = 0
   state.panY = 0
@@ -125,6 +171,8 @@ function reset() {
   revokeUrls()
   state.file = null
   state.resultBlob = null
+  state.fitWidth = 0
+  state.fitHeight = 0
   $('#fileInput').value = ''
   $('#idle').classList.remove('hidden')
   $('#workspace').classList.add('hidden')
@@ -151,8 +199,12 @@ async function processFile(file) {
   revokeUrls()
   state.file = file
   state.resultBlob = null
+  state.fitWidth = 0
+  state.fitHeight = 0
   state.originalUrl = URL.createObjectURL(file)
-  $('#originalImg').src = state.originalUrl
+  const originalImg = $('#originalImg')
+  originalImg.onload = () => resetView()
+  originalImg.src = state.originalUrl
   $('#fileName').textContent = file.name || 'image'
   $('#inputSize').textContent = fmt(file.size)
   $('#outputSize').textContent = '—'
@@ -177,7 +229,12 @@ async function processFile(file) {
     })
     state.resultBlob = result.blob
     state.resultUrl = URL.createObjectURL(result.blob)
-    $('#resultImg').src = state.resultUrl
+    const resultImg = $('#resultImg')
+    resultImg.onload = () => {
+      fitImagesToStage()
+      applyViewTransform()
+    }
+    resultImg.src = state.resultUrl
     $('#outputSize').textContent = fmt(result.blob.size)
     $('#modelInfo').textContent = `${result.model} / ${result.provider}`
     $('#processing').classList.add('hidden')
@@ -286,6 +343,13 @@ $('#idle').addEventListener('drop', (e) => processFile(e.dataTransfer.files?.[0]
 window.addEventListener('paste', (e) => {
   const f = [...(e.clipboardData?.files || [])].find((x) => x.type?.startsWith('image/'))
   if (f) processFile(f)
+})
+
+window.addEventListener('resize', () => {
+  if (!$('#workspace').classList.contains('hidden') && $('#originalImg').naturalWidth) {
+    fitImagesToStage()
+    applyViewTransform()
+  }
 })
 
 const caps = getBrowserCapabilities()
