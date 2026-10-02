@@ -11,11 +11,12 @@ if (entry && !document.getElementById('png-cutout-whale-style')) {
     const style = document.createElement('style')
     style.id = 'png-cutout-whale-style'
     style.textContent = `
-      #png-cutout-entry .whale-canvas{position:absolute;inset:0;z-index:7;width:100%;height:100%;display:block;pointer-events:none;will-change:opacity}
-      #png-cutout-entry .whale-caption{position:absolute;left:50%;top:74%;z-index:9;transform:translate(-50%,-50%);pointer-events:none;font:7px/1.4 "SFMono-Regular",Consolas,"Liberation Mono",monospace;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.24);opacity:0;transition:opacity 1.5s ease 1.9s;white-space:nowrap}
+      #png-cutout-entry .whale-canvas{position:absolute;inset:0;z-index:7;width:100%;height:100%;display:block;pointer-events:none}
+      #png-cutout-entry .whale-caption{position:absolute;left:50%;top:88%;z-index:9;transform:translate(-50%,-50%);pointer-events:none;font:7px/1.4 "SFMono-Regular",Consolas,"Liberation Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.26);opacity:0;transition:opacity 1.8s ease 1.8s;white-space:nowrap}
       #png-cutout-entry.is-ready .whale-caption{opacity:1}
-      #png-cutout-entry .whale-caption:before{content:"";display:inline-block;width:26px;height:1px;margin:0 9px 2px 0;background:linear-gradient(90deg,rgba(201,255,57,.58),rgba(201,255,57,0))}
-      @media(max-width:700px){#png-cutout-entry .whale-caption{display:none}}
+      #png-cutout-entry .whale-caption:before,#png-cutout-entry .whale-caption:after{content:"";display:inline-block;width:28px;height:1px;margin:0 10px 2px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.22))}
+      #png-cutout-entry .whale-caption:after{background:linear-gradient(90deg,rgba(255,255,255,.22),rgba(255,255,255,0))}
+      @media(max-width:700px){#png-cutout-entry .whale-caption{top:84%;font-size:6px}}
       @media(prefers-reduced-motion:reduce){#png-cutout-entry .whale-caption{transition:opacity .3s linear}}
     `
     document.head.appendChild(style)
@@ -28,13 +29,13 @@ if (entry && !document.getElementById('png-cutout-whale-style')) {
 
     const caption = document.createElement('div')
     caption.className = 'whale-caption'
-    caption.textContent = 'ORBITAL GUIDE / COSMIC WHALE'
+    caption.textContent = 'CELESTIAL GUIDE / EARTH FIELD'
     const ui = entry.querySelector('.entry-ui')
     entry.insertBefore(caption, ui || null)
 
     const topMeta = entry.querySelector('.entry-top-meta')
     const enterCopy = entry.querySelector('.entry-enter span')
-    if (topMeta) topMeta.textContent = 'EARTH / MOON / SUN / WHALE · 07 CONTINENTS'
+    if (topMeta) topMeta.textContent = 'EARTH / MOON / SUN / WHALE · ORBIT FIELD'
     if (enterCopy) enterCopy.textContent = mobile ? 'MOVE · PINCH · ENTER THE FIELD' : 'MOVE · SCROLL TO ZOOM · ENTER THE FIELD'
 
     const ctx = canvas.getContext('2d')
@@ -42,73 +43,49 @@ if (entry && !document.getElementById('png-cutout-whale-style')) {
     let height = Math.max(1, window.innerHeight)
     let pointerX = width * 0.5
     let pointerY = height * 0.5
-    let targetNx = 0
-    let targetNy = 0
-    let nx = 0
-    let ny = 0
-    let whaleOffsetX = 0
-    let whaleOffsetY = 0
+    let pointerNX = 0
+    let pointerNY = 0
+    let smoothNX = 0
+    let smoothNY = 0
+    let lastPointerX = pointerX
+    let lastPointerY = pointerY
+    let pointerSpeed = 0
     let lastTime = performance.now()
     const startedAt = lastTime
     let exitStartedAt = 0
     let raf = 0
     let lastTrailEmit = 0
-    let pointerLastX = pointerX
-    let pointerLastY = pointerY
-    let pointerSpeed = 0
     const trail = []
+    const splash = []
 
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v))
-    const lerp = (a, b, t) => a + (b - a) * t
     const smoothstep = (a, b, x) => {
       const t = clamp((x - a) / Math.max(0.0001, b - a), 0, 1)
       return t * t * (3 - 2 * t)
     }
     const easeOut = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3)
     const hash = (n) => {
-      const x = Math.sin(n * 71.371 + 19.73) * 43758.5453
+      const x = Math.sin(n * 73.173 + 17.91) * 43758.5453
       return x - Math.floor(x)
     }
 
-    const path = [
-      [-0.62, 0.66],
-      [-0.30, 0.82],
-      [0.18, 0.76],
-      [0.58, 0.50],
-      [0.30, 0.60],
-      [-0.18, 0.73],
-      [-0.55, 0.66],
-    ]
-
-    function samplePath(t) {
-      const n = path.length
-      const u = ((t % 1) + 1) % 1 * n
-      const i = Math.floor(u)
-      const f = u - i
-      const p0 = path[(i - 1 + n) % n]
-      const p1 = path[i % n]
-      const p2 = path[(i + 1) % n]
-      const p3 = path[(i + 2) % n]
-      const f2 = f * f
-      const f3 = f2 * f
-      const x = 0.5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * f + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * f2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * f3)
-      const y = 0.5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * f + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * f2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * f3)
-      return { x, y }
-    }
-
-    const bodyParticles = Array.from({ length: mobile ? 54 : 118 }, (_, i) => {
-      let x = -0.40 + hash(i * 3.17) * 0.92
-      const profile = Math.sqrt(Math.max(0, 1 - Math.pow((x - 0.03) / 0.51, 2)))
-      const y = (hash(i * 5.23) - 0.5) * profile * 0.25 + 0.005
+    const bodyParticles = Array.from({ length: mobile ? 72 : 168 }, (_, i) => {
+      const x = -0.46 + hash(i * 3.17) * 0.98
+      const taper = Math.max(0.08, Math.sqrt(Math.max(0, 1 - Math.pow((x + 0.02) / 0.55, 2))))
+      const y = (hash(i * 5.23) - 0.5) * taper * 0.28
       return {
         x,
         y,
-        size: 0.45 + hash(i * 7.9) * 1.05,
-        alpha: 0.12 + hash(i * 9.11) * 0.36,
+        size: 0.35 + hash(i * 7.9) * 1.15,
+        alpha: 0.11 + hash(i * 9.11) * 0.46,
         phase: hash(i * 12.37) * Math.PI * 2,
-        green: hash(i * 14.13) > 0.965,
+        green: hash(i * 14.13) > 0.976,
       }
     })
+
+    const constellationSeeds = [
+      [-0.33, 0.50, 0], [0.34, 0.45, 1], [-0.38, 0.72, 2], [0.31, 0.74, 3],
+    ]
 
     function resize() {
       width = Math.max(1, window.innerWidth)
@@ -125,71 +102,183 @@ if (entry && !document.getElementById('png-cutout-whale-style')) {
       return match ? clamp(Number(match[1]) || 1, 0.6, 1.7) : 1
     }
 
-    function getEarthState() {
-      const zoom = getZoom()
-      const radius = Math.min(width, height) * (mobile ? 0.235 : width < 1200 ? 0.25 : 0.268) * zoom
-      const x = width * 0.5 + nx * (mobile ? 7 : 15)
-      const y = height * 0.465 + ny * (mobile ? 5 : 10)
-      return { x, y, radius, zoom }
-    }
-
-    function worldFromLocal(cx, cy, rotation, unit, lx, ly) {
-      const c = Math.cos(rotation)
-      const s = Math.sin(rotation)
-      return {
-        x: cx + (lx * c - ly * s) * unit,
-        y: cy + (lx * s + ly * c) * unit,
-      }
-    }
-
-    function drawTrail(exitP) {
+    function drawConstellations(formation, fade) {
+      const a = 0.14 * formation * fade
       ctx.save()
-      for (let i = 0; i < trail.length; i++) {
-        const p = trail[i]
-        const age = 1 - p.life
-        const drift = age * age * 18
-        const a = p.life * p.life * (exitP > 0 ? 0.72 : 0.44)
+      ctx.lineWidth = 0.55
+      for (const [sx, sy, seed] of constellationSeeds) {
+        const cx = width * (0.5 + sx)
+        const cy = height * sy
+        const pts = []
+        for (let i = 0; i < 5; i++) {
+          pts.push({
+            x: cx + (hash(seed * 31 + i * 7.1) - 0.5) * (mobile ? 65 : 105),
+            y: cy + (hash(seed * 47 + i * 9.3) - 0.5) * (mobile ? 55 : 88),
+          })
+        }
         ctx.beginPath()
-        ctx.fillStyle = p.green ? `rgba(201,255,57,${a * 0.62})` : `rgba(255,255,255,${a})`
-        ctx.arc(p.x - drift, p.y + Math.sin(p.phase + age * 5) * 3, p.size * (0.6 + p.life), 0, Math.PI * 2)
-        ctx.fill()
+        ctx.moveTo(pts[0].x, pts[0].y)
+        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y)
+        ctx.strokeStyle = `rgba(255,255,255,${a})`
+        ctx.stroke()
+        for (let i = 0; i < pts.length; i++) {
+          ctx.beginPath()
+          ctx.fillStyle = `rgba(255,255,255,${a * (i === 0 ? 4 : 2.2)})`
+          ctx.arc(pts[i].x, pts[i].y, i === 0 ? 1.35 : 0.8, 0, Math.PI * 2)
+          ctx.fill()
+        }
       }
       ctx.restore()
     }
 
-    function emitTrail(tail, time, intensity) {
-      if (time - lastTrailEmit < (mobile ? 62 : 42) / Math.max(1, intensity)) return
+    function drawPortal(time, cx, cy, unit, formation, fade, exitP) {
+      const pulse = reducedMotion ? 1 : 1 + Math.sin(time * 0.00055) * 0.018
+      const leapGlow = 1 + easeOut(clamp(exitP / 0.45, 0, 1)) * 0.8
+      const rx = unit * 0.72 * pulse
+      const ry = unit * 0.17 * pulse
+
+      ctx.save()
+      ctx.translate(cx, cy)
+      ctx.rotate(-0.035 + smoothNX * 0.025)
+      ctx.globalAlpha = formation * fade
+
+      const glow = ctx.createRadialGradient(0, 0, unit * 0.08, 0, 0, unit * 0.82)
+      glow.addColorStop(0, `rgba(255,255,255,${0.11 * leapGlow})`)
+      glow.addColorStop(0.24, `rgba(255,255,255,${0.045 * leapGlow})`)
+      glow.addColorStop(0.55, 'rgba(201,255,57,.008)')
+      glow.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.fillStyle = glow
+      ctx.beginPath()
+      ctx.ellipse(0, 0, rx * 1.15, ry * 2.7, 0, 0, Math.PI * 2)
+      ctx.fill()
+
+      for (let i = 0; i < 7; i++) {
+        const k = 0.60 + i * 0.095
+        const wobble = reducedMotion ? 0 : Math.sin(time * 0.00035 + i * 1.73) * 0.018
+        ctx.beginPath()
+        ctx.ellipse(0, 0, rx * k, ry * (0.78 + i * 0.07), wobble, Math.PI * (0.08 + i * 0.025), Math.PI * (1.90 - i * 0.018))
+        ctx.strokeStyle = i === 2
+          ? `rgba(255,255,255,${0.46 * leapGlow})`
+          : `rgba(255,255,255,${0.075 + i * 0.018})`
+        ctx.lineWidth = i === 2 ? 1.25 : 0.55
+        ctx.stroke()
+      }
+
+      ctx.beginPath()
+      ctx.ellipse(0, 0, rx * 0.73, ry * 0.94, 0, 0, Math.PI * 2)
+      ctx.strokeStyle = `rgba(255,255,255,${0.88 * leapGlow})`
+      ctx.lineWidth = 1.25
+      ctx.shadowColor = 'rgba(255,255,255,.42)'
+      ctx.shadowBlur = 18 * leapGlow
+      ctx.stroke()
+      ctx.shadowBlur = 0
+
+      for (let i = 0; i < 22; i++) {
+        const angle = hash(i * 9.13) * Math.PI * 2
+        const r = rx * (0.58 + hash(i * 5.71) * 0.47)
+        const x = Math.cos(angle) * r
+        const y = Math.sin(angle) * ry * (0.72 + hash(i * 4.81) * 0.55)
+        ctx.beginPath()
+        ctx.fillStyle = `rgba(255,255,255,${0.18 + hash(i * 7.17) * 0.35})`
+        ctx.arc(x, y, 0.55 + hash(i * 3.3) * 1.05, 0, Math.PI * 2)
+        ctx.fill()
+      }
+
+      ctx.restore()
+    }
+
+    function emitSplash(cx, cy, unit, time, intensity = 1) {
+      const interval = mobile ? 95 : 68
+      if (time - lastTrailEmit < interval / Math.max(1, intensity)) return
       lastTrailEmit = time
-      const count = intensity > 1.7 ? 3 : intensity > 1.1 ? 2 : 1
+      const count = intensity > 1.5 ? 5 : 3
+      for (let i = 0; i < count; i++) {
+        const seed = time * 0.001 + i * 17.3
+        const angle = -Math.PI * (0.10 + hash(seed * 2.1) * 0.80)
+        splash.push({
+          x: cx + (hash(seed * 5.2) - 0.5) * unit * 0.46,
+          y: cy + (hash(seed * 7.7) - 0.5) * 10,
+          vx: Math.cos(angle) * (8 + hash(seed * 11.2) * 22),
+          vy: -16 - hash(seed * 13.4) * 42,
+          life: 1,
+          size: 0.4 + hash(seed * 17.7) * 1.5,
+          green: hash(seed * 23.9) > 0.97,
+        })
+      }
+      while (splash.length > (mobile ? 38 : 82)) splash.shift()
+    }
+
+    function updateSplash(dt) {
+      for (const p of splash) {
+        p.life -= dt * 0.55
+        p.x += p.vx * dt
+        p.y += p.vy * dt
+        p.vy += 13 * dt
+      }
+      for (let i = splash.length - 1; i >= 0; i--) if (splash[i].life <= 0) splash.splice(i, 1)
+    }
+
+    function drawSplash(fade) {
+      for (const p of splash) {
+        const a = p.life * p.life * fade
+        ctx.beginPath()
+        ctx.fillStyle = p.green ? `rgba(201,255,57,${a * 0.45})` : `rgba(255,255,255,${a * 0.58})`
+        ctx.arc(p.x, p.y, p.size * (0.7 + p.life), 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+
+    function emitTrail(tail, time, intensity) {
+      const every = (mobile ? 72 : 48) / Math.max(1, intensity)
+      if (time - lastTrailEmit < every) return
+      lastTrailEmit = time
+      const count = intensity > 1.6 ? 4 : intensity > 1.1 ? 2 : 1
       for (let i = 0; i < count; i++) {
         const seed = time * 0.001 + i * 13.7
         trail.push({
-          x: tail.x + (hash(seed * 7.1) - 0.5) * 8,
-          y: tail.y + (hash(seed * 11.3) - 0.5) * 8,
+          x: tail.x + (hash(seed * 7.1) - 0.5) * 10,
+          y: tail.y + (hash(seed * 11.3) - 0.5) * 10,
           life: 1,
-          size: 0.65 + hash(seed * 17.9) * 1.75,
-          green: hash(seed * 23.7) > 0.94,
+          size: 0.55 + hash(seed * 17.9) * 1.8,
+          green: hash(seed * 23.7) > 0.965,
           phase: hash(seed * 31.1) * Math.PI * 2,
         })
       }
-      while (trail.length > (mobile ? 28 : 50)) trail.shift()
+      while (trail.length > (mobile ? 34 : 64)) trail.shift()
     }
 
     function updateTrail(dt, exitP) {
-      const decay = (reducedMotion ? 1.6 : exitP > 0 ? 0.62 : 0.82) * dt
+      const decay = (reducedMotion ? 1.7 : exitP > 0 ? 0.60 : 0.76) * dt
       for (const p of trail) p.life -= decay
       while (trail.length && trail[0].life <= 0) trail.shift()
     }
 
-    function drawWhale(cx, cy, rotation, unit, formation, hover, depthAlpha, exitP, time) {
-      const dissolve = smoothstep(0.42, 0.94, exitP)
-      const leap = easeOut(clamp((exitP - 0.08) / 0.34, 0, 1))
-      const visible = formation * (1 - dissolve) * depthAlpha
-      if (visible <= 0.005) return
+    function drawTrail(exitP, fade) {
+      for (const p of trail) {
+        const age = 1 - p.life
+        const a = p.life * p.life * (exitP > 0 ? 0.82 : 0.42) * fade
+        ctx.beginPath()
+        ctx.fillStyle = p.green ? `rgba(201,255,57,${a * 0.55})` : `rgba(255,255,255,${a})`
+        ctx.arc(p.x - age * 15, p.y + Math.sin(p.phase + age * 4) * 2.5, p.size, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
 
-      const tailWave = reducedMotion ? 0 : Math.sin(time * 0.00205) * (0.045 + hover * 0.028)
-      const bodyGlow = 5 + hover * 8 + leap * 8
-      const lineAlpha = (0.62 + hover * 0.18) * visible
+    function worldPoint(cx, cy, rotation, unit, x, y) {
+      const c = Math.cos(rotation)
+      const s = Math.sin(rotation)
+      return { x: cx + (x * c - y * s) * unit, y: cy + (x * s + y * c) * unit }
+    }
+
+    function drawWhale(time, cx, cy, rotation, unit, formation, hover, fade, exitP) {
+      const dissolve = smoothstep(0.43, 0.94, exitP)
+      const leap = easeOut(clamp((exitP - 0.06) / 0.36, 0, 1))
+      const visible = formation * (1 - dissolve) * fade
+      if (visible <= 0.004) return
+
+      const tailWave = reducedMotion ? 0 : Math.sin(time * 0.00165) * (0.050 + hover * 0.025)
+      const finWave = reducedMotion ? 0 : Math.sin(time * 0.00115 + 1.1) * 0.025
+      const lineAlpha = (0.80 + hover * 0.14 + leap * 0.06) * visible
 
       ctx.save()
       ctx.translate(cx, cy)
@@ -197,69 +286,111 @@ if (entry && !document.getElementById('png-cutout-whale-style')) {
       ctx.scale(unit, unit)
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
-      ctx.shadowColor = `rgba(255,255,255,${0.13 + hover * 0.08})`
-      ctx.shadowBlur = bodyGlow
+      ctx.shadowColor = `rgba(255,255,255,${0.16 + hover * 0.08 + leap * 0.10})`
+      ctx.shadowBlur = 8 + hover * 7 + leap * 8
       ctx.strokeStyle = `rgba(255,255,255,${lineAlpha})`
-      ctx.lineWidth = 1.25 / unit
+      ctx.lineWidth = 1.4 / unit
 
+      // Main humpback silhouette: long head, arched back, tapered tail stock.
       ctx.beginPath()
-      ctx.moveTo(-0.44, -0.02)
-      ctx.bezierCurveTo(-0.30, -0.16, 0.04, -0.19, 0.34, -0.11)
-      ctx.bezierCurveTo(0.47, -0.08, 0.56, -0.03, 0.54, 0.015)
-      ctx.bezierCurveTo(0.51, 0.07, 0.42, 0.10, 0.28, 0.115)
-      ctx.bezierCurveTo(0.05, 0.145, -0.20, 0.145, -0.38, 0.08)
-      ctx.bezierCurveTo(-0.46, 0.05, -0.49, 0.015, -0.44, -0.02)
+      ctx.moveTo(0.53, -0.035)
+      ctx.bezierCurveTo(0.47, -0.115, 0.30, -0.155, 0.05, -0.165)
+      ctx.bezierCurveTo(-0.14, -0.17, -0.31, -0.135, -0.43, -0.085)
+      ctx.bezierCurveTo(-0.51, -0.052, -0.55, -0.018, -0.51, 0.014)
+      ctx.bezierCurveTo(-0.43, 0.08, -0.24, 0.135, 0.02, 0.14)
+      ctx.bezierCurveTo(0.24, 0.143, 0.42, 0.095, 0.51, 0.035)
+      ctx.bezierCurveTo(0.55, 0.010, 0.56, -0.010, 0.53, -0.035)
       ctx.stroke()
 
       ctx.shadowBlur = 0
-      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * 0.65})`
-      ctx.lineWidth = 0.86 / unit
+      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * 0.78})`
+      ctx.lineWidth = 0.92 / unit
 
-      ctx.save()
-      ctx.translate(-0.455, 0.015)
-      ctx.rotate(tailWave)
+      // Mouth / jaw contour.
       ctx.beginPath()
-      ctx.moveTo(0.02, 0)
-      ctx.bezierCurveTo(-0.05, -0.055, -0.14, -0.115, -0.22, -0.092)
-      ctx.bezierCurveTo(-0.16, -0.02, -0.09, 0.015, 0.005, 0.027)
-      ctx.bezierCurveTo(-0.08, 0.04, -0.16, 0.10, -0.21, 0.16)
-      ctx.bezierCurveTo(-0.12, 0.17, -0.035, 0.10, 0.02, 0.035)
-      ctx.stroke()
-      ctx.restore()
-
-      ctx.beginPath()
-      ctx.moveTo(0.10, 0.095)
-      ctx.bezierCurveTo(0.07, 0.16, 0.02, 0.24, -0.035, 0.30)
-      ctx.bezierCurveTo(0.055, 0.275, 0.13, 0.20, 0.18, 0.12)
+      ctx.moveTo(0.51, 0.010)
+      ctx.bezierCurveTo(0.35, 0.035, 0.17, 0.065, -0.08, 0.078)
+      ctx.bezierCurveTo(-0.23, 0.084, -0.34, 0.075, -0.43, 0.050)
       ctx.stroke()
 
-      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * 0.33})`
-      ctx.lineWidth = 0.58 / unit
-      for (let i = 0; i < 7; i++) {
-        const o = i * 0.017
+      // Throat grooves inspired by the references.
+      for (let i = 0; i < 10; i++) {
+        const k = i / 9
         ctx.beginPath()
-        ctx.moveTo(0.38 - o * 0.8, -0.055 + o * 0.22)
-        ctx.bezierCurveTo(0.24 - o, 0.005 + o, 0.03 - o * 0.6, 0.085 + o * 1.15, -0.26 - o * 0.28, 0.064 + o * 0.6)
+        ctx.moveTo(0.46 - k * 0.025, 0.028 + k * 0.004)
+        ctx.bezierCurveTo(0.28 - k * 0.06, 0.072 + k * 0.012, 0.05 - k * 0.085, 0.112 + k * 0.008, -0.31 - k * 0.045, 0.073 + k * 0.018)
+        ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * (0.22 + k * 0.025)})`
+        ctx.lineWidth = 0.54 / unit
         ctx.stroke()
       }
 
-      const particleInfluence = hover * 0.010
+      // Back contour accents.
+      ctx.beginPath()
+      ctx.moveTo(0.38, -0.092)
+      ctx.bezierCurveTo(0.16, -0.126, -0.08, -0.126, -0.31, -0.073)
+      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * 0.28})`
+      ctx.stroke()
+
+      // Pectoral fin.
+      ctx.save()
+      ctx.translate(0.06, 0.105)
+      ctx.rotate(finWave)
+      ctx.beginPath()
+      ctx.moveTo(0, 0)
+      ctx.bezierCurveTo(0.015, 0.10, -0.005, 0.25, -0.085, 0.36)
+      ctx.bezierCurveTo(-0.012, 0.33, 0.09, 0.21, 0.16, 0.075)
+      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * 0.62})`
+      ctx.lineWidth = 0.88 / unit
+      ctx.stroke()
+      ctx.restore()
+
+      // Far pectoral fin.
+      ctx.beginPath()
+      ctx.moveTo(-0.02, 0.095)
+      ctx.bezierCurveTo(-0.11, 0.16, -0.20, 0.205, -0.28, 0.225)
+      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * 0.24})`
+      ctx.stroke()
+
+      // Tail flukes.
+      ctx.save()
+      ctx.translate(-0.50, -0.012)
+      ctx.rotate(tailWave)
+      ctx.beginPath()
+      ctx.moveTo(0.01, 0)
+      ctx.bezierCurveTo(-0.06, -0.038, -0.14, -0.11, -0.235, -0.11)
+      ctx.bezierCurveTo(-0.20, -0.038, -0.12, 0.008, -0.01, 0.025)
+      ctx.bezierCurveTo(-0.10, 0.038, -0.19, 0.10, -0.25, 0.158)
+      ctx.bezierCurveTo(-0.15, 0.17, -0.055, 0.10, 0.012, 0.032)
+      ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * 0.82})`
+      ctx.lineWidth = 0.92 / unit
+      ctx.stroke()
+      ctx.restore()
+
+      // Eye + short orbital data tick.
+      ctx.beginPath()
+      ctx.fillStyle = `rgba(255,255,255,${visible * 0.94})`
+      ctx.arc(0.405, -0.062, 1.6 / unit, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.beginPath()
+      ctx.strokeStyle = `rgba(201,255,57,${visible * (0.26 + hover * 0.28)})`
+      ctx.lineWidth = 0.55 / unit
+      ctx.arc(0.405, -0.062, 5 / unit, 0, Math.PI * 2)
+      ctx.stroke()
+
+      // Particle / star field inside the whale body.
       for (let i = 0; i < bodyParticles.length; i++) {
         const p = bodyParticles[i]
-        const pulse = 0.7 + Math.sin(time * 0.0012 + p.phase) * 0.3
-        const jitterX = reducedMotion ? 0 : Math.sin(time * 0.0008 + p.phase) * particleInfluence
-        const jitterY = reducedMotion ? 0 : Math.cos(time * 0.0009 + p.phase) * particleInfluence
-        const a = p.alpha * visible * (0.6 + hover * 0.55) * pulse
+        const pulse = 0.72 + Math.sin(time * 0.00085 + p.phase) * 0.28
+        const j = reducedMotion ? 0 : hover * 0.010
+        const px = p.x + Math.sin(time * 0.0007 + p.phase) * j
+        const py = p.y + Math.cos(time * 0.00075 + p.phase) * j
+        const a = p.alpha * visible * (0.58 + hover * 0.42) * pulse
         ctx.beginPath()
-        ctx.fillStyle = p.green ? `rgba(201,255,57,${a * 0.9})` : `rgba(255,255,255,${a})`
-        ctx.arc(p.x + jitterX, p.y + jitterY, p.size / unit, 0, Math.PI * 2)
+        ctx.fillStyle = p.green ? `rgba(201,255,57,${a * 0.60})` : `rgba(255,255,255,${a})`
+        ctx.arc(px, py, p.size / unit, 0, Math.PI * 2)
         ctx.fill()
       }
 
-      ctx.beginPath()
-      ctx.fillStyle = `rgba(201,255,57,${visible * (0.48 + hover * 0.32)})`
-      ctx.arc(0.395, -0.058, 1.45 / unit, 0, Math.PI * 2)
-      ctx.fill()
       ctx.restore()
     }
 
@@ -267,89 +398,114 @@ if (entry && !document.getElementById('png-cutout-whale-style')) {
       if (!exitStartedAt) exitStartedAt = performance.now()
     }
 
-    function onPointerMove(event) {
-      pointerX = event.clientX
-      pointerY = event.clientY
-      targetNx = clamp((pointerX / width - 0.5) * 2, -1, 1)
-      targetNy = clamp((pointerY / height - 0.5) * 2, -1, 1)
+    function onPointerMove(e) {
+      pointerX = e.clientX
+      pointerY = e.clientY
+      pointerNX = clamp((pointerX / width - 0.5) * 2, -1, 1)
+      pointerNY = clamp((pointerY / height - 0.5) * 2, -1, 1)
     }
 
-    function onPointerUp(event) {
-      if (event.defaultPrevented) return
-      beginExit()
-    }
-
-    function onKeydown(event) {
-      if (event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') beginExit()
-    }
+    function onPointerUp() { beginExit() }
+    function onKeydown(e) { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') beginExit() }
 
     function frame(time) {
       if (!entry.isConnected) {
         cancelAnimationFrame(raf)
+        window.removeEventListener('resize', resize)
         style.remove()
         return
       }
 
       const dt = Math.min(0.033, Math.max(0.001, (time - lastTime) / 1000))
       lastTime = time
-      nx += (targetNx - nx) * (reducedMotion ? 0.025 : 0.055)
-      ny += (targetNy - ny) * (reducedMotion ? 0.025 : 0.055)
+      const dxp = pointerX - lastPointerX
+      const dyp = pointerY - lastPointerY
+      pointerSpeed += (Math.min(1100, Math.hypot(dxp, dyp) / Math.max(dt, 0.001)) - pointerSpeed) * 0.10
+      lastPointerX = pointerX
+      lastPointerY = pointerY
+      smoothNX += (pointerNX - smoothNX) * (reducedMotion ? 0.025 : 0.055)
+      smoothNY += (pointerNY - smoothNY) * (reducedMotion ? 0.025 : 0.055)
 
-      const instantSpeed = Math.hypot(pointerX - pointerLastX, pointerY - pointerLastY) / Math.max(dt, 0.001)
-      pointerSpeed = lerp(pointerSpeed, Math.min(1200, instantSpeed), 0.08)
-      pointerLastX = pointerX
-      pointerLastY = pointerY
-
-      const earth = getEarthState()
       const age = (time - startedAt) / 1000
-      const formation = smoothstep(1.25, 2.55, age)
-      const exitP = exitStartedAt ? clamp((time - exitStartedAt) / (reducedMotion ? 420 : 1120), 0, 1) : 0
-      const pathSpeed = reducedMotion ? 0.006 : 0.052
-      const t = ((time - startedAt) * 0.001 * pathSpeed + 0.04) % 1
-      const p = samplePath(t)
-      const next = samplePath(t + 0.0035)
-      const pathScale = earth.radius * (mobile ? 1.30 : 1.47)
-      const baseX = earth.x + p.x * pathScale
-      const baseY = earth.y + p.y * pathScale
-      const tangent = Math.atan2(next.y - p.y, next.x - p.x)
-      const floatY = reducedMotion ? 0 : Math.sin(time * 0.00095) * (mobile ? 4 : 8)
+      const formation = smoothstep(1.0, 2.7, age)
+      const exitP = exitStartedAt ? clamp((time - exitStartedAt) / 1180, 0, 1) : 0
+      const fade = 1 - smoothstep(0.58, 1, exitP)
+      const leap = easeOut(clamp((exitP - 0.06) / 0.36, 0, 1))
+      const zoom = getZoom()
 
-      const distToWhale = Math.hypot(pointerX - baseX, pointerY - baseY)
-      const interactRadius = mobile ? 130 : 210
-      const hover = Math.pow(1 - clamp(distToWhale / interactRadius, 0, 1), 2)
-      const distToEarth = Math.hypot(pointerX - earth.x, pointerY - earth.y)
-      const earthInfluence = Math.pow(1 - clamp(distToEarth / (earth.radius * 1.35), 0, 1), 2)
+      const earthY = height * (mobile ? 0.355 : 0.325)
+      const earthX = width * 0.5 + smoothNX * (mobile ? 6 : 12)
+      const portalX = width * 0.5 + smoothNX * (mobile ? 10 : 24)
+      const portalY = height * (mobile ? 0.695 : 0.715) + smoothNY * (mobile ? 7 : 14)
+      const unit = Math.min(width, height) * (mobile ? 0.39 : width < 1200 ? 0.43 : 0.46) * (0.94 + (zoom - 1) * 0.42)
 
-      const attractionX = nx * (mobile ? 12 : 28) + (pointerX - baseX) * hover * 0.045 - p.x * earth.radius * earthInfluence * 0.06
-      const attractionY = ny * (mobile ? 8 : 18) + (pointerY - baseY) * hover * 0.035 - p.y * earth.radius * earthInfluence * 0.06
-      whaleOffsetX += (attractionX - whaleOffsetX) * (reducedMotion ? 0.025 : 0.048)
-      whaleOffsetY += (attractionY - whaleOffsetY) * (reducedMotion ? 0.025 : 0.048)
+      // The reference-led composition: Earth above, a large breaching whale below, luminous orbital basin beneath.
+      const baseRotation = mobile ? -1.78 : -1.92
+      const rotation = baseRotation + smoothNX * 0.055 + (reducedMotion ? 0 : Math.sin(time * 0.00032) * 0.018) - leap * 0.10
+      const whaleX = width * 0.50 + smoothNX * (mobile ? 14 : 32) - leap * (mobile ? 8 : 22)
+      const whaleY = height * (mobile ? 0.565 : 0.56) + smoothNY * (mobile ? 9 : 18) - leap * (mobile ? 28 : 54)
 
-      const leap = easeOut(clamp((exitP - 0.08) / 0.34, 0, 1))
-      const cx = baseX + whaleOffsetX + leap * (mobile ? 18 : 32)
-      const cy = baseY + whaleOffsetY + floatY - leap * (mobile ? 12 : 22)
-      const rotation = tangent - 0.07 - leap * 0.10 + (reducedMotion ? 0 : Math.sin(time * 0.00055) * 0.018)
-      const unit = earth.radius * (mobile ? 1.07 : 1.28) * (1 + leap * 0.035)
-      const depth = Math.sin(t * Math.PI * 2 - 0.8)
-      const depthAlpha = depth < -0.22 ? 0.44 : 1
+      const pointerDistance = Math.hypot(pointerX - whaleX, pointerY - whaleY)
+      const hoverRadius = unit * 0.58
+      const hover = clamp(1 - pointerDistance / Math.max(1, hoverRadius), 0, 1)
 
-      const tailPoint = worldFromLocal(cx, cy, rotation, unit, -0.63, 0.025)
-      const trailBoost = 1 + clamp(pointerSpeed / 900, 0, 1) * 0.75 + smoothstep(0.30, 0.72, exitP) * 1.8
-      if (formation > 0.5 && exitP < 0.9) emitTrail(tailPoint, time, trailBoost)
+      const tail = worldPoint(whaleX, whaleY, rotation, unit, -0.62, 0.015)
+      emitTrail(tail, time, 1 + hover * 1.2 + clamp(pointerSpeed / 1200, 0, 0.8) + leap * 1.3)
+      emitSplash(portalX, portalY, unit, time, 1 + hover * 0.6 + leap * 1.8)
       updateTrail(dt, exitP)
+      updateSplash(dt)
 
       ctx.clearRect(0, 0, width, height)
-      drawTrail(exitP)
-      drawWhale(cx, cy, rotation, unit, formation, hover, depthAlpha, exitP, time)
+      drawConstellations(formation, fade)
+
+      // Fine axial data line from Earth through the portal, similar to the reference layout.
+      ctx.save()
+      ctx.beginPath()
+      ctx.moveTo(earthX, earthY + 20)
+      ctx.lineTo(portalX, Math.min(height * 0.91, portalY + unit * 0.46))
+      ctx.setLineDash([2, 7])
+      ctx.strokeStyle = `rgba(255,255,255,${0.095 * formation * fade})`
+      ctx.lineWidth = 0.55
+      ctx.stroke()
+      ctx.setLineDash([])
+      for (let i = 0; i < 5; i++) {
+        const y = earthY + (portalY - earthY) * (0.15 + i * 0.19)
+        ctx.beginPath()
+        ctx.fillStyle = `rgba(255,255,255,${0.20 * formation * fade})`
+        ctx.arc(earthX + (i % 2 ? 1.5 : -1.5), y, i === 2 ? 1.6 : 0.9, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      ctx.restore()
+
+      drawPortal(time, portalX, portalY, unit, formation, fade, exitP)
+      drawTrail(exitP, fade)
+      drawSplash(fade)
+      drawWhale(time, whaleX, whaleY, rotation, unit, formation, hover, fade, exitP)
+
+      // Small technical rings under the portal to echo the supplied references without overtaking the Earth.
+      ctx.save()
+      ctx.translate(portalX, portalY + unit * 0.43)
+      ctx.globalAlpha = formation * fade
+      for (let i = 0; i < 4; i++) {
+        ctx.beginPath()
+        ctx.arc(0, 0, unit * (0.055 + i * 0.025), 0, Math.PI * 2)
+        ctx.strokeStyle = `rgba(255,255,255,${0.18 - i * 0.028})`
+        ctx.lineWidth = 0.55
+        ctx.stroke()
+      }
+      ctx.beginPath()
+      ctx.fillStyle = 'rgba(255,255,255,.72)'
+      ctx.arc(0, 0, 1.8, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.restore()
 
       raf = requestAnimationFrame(frame)
     }
 
-    entry.addEventListener('pointermove', onPointerMove, true)
+    entry.addEventListener('pointermove', onPointerMove, { passive: true })
     entry.addEventListener('pointerup', onPointerUp, true)
     entry.addEventListener('keydown', onKeydown, true)
     window.addEventListener('resize', resize, { passive: true })
-
     resize()
     raf = requestAnimationFrame(frame)
   }
