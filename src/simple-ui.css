@@ -1,88 +1,99 @@
-/* Minimal tool-first interface: black + green surfaces, white text, almost no decoration. */
+/* Award-polish utility interface: black/green surfaces, white type, restrained motion. */
 :root{
   --paper:#020302!important;
-  --panel:#071109!important;
-  --canvas:#071109!important;
+  --panel:#061108!important;
+  --canvas:#061108!important;
   --ink:#ffffff!important;
   --muted:#ffffff!important;
-  --line:#1c5a29!important;
+  --line:#174c22!important;
   --acid:#b7ff2a!important;
   --green:#63ff7c!important;
   --blue:#63ff7c!important;
 }
-*{box-shadow:none!important}
-html,body,.shell,main,.tool,.dropzone,.drop-main,.workspace,.workspace-main,.inspector{background:#020302!important;color:#fff!important}
-body{background-image:none!important}
-.shell{width:100%!important;max-width:none!important;border:0!important;min-height:100vh!important}
+html{background:#020302!important}
+body{background:#020302!important;background-image:none!important;color:#fff!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.shell{width:100%!important;max-width:none!important;border:0!important;min-height:100vh!important;background:#020302!important;color:#fff!important}
 .shell,.shell button,.shell input,.shell select,.shell option,.shell label,.shell span,.shell small,.shell strong,.shell b,.shell p,.shell h1,.shell h2,.shell h3,.shell output{color:#fff!important}
+button,input,select{font:inherit}
+button{transition:background-color .22s ease,border-color .22s ease,transform .22s cubic-bezier(.22,1,.36,1),opacity .22s ease!important}
+button:active{transform:translateY(1px)!important}
 
-/* Header: one quiet bar only. */
-header{position:sticky!important;top:0!important;z-index:60!important;background:#020302!important;border-bottom:1px solid #12361a!important;backdrop-filter:none!important}
-.topbar{height:52px!important;grid-template-columns:1fr auto!important}
-.top-cell{padding:0 18px!important;border:0!important}
+/* Header: precise, quiet and persistent. */
+header{position:sticky!important;top:0!important;z-index:60!important;background:rgba(2,3,2,.96)!important;border-bottom:1px solid #12361a!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important}
+.topbar{height:54px!important;grid-template-columns:1fr auto!important}
+.top-cell{padding:0 20px!important;border:0!important}
 .header-note{display:none!important}
-.brand{font-size:15px!important;letter-spacing:-.3px!important;color:#fff!important}
-.brand small{font-size:8px!important;color:#fff!important;opacity:.62!important}
-.lang{border:1px solid #1c5a29!important;background:#020302!important}
-.lang button{padding:6px 8px!important;background:#020302!important;color:#fff!important;border:0!important}
-.lang button.active{background:#0d2b14!important;color:#fff!important}
+.brand{font-size:15px!important;letter-spacing:-.3px!important;color:#fff!important;font-weight:800!important}
+.brand small{font-size:8px!important;color:#fff!important;opacity:.52!important;letter-spacing:.08em!important}
+.lang{border:1px solid #174c22!important;background:#020302!important;padding:2px!important}
+.lang button{padding:5px 8px!important;background:transparent!important;color:#fff!important;border:0!important;opacity:.62!important}
+.lang button:hover{opacity:1!important}
+.lang button.active{background:#0d2b14!important;color:#fff!important;opacity:1!important}
 
 /* Remove marketing / decorative sections from the utility view. */
 .intro,.after-tool,footer{display:none!important}
-.tool{border:0!important}
+.tool{border:0!important;background:#020302!important}
 .tool-head{display:none!important}
 
-/* Main menu: just title, explanation, actions. */
-.dropzone{min-height:calc(100vh - 52px)!important;display:grid!important;grid-template-columns:1fr!important;background:#020302!important}
-.drop-main{border:0!important;padding:44px 24px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+/* Main menu: one decision, one clear action cluster. */
+.dropzone{position:relative;min-height:calc(100vh - 54px)!important;display:grid!important;grid-template-columns:1fr!important;background:#020302!important;overflow:hidden}
+.dropzone:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 42%,rgba(183,255,42,.035),transparent 32%),linear-gradient(180deg,rgba(183,255,42,.012),transparent 28%)}
+.dropzone:after{content:"";position:absolute;left:50%;top:12%;bottom:12%;width:1px;pointer-events:none;background:linear-gradient(transparent,rgba(183,255,42,.05) 30%,rgba(183,255,42,.05) 70%,transparent)}
+.drop-main{position:relative;z-index:1;border:0!important;padding:52px 24px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:transparent!important}
 .drop-specs{display:none!important}
-.drop-content{width:min(640px,100%)!important;text-align:center!important}
+.drop-content{width:min(650px,100%)!important;text-align:center!important}
 .drop-mark{display:none!important}
-.drop-content h2{margin:0 0 16px!important;font-size:clamp(42px,6vw,72px)!important;line-height:.94!important;letter-spacing:-3px!important;font-weight:900!important;color:#fff!important}
-.drop-content p{max-width:560px!important;margin:0 auto 22px!important;font-size:10px!important;line-height:1.8!important;color:#fff!important;opacity:.68!important}
+.drop-content h2{margin:0 0 18px!important;font-size:clamp(40px,5.4vw,68px)!important;line-height:.95!important;letter-spacing:-2.8px!important;font-weight:850!important;color:#fff!important;text-wrap:balance}
+.drop-content p{max-width:560px!important;margin:0 auto 24px!important;font-size:10px!important;line-height:1.78!important;color:#fff!important;opacity:.62!important;letter-spacing:.01em!important}
 .drop-actions{display:flex!important;justify-content:center!important;gap:8px!important;flex-wrap:wrap!important;margin-top:0!important}
-.primary,.secondary,.ghost,.batch-launch{min-height:40px!important;padding:10px 14px!important;border:1px solid #1c5a29!important;background:#020302!important;color:#fff!important;font-weight:700!important;border-radius:0!important}
-.primary{background:#0d2b14!important;border-color:#3f9b4e!important}
-.primary:hover,.secondary:hover,.ghost:hover,.batch-launch:hover{background:#12391a!important;border-color:#b7ff2a!important;color:#fff!important}
+.primary,.secondary,.ghost,.batch-launch{min-height:42px!important;padding:10px 15px!important;border:1px solid #174c22!important;background:#020302!important;color:#fff!important;font-weight:700!important;border-radius:0!important;letter-spacing:.015em!important}
+.primary{background:#0c2812!important;border-color:#367f42!important}
+.primary:hover,.secondary:hover,.ghost:hover,.batch-launch:hover{background:#103418!important;border-color:#b7ff2a!important;color:#fff!important;transform:translateY(-1px)!important}
 .batch-feature-note{display:none!important}
 .drop-error{color:#fff!important;opacity:.82!important}
 
-/* Workspace stays functional but visually restrained. */
-.workspace{min-height:calc(100vh - 52px)!important;grid-template-columns:minmax(0,1fr) 292px!important;background:#020302!important}
-.workspace-main{border-right:1px solid #12361a!important}
-.work-head,.viewer-bar,.inspector-head,.panel,.info-grid,.shortcut-card{background:#071109!important;border-color:#1c5a29!important}
-.work-head{height:46px!important;padding:0 12px!important}.stage{min-height:calc(100vh - 144px)!important;background:#071109!important}
-.viewer-bar{min-height:46px!important;padding:7px 9px!important}.viewer-group button{padding:6px 8px!important}.compare-range{min-width:190px!important}.compare-range input{width:118px!important}
-.inspector{background:#020302!important}.inspector-head{height:46px!important;padding:0 12px!important}.panel{padding:12px!important}.panel-title{margin-bottom:8px!important}.inspector-foot{display:none!important}
-.info-grid div{padding:8px!important;border-color:#1c5a29!important}.action-stack{gap:6px!important}.copy-btn,.download-btn{padding:11px!important}
-.brand small,.file-meta span,.panel-title span,.slider-row label,.check-row,.select-row label,.info-grid small,.action-msg,.compare-range label,.compare-range output,.processing p,.error-overlay p,.progress-meta,.pro-note,.crop-state{color:#fff!important;opacity:.72!important}
+/* Workspace: professional editor density with strong visual hierarchy. */
+.workspace{min-height:calc(100vh - 54px)!important;grid-template-columns:minmax(0,1fr) 300px!important;background:#020302!important}
+.workspace-main{border-right:1px solid #12361a!important;background:#020302!important}
+.work-head,.viewer-bar,.inspector-head,.panel,.info-grid,.shortcut-card{background:#061108!important;border-color:#174c22!important}
+.work-head{height:46px!important;padding:0 13px!important}
+.stage{min-height:calc(100vh - 146px)!important;background:#061108!important}
+.viewer-bar{min-height:46px!important;padding:7px 9px!important;gap:7px!important}
+.viewer-group button{padding:6px 8px!important}
+.compare-range{min-width:190px!important}.compare-range input{width:118px!important}
+.inspector{background:#020302!important}
+.inspector-head{height:46px!important;padding:0 13px!important;border-color:#174c22!important}
+.panel{padding:13px!important}.panel-title{margin-bottom:9px!important}.inspector-foot{display:none!important}
+.info-grid div{padding:8px!important;border-color:#174c22!important}.action-stack{gap:7px!important}.copy-btn,.download-btn{padding:11px!important}
+.brand small,.file-meta span,.panel-title span,.slider-row label,.check-row,.select-row label,.info-grid small,.action-msg,.compare-range label,.compare-range output,.processing p,.error-overlay p,.progress-meta,.pro-note,.crop-state{color:#fff!important;opacity:.68!important}
 
-.tiny-btn,.head-btn,.viewer-group button,.segmented button,.ghost,.secondary,.select-row select,.lang button,.shortcut-list kbd,.pro-mode-buttons button,.crop-actions button{background:#020302!important;color:#fff!important;border-color:#1c5a29!important}
+.tiny-btn,.head-btn,.viewer-group button,.segmented button,.ghost,.secondary,.select-row select,.lang button,.shortcut-list kbd,.pro-mode-buttons button,.crop-actions button{background:#020302!important;color:#fff!important;border-color:#174c22!important}
 .tiny-btn:hover,.head-btn:hover,.viewer-group button:hover,.viewer-group button.active,.segmented button:hover,.segmented button.active,.ghost:hover,.secondary:hover,.pro-mode-buttons button.active,.crop-actions button.primary-crop{background:#0d2b14!important;color:#fff!important;border-color:#b7ff2a!important}
-.primary,.copy-btn,.download-btn,.crop-first-on{background:#0d2b14!important;color:#fff!important;border-color:#3f9b4e!important}
-.primary:hover,.copy-btn:hover,.download-btn:hover{background:#12391a!important;color:#fff!important;border-color:#b7ff2a!important}
+.primary,.copy-btn,.download-btn,.crop-first-on{background:#0c2812!important;color:#fff!important;border-color:#367f42!important}
+.primary:hover,.copy-btn:hover,.download-btn:hover{background:#103418!important;color:#fff!important;border-color:#b7ff2a!important}
 
-/* Keep only necessary functional graphics. */
-.stage{background:#071109!important}
-.checker{background-color:#020302!important;background-image:linear-gradient(45deg,#0b2411 25%,transparent 25%),linear-gradient(-45deg,#0b2411 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#0b2411 75%),linear-gradient(-45deg,transparent 75%,#0b2411 75%)!important}
-.tag{background:#071109!important;color:#fff!important;border-color:#1c5a29!important}
+/* Necessary functional graphics only. */
+.checker{background-color:#020302!important;background-image:linear-gradient(45deg,#0a2110 25%,transparent 25%),linear-gradient(-45deg,#0a2110 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#0a2110 75%),linear-gradient(-45deg,transparent 75%,#0a2110 75%)!important}
+.tag{background:#061108!important;color:#fff!important;border-color:#174c22!important}
 .divider{background:#b7ff2a!important}.divider:after{background:#0d2b14!important;color:#fff!important;border-color:#b7ff2a!important}
-.processing,.error-overlay{background:rgba(2,3,2,.97)!important;color:#fff!important;backdrop-filter:none!important}.progress{border-color:#1c5a29!important}.progress i{background:#b7ff2a!important}
+.processing,.error-overlay{background:rgba(2,3,2,.97)!important;color:#fff!important;backdrop-filter:blur(8px)!important}.progress{border-color:#174c22!important}.progress i{background:#b7ff2a!important}
 .compare-range input,.slider-row input,.check-row input{accent-color:#b7ff2a!important}
-.shortcuts{background:rgba(0,0,0,.9)!important;backdrop-filter:none!important}.shortcut-card,.shortcut-head,.shortcut-list div{border-color:#1c5a29!important}.shortcut-head button,.shortcut-list kbd{color:#fff!important}
-.mobile-bar{background:#020302!important;border-color:#1c5a29!important}.mobile-bar button{color:#fff!important}
+.shortcuts{background:rgba(0,0,0,.9)!important;backdrop-filter:blur(10px)!important}.shortcut-card,.shortcut-head,.shortcut-list div{border-color:#174c22!important}.shortcut-head button,.shortcut-list kbd{color:#fff!important}
+.mobile-bar{background:#020302!important;border-color:#174c22!important}.mobile-bar button{color:#fff!important}
 
 /* Product / crop / refine surfaces use the same restrained palette. */
-.pro-mode-panel,.crop-top,.crop-bottom{background:#071109!important;color:#fff!important;border-color:#1c5a29!important}
+.pro-mode-panel,.crop-top,.crop-bottom{background:#061108!important;color:#fff!important;border-color:#174c22!important}
 .crop-modal{background:#020302!important;color:#fff!important}.crop-top span,.crop-dims{color:#fff!important}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid #b7ff2a!important;outline-offset:2px!important}
+.refine-modal,.batch-workspace{background:#020302!important;color:#fff!important}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid #b7ff2a!important;outline-offset:3px!important}
 ::selection{background:#12391a!important;color:#fff!important}
 
 @media(max-width:980px){
   .workspace{grid-template-columns:1fr!important}.workspace-main{border-right:0!important}.stage{min-height:58vh!important}.inspector{border-top:1px solid #12361a!important}
 }
 @media(max-width:700px){
-  .topbar{height:48px!important}.top-cell{padding:0 12px!important}.brand small{display:none!important}
-  .dropzone{min-height:calc(100vh - 48px)!important}.drop-main{padding:30px 16px!important}.drop-content h2{font-size:44px!important;letter-spacing:-2px!important}.drop-content p{font-size:9px!important;line-height:1.7!important}.drop-actions{display:grid!important;grid-template-columns:1fr!important;width:min(320px,100%)!important;margin-inline:auto!important}.primary,.ghost,.batch-launch{width:100%!important}
-  .workspace{min-height:calc(100vh - 48px)!important}.stage{min-height:52vh!important}.viewer-bar{padding:6px!important}.inspector-head{height:42px!important}.panel{padding:11px!important}
+  .topbar{height:50px!important}.top-cell{padding:0 13px!important}.brand small{display:none!important}
+  .dropzone{min-height:calc(100vh - 50px)!important}.dropzone:after{display:none}.drop-main{padding:34px 16px!important}.drop-content h2{font-size:42px!important;letter-spacing:-1.9px!important}.drop-content p{font-size:9px!important;line-height:1.72!important}.drop-actions{display:grid!important;grid-template-columns:1fr!important;width:min(320px,100%)!important;margin-inline:auto!important}.primary,.ghost,.batch-launch{width:100%!important}
+  .workspace{min-height:calc(100vh - 50px)!important}.stage{min-height:52vh!important}.viewer-bar{padding:6px!important}.inspector-head{height:42px!important}.panel{padding:11px!important}
 }
+@media(prefers-reduced-motion:reduce){button{transition:none!important}}
