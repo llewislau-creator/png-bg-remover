@@ -5,34 +5,42 @@ if (entry && !document.getElementById('png-cutout-system-style')) {
   if (globeCanvas) {
     const mobile = window.matchMedia('(max-width: 700px)').matches
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const minZoom = mobile ? 0.82 : 0.72
-    const maxZoom = mobile ? 1.30 : 1.48
-    const systemStartedAt = performance.now()
+    const minZoom = mobile ? 0.84 : 0.74
+    const maxZoom = mobile ? 1.28 : 1.44
+    const startedAt = performance.now()
+    const ACID_RGB = '183,255,42'
 
     const style = document.createElement('style')
     style.id = 'png-cutout-system-style'
     style.textContent = `
-      #png-cutout-entry .globe-canvas{transform-origin:50% 46.5%;will-change:transform}
+      #png-cutout-entry .globe-canvas{transform-origin:50% 46.5%;will-change:transform;backface-visibility:hidden}
       #png-cutout-entry .entry-system-layer{position:absolute;inset:0;z-index:8;overflow:hidden;pointer-events:none;font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
-      #png-cutout-entry .system-sun{position:absolute;left:84%;top:18%;width:118px;height:118px;transform:translate(-50%,-50%);opacity:0;transition:opacity 1.8s ease;will-change:left,top,transform}
-      #png-cutout-entry.is-ready .system-sun{opacity:1}
-      #png-cutout-entry .system-sun-core{position:absolute;inset:25%;border-radius:50%;background:rgba(255,255,255,.075);border:1px solid rgba(201,255,57,.10);box-shadow:0 0 28px rgba(201,255,57,.05),0 0 90px rgba(201,255,57,.035)}
-      #png-cutout-entry .system-sun:before{content:"";position:absolute;inset:-72%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.07) 0,rgba(201,255,57,.03) 19%,rgba(201,255,57,.009) 43%,transparent 70%)}
-      #png-cutout-entry .system-sun span,#png-cutout-entry .system-moon span{position:absolute;color:rgba(255,255,255,.58);font-size:7px;letter-spacing:.12em;white-space:nowrap;text-transform:uppercase}
-      #png-cutout-entry .system-sun span{left:86%;top:50%;transform:translateY(-50%)}
-      #png-cutout-entry .system-moon-orbit{position:absolute;left:50%;top:46.5%;width:600px;height:250px;border:1px solid rgba(255,255,255,.085);border-radius:50%;transform:translate(-50%,-50%) rotate(2deg);opacity:0;transition:opacity 1.8s ease .55s;will-change:left,top,width,height,transform;box-shadow:inset 0 0 34px rgba(201,255,57,.012)}
+      #png-cutout-entry .system-sun{position:absolute;left:84%;top:17%;width:122px;height:122px;transform:translate(-50%,-50%);opacity:0;transition:opacity 2.2s cubic-bezier(.22,1,.36,1);will-change:left,top,transform,opacity}
+      #png-cutout-entry.is-ready .system-sun{opacity:.82}
+      #png-cutout-entry .system-sun:before,#png-cutout-entry .system-sun:after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+      #png-cutout-entry .system-sun:before{inset:-88%;background:radial-gradient(circle,rgba(255,255,255,.055) 0,rgba(${ACID_RGB},.022) 18%,rgba(${ACID_RGB},.006) 42%,transparent 69%)}
+      #png-cutout-entry .system-sun:after{inset:12%;border:1px solid rgba(255,255,255,.055);box-shadow:0 0 0 12px rgba(255,255,255,.012),0 0 0 26px rgba(${ACID_RGB},.008)}
+      #png-cutout-entry .system-sun-core{position:absolute;inset:34%;border-radius:50%;background:radial-gradient(circle at 38% 35%,rgba(255,255,255,.24),rgba(255,255,255,.055) 34%,rgba(255,255,255,.018) 68%,transparent 72%);border:1px solid rgba(${ACID_RGB},.12);box-shadow:0 0 28px rgba(${ACID_RGB},.045)}
+      #png-cutout-entry .system-sun span,#png-cutout-entry .system-moon span{position:absolute;color:rgba(255,255,255,.48);font-size:7px;letter-spacing:.15em;white-space:nowrap;text-transform:uppercase}
+      #png-cutout-entry .system-sun span{left:78%;top:50%;transform:translateY(-50%)}
+      #png-cutout-entry .system-moon-orbit{position:absolute;left:50%;top:46.5%;width:600px;height:250px;border:1px solid rgba(255,255,255,.055);border-radius:50%;transform:translate(-50%,-50%) rotate(2deg);opacity:0;transition:opacity 2s ease .45s;will-change:left,top,width,height,transform;box-shadow:inset 0 0 30px rgba(${ACID_RGB},.006)}
       #png-cutout-entry.is-ready .system-moon-orbit{opacity:1}
-      #png-cutout-entry .system-moon{position:absolute;left:68%;top:42%;width:30px;height:30px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 34% 31%,rgba(255,255,255,.98) 0 8%,rgba(224,232,226,.92) 10% 42%,rgba(151,164,155,.88) 78%,rgba(83,94,86,.92) 100%);border:1px solid rgba(201,255,57,.34);box-shadow:0 0 0 1px rgba(255,255,255,.09),0 0 24px rgba(255,255,255,.16),0 0 46px rgba(201,255,57,.08);opacity:0;transition:opacity 1.4s ease .75s;will-change:left,top,width,height;z-index:3}
+      #png-cutout-entry .system-moon{position:absolute;left:68%;top:42%;width:30px;height:30px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 32% 30%,rgba(255,255,255,.96) 0 8%,rgba(221,229,223,.86) 10% 40%,rgba(127,139,131,.72) 76%,rgba(55,66,58,.86) 100%);border:1px solid rgba(255,255,255,.22);box-shadow:0 0 0 1px rgba(${ACID_RGB},.06),0 0 22px rgba(255,255,255,.08);opacity:0;transition:opacity 1.8s ease .65s;will-change:left,top,width,height,opacity;z-index:3}
       #png-cutout-entry.is-ready .system-moon{opacity:1}
-      #png-cutout-entry .system-moon:before,#png-cutout-entry .system-moon:after{content:"";position:absolute;border-radius:50%;background:rgba(31,41,34,.34);box-shadow:inset 0 0 2px rgba(255,255,255,.12)}
-      #png-cutout-entry .system-moon:before{width:28%;height:28%;left:18%;top:22%}
-      #png-cutout-entry .system-moon:after{width:18%;height:18%;right:17%;bottom:18%;opacity:.82}
-      #png-cutout-entry .system-moon span{left:145%;top:50%;transform:translateY(-50%);text-shadow:0 0 12px rgba(0,0,0,.8)}
-      #png-cutout-entry .system-moon-guide{position:absolute;width:42px;height:1px;background:linear-gradient(90deg,rgba(201,255,57,.48),rgba(201,255,57,0));transform-origin:left center;opacity:.7}
-      #png-cutout-entry .system-zoom-hint{position:absolute;right:28px;bottom:26px;display:grid;gap:4px;text-align:right;color:rgba(255,255,255,.42);font-size:7px;line-height:1.4;letter-spacing:.11em;text-transform:uppercase;opacity:0;transition:opacity 1.4s ease 1.2s}
+      #png-cutout-entry .system-moon:before,#png-cutout-entry .system-moon:after{content:"";position:absolute;border-radius:50%;background:rgba(20,28,22,.31);box-shadow:inset 0 0 2px rgba(255,255,255,.10)}
+      #png-cutout-entry .system-moon:before{width:27%;height:27%;left:18%;top:22%}
+      #png-cutout-entry .system-moon:after{width:17%;height:17%;right:18%;bottom:18%;opacity:.82}
+      #png-cutout-entry .system-moon span{left:150%;top:50%;transform:translateY(-50%);text-shadow:0 0 12px rgba(0,0,0,.9)}
+      #png-cutout-entry .system-zoom-hint{position:absolute;right:28px;bottom:26px;display:grid;gap:5px;text-align:right;color:rgba(255,255,255,.30);font-size:7px;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;opacity:0;transition:opacity 1.6s ease 1.3s}
       #png-cutout-entry.is-ready .system-zoom-hint{opacity:1}
-      #png-cutout-entry .system-zoom-hint b{color:rgba(255,255,255,.82);font-size:8px;font-weight:500}
-      @media(max-width:700px){#png-cutout-entry .system-sun{width:78px;height:78px;left:82%;top:20%}#png-cutout-entry .system-zoom-hint{right:14px;bottom:14px}#png-cutout-entry .system-moon{width:22px;height:22px}#png-cutout-entry .system-moon span,#png-cutout-entry .system-sun span{display:none}}
+      #png-cutout-entry .system-zoom-hint b{position:relative;color:rgba(255,255,255,.74);font-size:8px;font-weight:500;letter-spacing:.18em}
+      #png-cutout-entry .system-zoom-hint b:before{content:"";display:inline-block;width:18px;height:1px;margin:0 8px 2px 0;background:rgba(${ACID_RGB},.45)}
+      @media(max-width:700px){
+        #png-cutout-entry .system-sun{width:82px;height:82px;left:82%;top:18%}
+        #png-cutout-entry .system-zoom-hint{right:14px;bottom:14px}
+        #png-cutout-entry .system-moon{width:23px;height:23px}
+        #png-cutout-entry .system-moon span,#png-cutout-entry .system-sun span{display:none}
+      }
       @media(prefers-reduced-motion:reduce){#png-cutout-entry .system-sun,#png-cutout-entry .system-moon,#png-cutout-entry .system-moon-orbit{transition:opacity .3s linear}}
     `
     document.head.appendChild(style)
@@ -41,10 +49,10 @@ if (entry && !document.getElementById('png-cutout-system-style')) {
     layer.className = 'entry-system-layer'
     layer.setAttribute('aria-hidden', 'true')
     layer.innerHTML = `
-      <div class="system-sun"><i class="system-sun-core"></i><span>SUN</span></div>
+      <div class="system-sun"><i class="system-sun-core"></i><span>SUN / DISTANT</span></div>
       <div class="system-moon-orbit"></div>
-      <div class="system-moon"><span>MOON</span></div>
-      <div class="system-zoom-hint"><b>100%</b><span>${mobile ? 'PINCH TO ZOOM' : 'SCROLL TO ZOOM · +/-'}</span></div>
+      <div class="system-moon"><span>MOON / 01</span></div>
+      <div class="system-zoom-hint"><b>100%</b><span>${mobile ? 'PINCH · MOVE FIELD' : 'SCROLL · MOVE FIELD'}</span></div>
     `
     const ui = entry.querySelector('.entry-ui')
     entry.insertBefore(layer, ui || null)
@@ -55,8 +63,8 @@ if (entry && !document.getElementById('png-cutout-system-style')) {
     const zoomLabel = layer.querySelector('.system-zoom-hint b')
     const enterCopy = entry.querySelector('.entry-enter span')
     const topMeta = entry.querySelector('.entry-top-meta')
-    if (enterCopy) enterCopy.textContent = mobile ? 'MOVE · PINCH · ENTER THE TOOL' : 'MOVE THE SYSTEM · SCROLL TO ZOOM · ENTER'
-    if (topMeta) topMeta.textContent = 'EARTH / MOON / SUN · 07 CONTINENTS'
+    if (enterCopy) enterCopy.textContent = mobile ? 'MOVE · PINCH · ENTER THE FIELD' : 'MOVE · SCROLL · ENTER THE FIELD'
+    if (topMeta) topMeta.textContent = 'EARTH FIELD · LUNAR ORBIT · SOLAR VECTOR'
 
     let width = Math.max(1, window.innerWidth)
     let height = Math.max(1, window.innerHeight)
@@ -73,6 +81,20 @@ if (entry && !document.getElementById('png-cutout-system-style')) {
     let pinchStartZoom = 1
 
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+
+    entry.__cosmicState = {
+      earthX: width * .5,
+      earthY: height * .325,
+      earthRadius: 1,
+      zoom: 1,
+      nx: 0,
+      ny: 0,
+      moonX: width * .68,
+      moonY: height * .36,
+      sunX: width * .84,
+      sunY: height * .17,
+      time: startedAt,
+    }
 
     function pointerDistance() {
       const p = [...pointers.values()]
@@ -123,7 +145,7 @@ if (entry && !document.getElementById('png-cutout-system-style')) {
     function onWheel(event) {
       if (!entry.isConnected) return
       event.preventDefault()
-      const sensitivity = event.ctrlKey ? 0.0017 : 0.0009
+      const sensitivity = event.ctrlKey ? 0.00155 : 0.00082
       targetZoom = clamp(targetZoom - event.deltaY * sensitivity, minZoom, maxZoom)
       setPointer(event.clientX, event.clientY)
     }
@@ -132,11 +154,11 @@ if (entry && !document.getElementById('png-cutout-system-style')) {
       if (event.key === '+' || event.key === '=') {
         event.preventDefault()
         event.stopImmediatePropagation()
-        targetZoom = clamp(targetZoom + 0.08, minZoom, maxZoom)
+        targetZoom = clamp(targetZoom + 0.075, minZoom, maxZoom)
       } else if (event.key === '-' || event.key === '_') {
         event.preventDefault()
         event.stopImmediatePropagation()
-        targetZoom = clamp(targetZoom - 0.08, minZoom, maxZoom)
+        targetZoom = clamp(targetZoom - 0.075, minZoom, maxZoom)
       } else if (event.key === '0') {
         event.preventDefault()
         event.stopImmediatePropagation()
@@ -153,47 +175,53 @@ if (entry && !document.getElementById('png-cutout-system-style')) {
       if (!entry.isConnected) {
         cancelAnimationFrame(raf)
         window.removeEventListener('resize', onResize)
+        delete entry.__cosmicState
         style.remove()
         return
       }
 
-      const response = reduceMotion ? 0.035 : 0.075
+      const response = reduceMotion ? 0.028 : 0.062
       nx += (targetNx - nx) * response
       ny += (targetNy - ny) * response
-      zoom += (targetZoom - zoom) * (reduceMotion ? 0.08 : 0.11)
+      zoom += (targetZoom - zoom) * (reduceMotion ? 0.075 : 0.095)
 
       const earthShiftY = -height * (mobile ? 0.10 : 0.14)
       globeCanvas.style.transform = `translate3d(0,${earthShiftY.toFixed(2)}px,0) scale(${zoom.toFixed(4)})`
       zoomLabel.textContent = `${Math.round(zoom * 100)}%`
 
       const earthRadius = Math.min(width, height) * (mobile ? 0.235 : width < 1200 ? 0.25 : 0.268) * zoom
-      const earthX = width * 0.5 + nx * (mobile ? 7 : 15)
-      const earthY = height * 0.465 + earthShiftY + ny * (mobile ? 5 : 10)
+      const earthX = width * 0.5 + nx * (mobile ? 6 : 13)
+      const earthY = height * 0.465 + earthShiftY + ny * (mobile ? 4 : 8)
 
-      const elapsed = Math.max(0, time - systemStartedAt)
-      const moonAngle = reduceMotion ? -0.58 : -0.58 + elapsed * 0.000026
+      const elapsed = Math.max(0, time - startedAt)
+      const moonAngle = reduceMotion ? -0.58 : -0.58 + elapsed * 0.000020
       const moonOrbitRadius = earthRadius * (mobile ? 1.34 : 1.43)
-      const moonX = earthX + Math.cos(moonAngle) * moonOrbitRadius + nx * (mobile ? 2 : 7)
-      const moonY = earthY + Math.sin(moonAngle) * moonOrbitRadius * 0.50 + ny * (mobile ? 2 : 5)
-      const moonSize = Math.max(mobile ? 22 : 28, earthRadius * (mobile ? 0.082 : 0.092))
+      const moonX = earthX + Math.cos(moonAngle) * moonOrbitRadius + nx * (mobile ? 2 : 5)
+      const moonY = earthY + Math.sin(moonAngle) * moonOrbitRadius * 0.50 + ny * (mobile ? 2 : 4)
+      const moonSize = Math.max(mobile ? 23 : 28, earthRadius * (mobile ? 0.082 : 0.091))
       moon.style.left = `${moonX}px`
       moon.style.top = `${moonY}px`
       moon.style.width = `${moonSize}px`
       moon.style.height = `${moonSize}px`
-      moon.style.opacity = `${0.90 + (Math.sin(moonAngle) + 1) * 0.04}`
+      moon.style.opacity = `${0.88 + (Math.sin(moonAngle) + 1) * 0.04}`
 
       moonOrbit.style.left = `${earthX}px`
       moonOrbit.style.top = `${earthY}px`
       moonOrbit.style.width = `${moonOrbitRadius * 2}px`
       moonOrbit.style.height = `${moonOrbitRadius}px`
-      moonOrbit.style.transform = `translate(-50%,-50%) rotate(${2 + nx * 1.8}deg)`
+      moonOrbit.style.transform = `translate(-50%,-50%) rotate(${1.8 + nx * 1.35}deg)`
 
-      const sunX = width * (mobile ? 0.82 : 0.84) + nx * (mobile ? 4 : 10) + (earthX - width * 0.5) * 0.16
-      const sunY = height * (mobile ? 0.20 : 0.18) + ny * (mobile ? 3 : 7) + (earthY - (height * 0.465 + earthShiftY)) * 0.14
-      const sunScale = 1 + (zoom - 1) * 0.05
+      const sunX = width * (mobile ? 0.82 : 0.84) + nx * (mobile ? 3 : 7) + (earthX - width * 0.5) * 0.11
+      const sunY = height * (mobile ? 0.18 : 0.17) + ny * (mobile ? 2 : 4)
+      const sunScale = 1 + (zoom - 1) * 0.035
       sun.style.left = `${sunX}px`
       sun.style.top = `${sunY}px`
       sun.style.transform = `translate(-50%,-50%) scale(${sunScale.toFixed(3)})`
+
+      Object.assign(entry.__cosmicState, {
+        earthX, earthY, earthRadius, zoom, nx, ny,
+        moonX, moonY, sunX, sunY, time,
+      })
 
       raf = requestAnimationFrame(frame)
     }
