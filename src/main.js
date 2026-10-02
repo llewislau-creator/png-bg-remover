@@ -1,4 +1,5 @@
 import './theme.css'
+import './simple-ui.css'
 import './intro.js'
 import './app-v6.js'
 import './batch-refine.js'
