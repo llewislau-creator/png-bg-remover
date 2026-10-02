@@ -1,7 +1,7 @@
 {
   "name": "png-bg-remover",
   "private": true,
-  "version": "4.0.0",
+  "version": "4.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@bg0/browser": "0.1.2"
+    "@bg0/browser": "0.1.1"
   },
   "devDependencies": {
     "vite": "7.1.7"
