@@ -1,2 +1,2 @@
 import './intro.js'
-import './app.js'
+import './app-v6.js'
