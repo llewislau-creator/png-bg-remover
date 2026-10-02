@@ -162,12 +162,13 @@ if (entry && !document.getElementById('png-cutout-system-style')) {
       ny += (targetNy - ny) * response
       zoom += (targetZoom - zoom) * (reduceMotion ? 0.08 : 0.11)
 
-      globeCanvas.style.transform = `scale(${zoom.toFixed(4)})`
+      const earthShiftY = -height * (mobile ? 0.10 : 0.14)
+      globeCanvas.style.transform = `translate3d(0,${earthShiftY.toFixed(2)}px,0) scale(${zoom.toFixed(4)})`
       zoomLabel.textContent = `${Math.round(zoom * 100)}%`
 
       const earthRadius = Math.min(width, height) * (mobile ? 0.235 : width < 1200 ? 0.25 : 0.268) * zoom
       const earthX = width * 0.5 + nx * (mobile ? 7 : 15)
-      const earthY = height * 0.465 + ny * (mobile ? 5 : 10)
+      const earthY = height * 0.465 + earthShiftY + ny * (mobile ? 5 : 10)
 
       const elapsed = Math.max(0, time - systemStartedAt)
       const moonAngle = reduceMotion ? -0.58 : -0.58 + elapsed * 0.000026
@@ -188,7 +189,7 @@ if (entry && !document.getElementById('png-cutout-system-style')) {
       moonOrbit.style.transform = `translate(-50%,-50%) rotate(${2 + nx * 1.8}deg)`
 
       const sunX = width * (mobile ? 0.82 : 0.84) + nx * (mobile ? 4 : 10) + (earthX - width * 0.5) * 0.16
-      const sunY = height * (mobile ? 0.20 : 0.18) + ny * (mobile ? 3 : 7) + (earthY - height * 0.465) * 0.14
+      const sunY = height * (mobile ? 0.20 : 0.18) + ny * (mobile ? 3 : 7) + (earthY - (height * 0.465 + earthShiftY)) * 0.14
       const sunScale = 1 + (zoom - 1) * 0.05
       sun.style.left = `${sunX}px`
       sun.style.top = `${sunY}px`
