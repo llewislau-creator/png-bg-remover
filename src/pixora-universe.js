@@ -1,130 +1,38 @@
-const shell = document.querySelector('.shell');
-
-if (!document.getElementById('pixora-universe-home')) {
-  const style = document.createElement('style');
-  style.id = 'pixora-universe-home-style';
-  style.textContent = `
-    html.pxu-open,body.pxu-open{overflow:hidden;background:#030408}
-    body.pxu-open .shell,body.pxu-open #mobileBar,body.pxu-open #shortcutModal{visibility:hidden!important}
-    #pixora-universe-home{position:fixed;inset:0;z-index:9999;overflow:hidden;background:#030408;color:#f7f7fb;font-family:Inter,Arial,"Noto Sans TC",sans-serif;isolation:isolate}
-    #pixora-universe-home *{box-sizing:border-box}
-    .pxu-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
-    .pxu-vignette{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle at 72% 46%,transparent 0 24%,rgba(3,4,8,.08) 43%,rgba(3,4,8,.54) 79%,#030408 100%)}
-    .pxu-grain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.16;background-image:radial-gradient(rgba(255,255,255,.32) .45px,transparent .45px);background-size:4px 4px;mix-blend-mode:soft-light}
-    .pxu-header{position:absolute;left:0;right:0;top:0;height:78px;z-index:6;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(22px,4vw,64px)}
-    .pxu-brand{font-weight:900;font-size:19px;letter-spacing:-.045em}.pxu-brand small{display:block;margin-top:4px;font:600 7px/1.1 "SFMono-Regular",Consolas,monospace;letter-spacing:.2em;color:rgba(255,255,255,.34)}
-    .pxu-header-right{display:flex;align-items:center;gap:18px}.pxu-signal{display:flex;align-items:center;gap:8px;font:600 7px "SFMono-Regular",Consolas,monospace;letter-spacing:.13em;color:rgba(255,255,255,.34)}.pxu-signal i{width:5px;height:5px;border-radius:50%;background:#8e82ff;box-shadow:0 0 18px #8e82ff}
-    .pxu-lang{display:flex;border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(12px)}.pxu-lang button{border:0;background:transparent;color:rgba(255,255,255,.46);padding:8px 10px;font:700 8px "SFMono-Regular",Consolas,monospace;cursor:pointer}.pxu-lang button.active{background:#f7f7fb;color:#05060a}
-    .pxu-copy{position:absolute;left:clamp(22px,5.6vw,88px);top:50%;transform:translateY(-48%);z-index:6;width:min(390px,34vw)}
-    .pxu-kicker{margin-bottom:18px;font:700 8px/1.2 "SFMono-Regular",Consolas,monospace;letter-spacing:.23em;color:#9186ff}
-    .pxu-title{margin:0;font-size:clamp(52px,7vw,108px);font-weight:820;line-height:.8;letter-spacing:-.07em;text-wrap:balance}
-    .pxu-desc{margin:24px 0 28px;max-width:340px;color:rgba(247,247,251,.52);font-size:12px;line-height:1.75}
-    .pxu-enter{display:inline-flex;align-items:center;gap:14px;border:1px solid rgba(255,255,255,.24);background:rgba(6,7,13,.34);color:white;padding:14px 16px;font:800 8px "SFMono-Regular",Consolas,monospace;letter-spacing:.16em;cursor:pointer;backdrop-filter:blur(14px);transition:.25s ease}.pxu-enter:after{content:'↗';font-size:12px}.pxu-enter:hover{border-color:#9186ff;background:rgba(126,108,255,.17);transform:translateX(3px)}
-    .pxu-side-index{position:absolute;right:clamp(20px,3vw,46px);top:50%;transform:translateY(-50%);z-index:6;display:grid;gap:10px;justify-items:center}
-    .pxu-side-index button{width:6px;height:6px;border-radius:50%;border:1px solid rgba(255,255,255,.27);background:transparent;padding:0;cursor:pointer;transition:.3s ease}.pxu-side-index button.active{height:34px;border-radius:999px;border-color:#8e82ff;background:linear-gradient(#8e82ff,#66e5ff)}
-    .pxu-footer{position:absolute;left:clamp(22px,4vw,64px);right:clamp(22px,4vw,64px);bottom:24px;z-index:6;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
-    .pxu-meta{font:600 7px/1.7 "SFMono-Regular",Consolas,monospace;letter-spacing:.12em;color:rgba(255,255,255,.26)}
-    .pxu-worldline{display:flex;align-items:center;gap:8px}.pxu-worldline span{font:700 8px "SFMono-Regular",Consolas,monospace;letter-spacing:.12em;color:rgba(255,255,255,.42)}.pxu-worldline b{font:700 8px "SFMono-Regular",Consolas,monospace;letter-spacing:.12em;color:#fff}
-    .pxu-progress{width:150px;height:1px;background:rgba(255,255,255,.15);position:relative;overflow:hidden}.pxu-progress i{display:block;height:100%;background:linear-gradient(90deg,#8e82ff,#66e5ff);transition:width .35s cubic-bezier(.22,1,.36,1)}
-    .pxu-ringlabel{position:absolute;left:50%;top:22%;z-index:3;font:600 7px "SFMono-Regular",Consolas,monospace;letter-spacing:.19em;color:rgba(255,255,255,.18);pointer-events:none}
-    @media(max-width:760px){.pxu-header{height:64px;padding:0 18px}.pxu-signal{display:none}.pxu-copy{left:18px;right:18px;top:auto;bottom:86px;transform:none;width:auto}.pxu-title{font-size:48px}.pxu-desc{margin:12px 0 16px;max-width:290px;font-size:10px}.pxu-side-index{right:16px;top:38%}.pxu-footer{left:18px;right:18px;bottom:20px}.pxu-meta{display:none}.pxu-ringlabel{display:none}}
-    @media(prefers-reduced-motion:reduce){.pxu-enter,.pxu-side-index button,.pxu-progress i{transition:none}}
-  `;
-  document.head.appendChild(style);
-
-  const worlds = [
-    {id:'cutout', zh:['去背','保留主體，移除不需要的背景。'], en:['CUTOUT','Keep the subject. Remove everything else.'], kind:'mesh', active:true},
-    {id:'refine', zh:['精修','還原、擦除並修正細節邊緣。'], en:['REFINE','Restore, erase and rebuild precise edges.'], kind:'halo'},
-    {id:'background', zh:['背景','替換透明、純色或自訂背景。'], en:['BACKGROUND','Transform the space behind your subject.'], kind:'flow'},
-    {id:'canvas', zh:['畫布','重排、縮放並適配不同版型。'], en:['CANVAS','Resize, reposition and compose for any format.'], kind:'rings'},
-    {id:'commerce', zh:['電商','快速整理乾淨一致的商品圖。'], en:['COMMERCE','Build clean product imagery for marketplaces.'], kind:'grid'},
-    {id:'batch', zh:['批次','把多張圖片放進同一處理流程。'], en:['BATCH','Move many images through one coordinated flow.'], kind:'bands'},
-    {id:'portrait', zh:['人物','處理人物背景與標準比例。'], en:['PORTRAIT','Background color and standard ratios for people.'], kind:'soft'},
-    {id:'export', zh:['匯出','輸出 PNG、JPG、WebP 與透明素材。'], en:['EXPORT','Deliver PNG, JPG and WebP without leaving the flow.'], kind:'burst'}
-  ];
-
-  const home = document.createElement('section');
-  home.id = 'pixora-universe-home';
-  home.innerHTML = `
-    <canvas class="pxu-canvas" aria-hidden="true"></canvas>
-    <div class="pxu-vignette" aria-hidden="true"></div><div class="pxu-grain" aria-hidden="true"></div>
-    <header class="pxu-header"><div class="pxu-brand">PIXORA<small>UNIVERSE / LOCAL IMAGE TOOLS</small></div><div class="pxu-header-right"><div class="pxu-signal"><i></i>LOCAL PROCESSING</div><div class="pxu-lang"><button data-lang="zh">繁中</button><button data-lang="en">EN</button></div></div></header>
-    <div class="pxu-copy"><div class="pxu-kicker"></div><h1 class="pxu-title"></h1><p class="pxu-desc"></p><button class="pxu-enter" type="button"></button></div>
-    <div class="pxu-side-index"></div><div class="pxu-ringlabel">ORBITAL TOOL SYSTEM / 08 WORLDS</div>
-    <footer class="pxu-footer"><div class="pxu-worldline"><span class="pxu-current"></span><div class="pxu-progress"><i></i></div><b class="pxu-name"></b></div><div class="pxu-meta">SCROLL / SWIPE TO NAVIGATE<br>SELECT A WORLD TO ENTER</div></footer>
-  `;
-  document.body.appendChild(home);
-  document.documentElement.classList.add('pxu-open');
-  document.body.classList.add('pxu-open');
-
-  let lang = 'zh';
-  try { lang = localStorage.getItem('pixora-lang') || (navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en'); } catch {}
-  let active = 0;
-  let targetActive = 0;
-  let wheelLock = 0;
-
-  const side = home.querySelector('.pxu-side-index');
-  worlds.forEach((world,i)=>{const b=document.createElement('button');b.type='button';b.title=world.en[0];b.setAttribute('aria-label',world.en[0]);b.onclick=()=>selectWorld(i);side.appendChild(b)});
-
-  function selectWorld(i){targetActive=(i+worlds.length)%worlds.length;active=targetActive;renderUI();}
-  function renderUI(){
-    const world=worlds[active],text=world[lang==='zh'?'zh':'en'];
-    home.querySelector('.pxu-kicker').textContent=`${String(active+1).padStart(2,'0')} / PIXORA UNIVERSE`;
-    home.querySelector('.pxu-title').textContent=text[0];
-    home.querySelector('.pxu-desc').textContent=text[1];
-    home.querySelector('.pxu-enter').textContent=world.active?(lang==='zh'?'進入工具':'ENTER TOOL'):(lang==='zh'?'探索此世界':'EXPLORE WORLD');
-    home.querySelector('.pxu-current').textContent=`${String(active+1).padStart(2,'0')} / ${String(worlds.length).padStart(2,'0')}`;
-    home.querySelector('.pxu-name').textContent=text[0];
-    home.querySelector('.pxu-progress i').style.width=`${((active+1)/worlds.length)*100}%`;
-    [...side.children].forEach((b,i)=>b.classList.toggle('active',i===active));
-    home.querySelectorAll('.pxu-lang button').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
-  }
-
-  home.querySelectorAll('.pxu-lang button').forEach(btn=>btn.onclick=()=>{lang=btn.dataset.lang;try{localStorage.setItem('pixora-lang',lang)}catch{}renderUI()});
-  home.querySelector('.pxu-enter').onclick=()=>{
-    if(!worlds[active].active)return;
-    home.style.transition='opacity .42s ease,transform .55s cubic-bezier(.22,1,.36,1)';
-    home.style.opacity='0';home.style.transform='scale(1.025)';
-    setTimeout(()=>{home.remove();document.documentElement.classList.remove('pxu-open');document.body.classList.remove('pxu-open');if(shell)shell.style.visibility='';document.getElementById('idle')?.scrollIntoView({behavior:'smooth',block:'start'})},420);
-  };
-
-  home.addEventListener('wheel',e=>{const now=performance.now();if(now-wheelLock<360||Math.abs(e.deltaY)<8)return;wheelLock=now;selectWorld(active+(e.deltaY>0?1:-1))},{passive:true});
-  let touchY=null;home.addEventListener('touchstart',e=>{touchY=e.touches[0]?.clientY??null},{passive:true});home.addEventListener('touchend',e=>{if(touchY==null)return;const y=e.changedTouches[0]?.clientY??touchY;const d=touchY-y;if(Math.abs(d)>40)selectWorld(active+(d>0?1:-1));touchY=null},{passive:true});
-
-  const canvas=home.querySelector('.pxu-canvas'),ctx=canvas.getContext('2d');
-  let w=0,h=0,dpr=Math.min(devicePixelRatio||1,2),mx=0,my=0;
-  function resize(){w=innerWidth;h=innerHeight;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}resize();addEventListener('resize',resize);
-  home.addEventListener('pointermove',e=>{mx=e.clientX/w-.5;my=e.clientY/h-.5});
-  const rand=s=>{const x=Math.sin(s*9283.113)*43758.5453;return x-Math.floor(x)};
-
-  function drawPlanet(cx,cy,r,kind,t,alpha,index,detail=1){
-    ctx.save();ctx.translate(cx,cy);ctx.globalAlpha=alpha;
-    const rgb=index%3===0?'114,225,255':index%3===1?'143,126,255':'218,223,255';
-    const pts=Math.floor(Math.max(120,r*2.4)*detail);
-    for(let i=0;i<pts;i++){
-      const u=rand(i+index*61),v=rand(i*4.31+index*13),th=u*Math.PI*2+t*.000035*(index%2?1:-1),ph=Math.acos(2*v-1);
-      let x=Math.sin(ph)*Math.cos(th),y=Math.cos(ph),z=Math.sin(ph)*Math.sin(th);
-      if(kind==='flow')x+=Math.sin(y*13+t*.001)*.08;if(kind==='bands')y=Math.round(y*12)/12;if(kind==='soft'&&rand(i*7)<.12)continue;
-      const depth=.78+.22*z,px=x*r*depth,py=y*r*.94*depth;
-      ctx.fillStyle=z>-0.25?`rgba(${rgb},${.15+.55*(z+1)/2})`:'rgba(255,255,255,.06)';ctx.beginPath();ctx.arc(px,py,z>.35?1.25:.65,0,Math.PI*2);ctx.fill();
-      if(i%11===0&&z>.12){ctx.strokeStyle=`rgba(${rgb},.10)`;ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+x*(10+rand(i)*16),py+y*(8+rand(i+2)*13));ctx.stroke()}
-    }
-    ctx.strokeStyle=`rgba(${rgb},.18)`;ctx.lineWidth=.65;
-    if(kind==='rings'||kind==='halo')for(let k=0;k<(kind==='rings'?4:2);k++){ctx.beginPath();ctx.ellipse(0,0,r*(1.18+k*.16),r*(.19+k*.035),-.2+k*.09,0,Math.PI*2);ctx.stroke()}
-    if(kind==='grid')for(let k=-2;k<=2;k++){ctx.beginPath();ctx.ellipse(0,k*r*.22,r*Math.sqrt(Math.max(.05,1-k*k*.05)),r*.075,0,0,Math.PI*2);ctx.stroke()}
-    if(kind==='burst')for(let k=0;k<24;k++){const a=k/24*Math.PI*2+t*.00003;ctx.beginPath();ctx.moveTo(Math.cos(a)*r*.78,Math.sin(a)*r*.78);ctx.lineTo(Math.cos(a)*r*(1.12+rand(k)*.48),Math.sin(a)*r*(1.12+rand(k)*.48));ctx.stroke()}
-    ctx.restore();
-  }
-
-  function frame(t){
-    ctx.clearRect(0,0,w,h);
-    const glow=ctx.createRadialGradient(w*.72,h*.47,0,w*.72,h*.47,Math.max(w,h)*.62);glow.addColorStop(0,'rgba(71,61,155,.17)');glow.addColorStop(.42,'rgba(23,24,52,.08)');glow.addColorStop(1,'rgba(3,4,8,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
-    for(let i=0;i<150;i++){const x=(rand(i*1.9)*w+mx*(i%4)*7+w)%w,y=rand(i*5.7)*h;ctx.fillStyle=`rgba(255,255,255,${.025+rand(i*7.7)*.12})`;ctx.fillRect(x,y,.65,.65)}
-    const mobile=w<760,mainX=w*(mobile?.64:.72)+mx*14,mainY=h*(mobile?.34:.49)+my*10,mainR=Math.min(w,h)*(mobile?.21:.285);
-    drawPlanet(mainX,mainY,mainR,worlds[active].kind,t,1,active,1.25);
-    ctx.save();ctx.strokeStyle='rgba(143,126,255,.11)';ctx.setLineDash([2,11]);ctx.lineWidth=.65;ctx.beginPath();ctx.ellipse(mainX,mainY,mainR*1.52,mainR*.42,-.18,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
-    [-2,-1,1,2].forEach((offset,j)=>{let idx=(active+offset+worlds.length)%worlds.length;const a=-.55+((j)/3)*1.08+(t*.000012*(offset>0?1:-1));const rr=mainR*(1.63+Math.abs(offset)*.23);const cx=mainX+Math.cos(a)*rr,cy=mainY+Math.sin(a)*rr*.46;const r=mainR*(Math.abs(offset)===1?.16:.09);drawPlanet(cx,cy,r,worlds[idx].kind,t,.28+(Math.abs(offset)===1?.16:0),idx,.55)});
-    requestAnimationFrame(frame);
-  }
-  renderUI();requestAnimationFrame(frame);
+const shell=document.querySelector('.shell');
+if(!document.getElementById('pixora-universe-home')){
+const style=document.createElement('style');style.id='pixora-universe-home-style';style.textContent=`
+html.pxu-open,body.pxu-open{overflow:hidden;background:#020810}body.pxu-open .shell,body.pxu-open #mobileBar,body.pxu-open #shortcutModal{visibility:hidden!important}
+#pixora-universe-home{position:fixed;inset:0;z-index:9999;overflow:hidden;background:radial-gradient(circle at 54% 48%,#08243a 0,#03111e 32%,#01070d 74%,#000409 100%);color:#eaf7ff;font-family:Inter,Arial,"Noto Sans TC",sans-serif;isolation:isolate}
+#pixora-universe-home *{box-sizing:border-box}.pxu-canvas{position:absolute;inset:0;width:100%;height:100%}.pxu-vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 52% 48%,transparent 0 34%,rgba(0,5,10,.08) 55%,rgba(0,3,8,.72) 100%)}
+.pxu-top{position:absolute;left:0;right:0;top:0;height:70px;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:0 clamp(18px,4vw,58px)}.pxu-brand{font-weight:900;font-size:18px;letter-spacing:-.04em}.pxu-brand small{display:block;margin-top:3px;font:600 7px/1.1 "SFMono-Regular",Consolas,monospace;letter-spacing:.18em;color:rgba(220,244,255,.35)}
+.pxu-lang{display:flex;border:1px solid rgba(142,219,255,.16);background:rgba(2,10,17,.28);backdrop-filter:blur(12px)}.pxu-lang button{border:0;background:transparent;color:rgba(220,244,255,.48);padding:8px 10px;font:700 8px "SFMono-Regular",Consolas,monospace;cursor:pointer}.pxu-lang button.active{background:#dff6ff;color:#03101b}
+.pxu-copy{position:absolute;left:clamp(18px,4vw,60px);bottom:clamp(58px,8vh,90px);z-index:5;width:min(350px,34vw)}.pxu-kicker{font:700 8px/1.2 "SFMono-Regular",Consolas,monospace;letter-spacing:.2em;color:#63dcff;margin-bottom:10px}.pxu-title{margin:0;font-size:clamp(38px,5vw,76px);line-height:.88;letter-spacing:-.055em}.pxu-desc{margin:14px 0 18px;max-width:310px;color:rgba(230,247,255,.56);font-size:11px;line-height:1.65}.pxu-enter{border:1px solid rgba(99,220,255,.45);background:rgba(3,18,28,.36);color:#ecfbff;padding:12px 15px;font:800 8px "SFMono-Regular",Consolas,monospace;letter-spacing:.14em;cursor:pointer;backdrop-filter:blur(12px)}.pxu-enter:hover{background:rgba(20,119,157,.22);border-color:#70e4ff}
+.pxu-worlds{position:absolute;right:clamp(16px,3vw,44px);top:50%;transform:translateY(-50%);z-index:5;display:grid;gap:9px}.pxu-worlds button{width:7px;height:7px;border-radius:50%;border:1px solid rgba(179,232,255,.32);background:transparent;padding:0;cursor:pointer;transition:.25s}.pxu-worlds button.active{height:34px;border-radius:8px;border-color:#64ddff;background:linear-gradient(#8aeaff,#2b8cff)}
+.pxu-meta{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:5;font:600 7px "SFMono-Regular",Consolas,monospace;letter-spacing:.15em;color:rgba(220,244,255,.27);white-space:nowrap}
+@media(max-width:760px){.pxu-top{height:58px;padding:0 16px}.pxu-copy{left:16px;right:60px;bottom:54px;width:auto}.pxu-title{font-size:42px}.pxu-desc{font-size:10px;max-width:260px}.pxu-worlds{right:14px}.pxu-meta{display:none}}
+`;
+document.head.appendChild(style);
+const worlds=[
+{id:'cutout',zh:['去背','保留主體，移除不需要的背景。'],en:['CUTOUT','Keep the subject. Remove everything else.'],active:true},
+{id:'refine',zh:['精修','還原、擦除並修正細節邊緣。'],en:['REFINE','Restore, erase and rebuild precise edges.']},
+{id:'background',zh:['背景','替換透明、純色或自訂背景。'],en:['BACKGROUND','Transform the space behind your subject.']},
+{id:'canvas',zh:['畫布','重排、縮放並適配不同版型。'],en:['CANVAS','Resize, reposition and compose for any format.']},
+{id:'commerce',zh:['電商','快速整理乾淨一致的商品圖。'],en:['COMMERCE','Build clean product imagery for marketplaces.']},
+{id:'batch',zh:['批次','把多張圖片放進同一處理流程。'],en:['BATCH','Move many images through one coordinated flow.']},
+{id:'portrait',zh:['人物','處理人物背景與標準比例。'],en:['PORTRAIT','Background color and standard ratios for people.']},
+{id:'export',zh:['匯出','輸出 PNG、JPG、WebP 與透明素材。'],en:['EXPORT','Deliver PNG, JPG and WebP without leaving the flow.']}
+];
+const home=document.createElement('section');home.id='pixora-universe-home';home.innerHTML=`<canvas class="pxu-canvas"></canvas><div class="pxu-vignette"></div><div class="pxu-top"><div class="pxu-brand">PIXORA<small>UNIVERSE / ORBITAL IMAGE TOOLS</small></div><div class="pxu-lang"><button data-lang="zh">繁中</button><button data-lang="en">EN</button></div></div><div class="pxu-copy"><div class="pxu-kicker"></div><h1 class="pxu-title"></h1><p class="pxu-desc"></p><button class="pxu-enter"></button></div><div class="pxu-worlds"></div><div class="pxu-meta">SCROLL / SWIPE TO NAVIGATE · SELECT A WORLD</div>`;document.body.appendChild(home);document.documentElement.classList.add('pxu-open');document.body.classList.add('pxu-open');
+let lang='zh';try{lang=localStorage.getItem('pixora-lang')||(navigator.language?.toLowerCase().startsWith('zh')?'zh':'en')}catch{}let active=0,wheelLock=0;
+const nav=home.querySelector('.pxu-worlds');worlds.forEach((x,i)=>{const b=document.createElement('button');b.type='button';b.title=x.en[0];b.setAttribute('aria-label',x.en[0]);b.onclick=()=>select(i);nav.appendChild(b)});
+function select(i){active=(i+worlds.length)%worlds.length;renderUI()}
+function renderUI(){const x=worlds[active],t=x[lang==='zh'?'zh':'en'];home.querySelector('.pxu-kicker').textContent=`${String(active+1).padStart(2,'0')} / PIXORA UNIVERSE`;home.querySelector('.pxu-title').textContent=t[0];home.querySelector('.pxu-desc').textContent=t[1];home.querySelector('.pxu-enter').textContent=x.active?(lang==='zh'?'進入工具 ↗':'ENTER TOOL ↗'):(lang==='zh'?'探索此世界':'EXPLORE WORLD');[...nav.children].forEach((b,i)=>b.classList.toggle('active',i===active));home.querySelectorAll('.pxu-lang button').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang))}
+home.querySelectorAll('.pxu-lang button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;try{localStorage.setItem('pixora-lang',lang)}catch{}renderUI()});home.querySelector('.pxu-enter').onclick=()=>{if(!worlds[active].active)return;home.style.transition='opacity .35s ease';home.style.opacity='0';setTimeout(()=>{home.remove();document.documentElement.classList.remove('pxu-open');document.body.classList.remove('pxu-open');if(shell)shell.style.visibility='';document.getElementById('idle')?.scrollIntoView({behavior:'smooth',block:'start'})},350)};
+home.addEventListener('wheel',e=>{const n=performance.now();if(n-wheelLock<320||Math.abs(e.deltaY)<8)return;wheelLock=n;select(active+(e.deltaY>0?1:-1))},{passive:true});let sy=null;home.addEventListener('touchstart',e=>sy=e.touches[0]?.clientY,{passive:true});home.addEventListener('touchend',e=>{if(sy==null)return;const d=sy-(e.changedTouches[0]?.clientY??sy);if(Math.abs(d)>36)select(active+(d>0?1:-1));sy=null},{passive:true});
+const canvas=home.querySelector('.pxu-canvas'),ctx=canvas.getContext('2d');let w=0,h=0,dpr=Math.min(devicePixelRatio||1,2),mx=0,my=0;function resize(){w=innerWidth;h=innerHeight;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}resize();addEventListener('resize',resize);home.addEventListener('pointermove',e=>{mx=e.clientX/w-.5;my=e.clientY/h-.5});const rand=s=>{const x=Math.sin(s*9182.17)*43758.5453;return x-Math.floor(x)};
+function planet(x,y,r,seed,ring=false,alpha=1){ctx.save();ctx.globalAlpha=alpha;const grad=ctx.createRadialGradient(x-r*.28,y-r*.32,r*.08,x,y,r);grad.addColorStop(0,'#75e8ff');grad.addColorStop(.35,'#2d9dcc');grad.addColorStop(.72,'#0e4166');grad.addColorStop(1,'#03111f');ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.globalCompositeOperation='screen';for(let i=0;i<Math.max(25,r*.9);i++){const a=rand(i+seed)*Math.PI*2,rr=Math.sqrt(rand(i*3+seed))*r*.88,px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr*.72;ctx.fillStyle=`rgba(120,225,255,${.06+rand(i*7+seed)*.22})`;ctx.beginPath();ctx.arc(px,py,.5+rand(i+4)*1.2,0,Math.PI*2);ctx.fill()}ctx.globalCompositeOperation='source-over';if(ring){ctx.strokeStyle='rgba(104,214,255,.34)';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(x,y,r*1.55,r*.28,-.14,0,Math.PI*2);ctx.stroke()}ctx.restore()}
+function core(cx,cy,r,t){const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,r*2.3);glow.addColorStop(0,'rgba(255,255,255,.98)');glow.addColorStop(.08,'rgba(160,241,255,.92)');glow.addColorStop(.36,'rgba(51,188,235,.34)');glow.addColorStop(1,'rgba(10,75,110,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(cx,cy,r*2.3,0,Math.PI*2);ctx.fill();for(let i=0;i<520;i++){const a=rand(i)*Math.PI*2,rr=Math.pow(rand(i*2.9),.58)*r,px=cx+Math.cos(a)*rr,py=cy+Math.sin(a)*rr*.93;ctx.fillStyle=`rgba(130,232,255,${.15+rand(i*5)*.68})`;ctx.beginPath();ctx.arc(px,py,.5+rand(i*7)*1.2,0,Math.PI*2);ctx.fill()}ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,r*.13,0,Math.PI*2);ctx.fill()}
+function frame(t){ctx.clearRect(0,0,w,h);const cx=w*(w<760?.52:.53)+mx*8,cy=h*(w<760?.43:.48)+my*5,base=Math.min(w,h);for(let i=0;i<75;i++){const x=rand(i)*w,y=rand(i*4.7)*h;ctx.fillStyle=`rgba(130,220,255,${.05+rand(i*9)*.18})`;ctx.fillRect(x,y,.7,.7)}
+const rings=9;for(let i=0;i<rings;i++){const rx=base*(.13+i*.065),ry=rx*(.18+i*.004);ctx.strokeStyle=`rgba(76,176,220,${.22-i*.012})`;ctx.lineWidth=.8;ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,-.04,0,Math.PI*2);ctx.stroke();if(i%2===0){ctx.setLineDash([2,9]);ctx.strokeStyle='rgba(94,206,245,.12)';ctx.beginPath();ctx.ellipse(cx,cy,rx+6,ry+1,-.04,0,Math.PI*2);ctx.stroke();ctx.setLineDash([])}}core(cx,cy,base*(w<760?.105:.12),t);
+const orbit=[[-2.7,8,.038,false],[-2.2,7,.055,true],[-1.5,5,.032,false],[-.9,6,.025,false],[-.3,4,.027,false],[.35,5,.04,false],[.75,7,.07,true],[1.25,6,.025,false],[1.75,8,.085,false],[2.35,7,.055,false],[2.85,9,.078,false]];orbit.forEach((p,i)=>{const a=p[0]+t*.000018*(i%2?1:-1),rx=base*(.12+p[1]*.055),ry=rx*.22,x=cx+Math.cos(a)*rx,y=cy+Math.sin(a)*ry,r=base*p[2]*(1+(y-cy)/(base*.8)*.32);planet(x,y,r,i+20,p[3],.92)});requestAnimationFrame(frame)}renderUI();requestAnimationFrame(frame);
 }
