@@ -1,0 +1,74 @@
+/* Recovery layer: simplify the post-intro utility screen and remove legacy decorative conflicts. */
+:root{
+  --ui-bg:#050706;
+  --ui-panel:#0b0f0c;
+  --ui-panel-2:#101511;
+  --ui-border:rgba(255,255,255,.12);
+  --ui-border-strong:rgba(255,255,255,.20);
+  --ui-text:#f4f5f2;
+  --ui-muted:#a8afa9;
+  --ui-accent:#b7ff2a;
+}
+
+html,body{background:var(--ui-bg)!important;color:var(--ui-text)!important}
+body{background-image:radial-gradient(circle at 50% 12%,rgba(255,255,255,.025),transparent 34%)!important}
+
+/* Header */
+header{background:rgba(5,7,6,.92)!important;border-bottom:1px solid var(--ui-border)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important}
+.topbar{height:72px!important;grid-template-columns:1fr auto!important;align-items:center!important}
+.top-cell{padding:0 22px!important}
+.brand{font-size:19px!important;letter-spacing:-.4px!important;color:var(--ui-text)!important}
+.brand small{font-size:10px!important;color:var(--ui-muted)!important;opacity:1!important;margin-left:10px!important}
+.lang{border:1px solid var(--ui-border)!important;background:var(--ui-panel)!important;border-radius:999px!important;padding:3px!important}
+.lang button{min-height:34px!important;padding:7px 12px!important;border-radius:999px!important;font-size:12px!important;color:var(--ui-muted)!important;opacity:1!important}
+.lang button.active{background:#202721!important;color:var(--ui-text)!important}
+.start-screen-btn{margin-left:18px!important;min-height:38px!important;padding:8px 13px!important;border:1px solid var(--ui-border-strong)!important;border-radius:999px!important;background:#101511!important;color:var(--ui-text)!important;font:700 12px/1 var(--mono)!important;letter-spacing:.01em!important;box-shadow:none!important}
+.start-screen-btn:hover,.start-screen-btn:focus-visible{background:#1a211b!important;border-color:rgba(183,255,42,.55)!important;color:var(--ui-text)!important;outline:none!important;transform:translateY(-1px)!important}
+
+/* Main menu: remove every legacy orbital/decorative pseudo layer. */
+.dropzone,.drop-main{background:transparent!important}
+.dropzone{min-height:calc(100vh - 72px)!important;display:grid!important;grid-template-columns:1fr!important;overflow:hidden!important;position:relative!important}
+.dropzone:before,.dropzone:after,.drop-main:before,.drop-main:after,.drop-content:before,.drop-content:after{content:none!important;display:none!important;background:none!important;border:0!important;box-shadow:none!important}
+.drop-main{border:0!important;padding:clamp(34px,6vh,78px) 24px!important;align-items:center!important;justify-content:center!important}
+.drop-specs{display:none!important}
+.drop-content{position:relative!important;z-index:2!important;width:min(760px,calc(100vw - 48px))!important;max-width:760px!important;padding:clamp(38px,5vw,64px)!important;background:linear-gradient(180deg,rgba(17,22,18,.98),rgba(9,13,10,.98))!important;border:1px solid var(--ui-border)!important;border-radius:24px!important;box-shadow:0 28px 90px rgba(0,0,0,.46)!important;text-align:left!important;overflow:hidden!important}
+.drop-content h2{max-width:none!important;margin:0 0 20px!important;font-size:clamp(54px,6vw,82px)!important;line-height:.92!important;letter-spacing:-4px!important;font-weight:820!important;color:var(--ui-text)!important;text-align:left!important;text-wrap:balance!important}
+.drop-content p{max-width:620px!important;margin:0 0 30px!important;font:400 16px/1.7 var(--sans)!important;letter-spacing:0!important;color:var(--ui-muted)!important;opacity:1!important;text-align:left!important}
+.drop-actions{display:grid!important;grid-template-columns:minmax(220px,1.3fr) minmax(160px,1fr) minmax(160px,1fr)!important;gap:10px!important;align-items:stretch!important;justify-content:start!important;margin:0!important}
+.drop-actions button,.primary,.secondary,.ghost,.batch-launch{min-height:52px!important;padding:12px 16px!important;border-radius:12px!important;font:750 13px/1.2 var(--mono)!important;letter-spacing:.01em!important;box-shadow:none!important}
+.drop-actions .primary,.primary{background:#f0f2ee!important;border:1px solid #f0f2ee!important;color:#0b0e0c!important}
+.drop-actions .primary:hover,.primary:hover{background:#fff!important;border-color:#fff!important;color:#090b09!important;transform:translateY(-1px)!important}
+.drop-actions .ghost,.drop-actions .batch-launch,.ghost,.secondary,.batch-launch{background:#141a15!important;border:1px solid var(--ui-border)!important;color:var(--ui-text)!important;opacity:1!important}
+.drop-actions .ghost:hover,.drop-actions .batch-launch:hover,.ghost:hover,.secondary:hover,.batch-launch:hover{background:#1b231c!important;border-color:rgba(183,255,42,.42)!important;color:var(--ui-text)!important;transform:translateY(-1px)!important}
+.drop-error{font-size:13px!important;color:#ff8984!important;margin-top:14px!important}
+
+/* A restrained accent line replaces the giant green orbital ring. */
+.drop-content{background-image:linear-gradient(180deg,rgba(17,22,18,.98),rgba(9,13,10,.98))!important}
+.drop-content h2:before{content:"PNG CUTOUT / 01";display:block;margin-bottom:18px;font:650 11px/1 var(--mono);letter-spacing:.16em;color:var(--ui-accent)}
+
+/* Workspace typography and density. */
+.workspace{min-height:calc(100vh - 72px)!important;background:var(--ui-bg)!important;grid-template-columns:minmax(0,1fr) 340px!important}
+.workspace-main{background:var(--ui-bg)!important;border-right:1px solid var(--ui-border)!important}
+.work-head,.viewer-bar,.inspector-head,.panel{background:var(--ui-panel)!important;border-color:var(--ui-border)!important}
+.work-head{height:58px!important;padding:0 16px!important}.file-meta strong{font-size:13px!important}.file-meta span{font-size:12px!important;color:var(--ui-muted)!important}
+.head-btn,.viewer-group button,.segmented button{font-size:12px!important;min-height:40px!important;border-radius:9px!important}
+.stage{background:#080b09!important;min-height:calc(100vh - 178px)!important}
+.viewer-bar{min-height:52px!important;padding:8px 12px!important}
+.inspector{background:var(--ui-bg)!important}.inspector-head{height:58px!important;padding:0 16px!important}.inspector-head b{font-size:16px!important}.inspector-head span{font-size:11px!important}
+.panel{padding:16px!important}.panel-title b{font-size:13px!important}.panel-title span{font-size:11px!important;color:var(--ui-muted)!important}
+.slider-row label,.check-row,.select-row label{font-size:11px!important}.slider-row output,.select-row select{font-size:12px!important}.info-grid small{font-size:10px!important}.info-grid b{font-size:12px!important}
+.copy-btn,.download-btn{min-height:50px!important;border-radius:10px!important;font-size:13px!important}
+.copy-btn{background:#eef1ec!important;color:#0a0d0b!important;border-color:#eef1ec!important}.download-btn{background:#151b16!important;color:var(--ui-text)!important;border-color:var(--ui-border-strong)!important}
+
+/* Prevent any post-intro decorative orbit artifact from leaking into the utility view. */
+body:not(.entry-locked) > .orbit-depth-layer,body:not(.entry-locked) > .opening-motion-layer,body:not(.entry-locked) > .entry-system-layer,body:not(.entry-locked) > .planet-function-layer{display:none!important}
+
+@media(max-width:900px){
+  .drop-content{width:min(680px,calc(100vw - 36px))!important;padding:36px!important}.drop-content h2{font-size:clamp(48px,9vw,68px)!important}.drop-actions{grid-template-columns:1fr 1fr!important}.drop-actions .primary{grid-column:1/-1!important}
+  .workspace{grid-template-columns:1fr!important}.workspace-main{border-right:0!important}.inspector{border-top:1px solid var(--ui-border)!important}
+}
+@media(max-width:700px){
+  .topbar{height:64px!important}.top-cell{padding:0 12px!important}.brand{font-size:16px!important}.brand small{display:none!important}.start-screen-btn{margin-left:10px!important;padding:8px 10px!important;font-size:11px!important}
+  .dropzone{min-height:calc(100vh - 64px)!important}.drop-main{padding:22px 14px!important}.drop-content{width:100%!important;padding:30px 22px!important;border-radius:18px!important}.drop-content h2{font-size:clamp(46px,14vw,62px)!important;letter-spacing:-2.7px!important}.drop-content p{font-size:15px!important;line-height:1.65!important;margin-bottom:24px!important}.drop-actions{grid-template-columns:1fr!important}.drop-actions .primary{grid-column:auto!important}.drop-actions button{width:100%!important;min-height:50px!important}
+  .workspace{min-height:calc(100vh - 64px)!important}.stage{min-height:52vh!important}
+}
