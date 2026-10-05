@@ -4,7 +4,10 @@ import './p0-foundation.js'
 import './p1-enhancements.css'
 import './p1-enhancements.js'
 
-// Auxiliary tools retained as part of Pixora. These do not replace the Cutout workspace.
+// Canonical Pixora homepage: Universe entry to all tools.
+import './pixora-universe.js'
+
+// Auxiliary tools retained as part of Pixora and entered from the Universe homepage.
 import './image-to-pdf.js'
 import './presentation-studio.js'
 import './print-studio.js'
