@@ -77,7 +77,6 @@ if (!document.getElementById('pixora-universe-home')) {
   const pointers = new Map()
   let gesture = null
   const nav = home.querySelector('.pxu-nav-list')
-  const allTools=document.createElement('button');allTools.type='button';allTools.className='pxu-all-tools';home.querySelector('.pxu-nav').append(allTools);allTools.onclick=()=>toolDialog.showModal()
   for (const [i,p] of planets.entries()) {
     const button = document.createElement('button')
     button.type = 'button'
@@ -92,7 +91,6 @@ if (!document.getElementById('pixora-universe-home')) {
     home.dataset.language=lang
     astronaut.setAttribute('aria-label',zh?'太空人：點擊顯示 Lewis':'Astronaut: click to reveal Lewis')
     moonDog.setAttribute('aria-label',zh?'月球上的太空狗':'A space dog on the Moon')
-    allTools.textContent=zh?'查看全部 10 個工具 ↗':'View all 10 tools ↗'
     effects.textContent=zh?`動態效果 ${effectsEnabled?'開':'關'}`:`Effects ${effectsEnabled?'on':'off'}`
     effects.setAttribute('aria-pressed',String(effectsEnabled))
     toolDialog.setAttribute('aria-label',zh?'太空發射站工具選單':'Spaceport tool menu')
@@ -117,7 +115,7 @@ if (!document.getElementById('pixora-universe-home')) {
     cutout.textContent=zh?'先使用 AI 去背 →':'Try AI Cutout →'
     text('.pxu-trust',p.id==='mercury'?(zh?'本機色調分析免費 · AI 辨識需啟用服務':'Free local color analysis · AI recognition requires setup'):(zh?'瀏覽器本機處理 · 免費使用 · 無需註冊':'Processed in your browser · Free to use · No account'))
     text('.pxu-local',p.id==='mercury'?(zh?'啟用 AI 辨識時，圖片會傳送至 OpenAI':'AI recognition sends images to OpenAI'):(zh?'圖片留在你的裝置':'Your images stay on your device'))
-    text('.pxu-nav-heading',zh?'常用工具':'Quick access')
+    text('.pxu-nav-heading',zh?'選擇圖片工具':'Choose an image tool')
     home.querySelector('.pxu-nav').setAttribute('aria-label',zh?'圖片工具':'Image tools')
     const touch=matchMedia('(pointer:coarse)').matches
     text('.pxu-help',zh?(touch?'單指旋轉 · 雙指縮放 · 點選行星':'拖曳探索 360° · 滾輪縮放 · 點擊行星'):(touch?'Drag to rotate · Pinch to zoom · Tap a planet':'Drag to explore 360° · Scroll to zoom · Select a planet'))
@@ -132,7 +130,6 @@ if (!document.getElementById('pixora-universe-home')) {
     text('.pxu-zoom',`${Math.round(zoom*100)}%`)
     nav.querySelectorAll('button').forEach((b,i)=>{
       b.classList.toggle('active',i===active)
-      b.hidden=![2,3,5,active].includes(i)
       b.setAttribute('aria-pressed',String(i===active))
       b.querySelector('span').textContent=zh?planets[i].toolZh:planets[i].toolEn
       b.querySelector('small').textContent=toolCopy[planets[i].id].summary[zh?0:1]
