@@ -35,7 +35,7 @@ if (!document.getElementById('pixora-universe-home')) {
   document.body.append(home)
   const station=document.createElement('button')
   station.className='pxu-station'
-  station.innerHTML=`<svg viewBox="0 0 80 48" aria-hidden="true"><g fill="#11374e" stroke="#88d6ef" stroke-width="1.2"><path d="M2 13h22v22H2zM56 13h22v22H56z"/><path d="M9 13v22m8-22v22M63 13v22m8-22v22M2 24h22m32 0h22"/><path d="M24 21h32v6H24z"/><ellipse cx="40" cy="24" rx="13" ry="17" fill="#d3edf4"/><ellipse cx="40" cy="24" rx="7" ry="11" fill="#1b536b"/></g><circle cx="40" cy="24" r="3" fill="#86f9db"/></svg><span></span>`
+  station.innerHTML=`<svg viewBox="0 0 160 100" aria-hidden="true"><defs><linearGradient id="pxu-alloy" x2=".3" y2="1"><stop stop-color="#e3eff4"/><stop offset=".45" stop-color="#647e91"/><stop offset="1" stop-color="#172c40"/></linearGradient><linearGradient id="pxu-panel" x2="1" y2="1"><stop stop-color="#163756"/><stop offset="1" stop-color="#062034"/></linearGradient></defs><g transform="translate(80 46) rotate(-18)"><ellipse rx="35" ry="23" fill="none" stroke="#182f42" stroke-width="8"/><ellipse rx="35" ry="23" fill="none" stroke="url(#pxu-alloy)" stroke-width="5"/><path d="M-29-15 29 15M-29 15 29-15" stroke="#59768a" stroke-width="2"/><path d="M-67-21h23v40h-23zM44-21h23v40H44z" fill="url(#pxu-panel)" stroke="#4b819f" stroke-width=".8"/><path d="M-59-21v40m8-40v40m103-40v40m8-40v40M-67-11h23m-23 10h23m-23 10h23m88-20h23m-23 10h23m-23 10h23" stroke="#3d6886" stroke-width=".5"/><path d="M-44 0h88" stroke="#8ba7b6" stroke-width="4"/><rect x="-10" y="-20" width="20" height="40" rx="8" fill="url(#pxu-alloy)" stroke="#aac5d4" stroke-width=".6"/><path d="M-9-7H9M-9 9H9" stroke="#253f54" stroke-width="3"/><rect x="-5" y="-4" width="10" height="7" rx="2" fill="#13283b"/><path d="M-4-1h8" stroke="#8be4ef"/><circle cy="-24" r="2" fill="#8ce6e0"/><circle cx="35" r="1.5" fill="#86e1eb"/></g><path d="M79 78v8m-19 0h38" stroke="#547689" stroke-width=".6"/></svg><span></span>`
   home.append(station)
   const launch=document.createElement('button');launch.className='pxu-launch';home.append(launch)
   const toolDialog=document.createElement('dialog');toolDialog.className='pxu-tool-dialog';toolDialog.innerHTML='<header><div><small>PIXORA / SPACEPORT</small><h2></h2></div><button class="pxu-dialog-close" type="button"></button></header><div class="pxu-dialog-tools"></div>';home.append(toolDialog)
@@ -220,8 +220,31 @@ if (!document.getElementById('pixora-universe-home')) {
     }
   }
   let lastTime=0,rotation=0
-  function drawShuttle(x,y,angle,scale,thrust){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale);ctx.shadowColor='#70dfff';ctx.shadowBlur=9;ctx.strokeStyle='#90d4e7';ctx.lineWidth=.8;if(thrust){const glow=ctx.createLinearGradient(-14,0,-31,0);glow.addColorStop(0,'#b9faff');glow.addColorStop(1,'#4fbaff00');ctx.fillStyle=glow;ctx.beginPath();ctx.moveTo(-12,-4);ctx.lineTo(-32,0);ctx.lineTo(-12,4);ctx.fill()}ctx.fillStyle='#477994';ctx.beginPath();ctx.moveTo(6,0);ctx.lineTo(-13,-15);ctx.lineTo(-8,-3);ctx.lineTo(-8,3);ctx.lineTo(-13,15);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#d8eef5';ctx.beginPath();ctx.moveTo(18,0);ctx.quadraticCurveTo(7,-7,-13,-5);ctx.lineTo(-13,5);ctx.quadraticCurveTo(7,7,18,0);ctx.fill();ctx.stroke();ctx.fillStyle='#153d55';ctx.beginPath();ctx.ellipse(6,0,4,3,0,0,Math.PI*2);ctx.fill();ctx.restore()}
-  function drawRocket(x,y,progress){ctx.save();ctx.translate(x,y-progress*160);ctx.globalAlpha=Math.min(1,(1-progress)*4);ctx.shadowColor='#6edaff';ctx.shadowBlur=9;ctx.fillStyle='#e6f5fa';ctx.beginPath();ctx.moveTo(0,-20);ctx.quadraticCurveTo(-8,-10,-6,11);ctx.lineTo(6,11);ctx.quadraticCurveTo(8,-10,0,-20);ctx.fill();ctx.fillStyle='#5cbde3';ctx.beginPath();ctx.arc(0,-4,3,0,6.28);ctx.fill();ctx.fillStyle='#789caf';ctx.beginPath();ctx.moveTo(-6,3);ctx.lineTo(-12,16);ctx.lineTo(-4,12);ctx.moveTo(6,3);ctx.lineTo(12,16);ctx.lineTo(4,12);ctx.fill();if(progress>0){ctx.fillStyle='#ffc47c';ctx.beginPath();ctx.moveTo(-4,12);ctx.lineTo(0,29+Math.sin(progress*80)*5);ctx.lineTo(4,12);ctx.fill()}ctx.restore()}
+  function drawShuttle(x,y,angle,scale,thrust){
+    ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale)
+    const shape=(points,fill,stroke='#7994a5')=>{ctx.beginPath();points.forEach(([a,b],i)=>i?ctx.lineTo(a,b):ctx.moveTo(a,b));ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=.65;ctx.stroke()}
+    if(thrust){for(const side of [-1,1]){const plume=ctx.createLinearGradient(-19,0,-45,0);plume.addColorStop(0,'#c8f9ffb0');plume.addColorStop(.3,'#51c9f560');plume.addColorStop(1,'#51c9f500');shape([[-18,side*7-2],[-45,side*7],[-18,side*7+2]],plume,'transparent')}}
+    const metal=ctx.createLinearGradient(0,-18,0,18);metal.addColorStop(0,'#bed0db');metal.addColorStop(.4,'#708a9b');metal.addColorStop(1,'#1b3449')
+    shape([[15,0],[-16,-23],[-12,-8],[-22,-6],[-22,6],[-12,8],[-16,23]],metal)
+    shape([[-12,-18],[-2,-5],[-8,-6]],'#1c3549');shape([[-12,18],[-2,5],[-8,6]],'#1c3549')
+    const hull=ctx.createLinearGradient(0,-6,0,6);hull.addColorStop(0,'#f3f6f5');hull.addColorStop(.48,'#a7bbc7');hull.addColorStop(1,'#405b70')
+    ctx.beginPath();ctx.moveTo(26,0);ctx.bezierCurveTo(16,-8,-2,-7,-20,-5);ctx.lineTo(-20,5);ctx.bezierCurveTo(-2,7,16,8,26,0);ctx.fillStyle=hull;ctx.fill();ctx.strokeStyle='#b4c7d0';ctx.stroke()
+    shape([[15,0],[8,-3],[3,-2],[3,2],[8,3]],'#0b2337','#789fad')
+    ctx.strokeStyle='#b7e7ed';ctx.beginPath();ctx.moveTo(8,-2);ctx.lineTo(12,0);ctx.stroke()
+    ctx.fillStyle='#172e40';ctx.fillRect(-21,-9,6,4);ctx.fillRect(-21,5,6,4)
+    ctx.fillStyle='#a3eef1';ctx.fillRect(-22,-8,2,2);ctx.fillRect(-22,6,2,2)
+    ctx.strokeStyle='#546c7c';ctx.beginPath();ctx.moveTo(-11,0);ctx.lineTo(0,0);ctx.stroke();ctx.restore()
+  }
+  function drawRocket(x,y,progress){
+    ctx.save();ctx.translate(x,y-progress*200);ctx.rotate(.12);ctx.globalAlpha=Math.min(1,(1-progress)*5)
+    const metal=ctx.createLinearGradient(-6,0,6,0);metal.addColorStop(0,'#4f687c');metal.addColorStop(.38,'#e4edf0');metal.addColorStop(.7,'#a6bcc9');metal.addColorStop(1,'#314b60')
+    ctx.fillStyle='#355269';ctx.beginPath();ctx.moveTo(-4,7);ctx.lineTo(-11,20);ctx.lineTo(-3,17);ctx.moveTo(4,7);ctx.lineTo(11,20);ctx.lineTo(3,17);ctx.fill()
+    ctx.beginPath();ctx.moveTo(0,-32);ctx.bezierCurveTo(-5,-27,-5,-20,-5,-15);ctx.lineTo(-5,17);ctx.lineTo(5,17);ctx.lineTo(5,-15);ctx.bezierCurveTo(5,-20,5,-27,0,-32);ctx.fillStyle=metal;ctx.fill();ctx.strokeStyle='#97b2c1';ctx.lineWidth=.6;ctx.stroke()
+    ctx.fillStyle='#172f43';ctx.fillRect(-5,-14,10,4);ctx.fillRect(-5,8,10,2);ctx.fillRect(-3,17,6,3)
+    ctx.fillStyle='#76cbdc';ctx.fillRect(-1,-7,2,9)
+    if(progress>0){const flame=ctx.createLinearGradient(0,20,0,62);flame.addColorStop(0,'#fff4d5');flame.addColorStop(.2,'#9ce6fb');flame.addColorStop(.55,'#309ddd90');flame.addColorStop(1,'#309ddd00');ctx.fillStyle=flame;ctx.beginPath();ctx.moveTo(-3,20);ctx.quadraticCurveTo(-6,33,0,62+Math.sin(progress*90)*4);ctx.quadraticCurveTo(6,33,3,20);ctx.fill()}
+    ctx.restore()
+  }
   function frame(t){
     if(destroyed||!home.isConnected)return
     const dt=Math.min(t-lastTime,50);lastTime=t
@@ -250,11 +273,11 @@ if (!document.getElementById('pixora-universe-home')) {
     shipWorld.x+=(goal.x-shipWorld.x)*ease;shipWorld.z+=(goal.z-shipWorld.z)*ease;shipWorld.y+=(goal.y-shipWorld.y)*ease
     const craft=project(shipWorld.x,shipWorld.y,shipWorld.z),distance=Math.hypot(craft.x-old.x,craft.y-old.y)
     if(distance>.02)shipHeading=Math.atan2(craft.y-old.y,craft.x-old.x)
-    drawShuttle(craft.x,craft.y,shipHeading,w<760?.66:.9,animate&&(moving||shipTravel<1600))
+    drawShuttle(craft.x,craft.y,shipHeading,w<760?.7:1.1,animate&&(moving||shipTravel<1600))
     const dock=project(earth.worldX+.7,.05,earth.worldZ-.5)
-    stationPoint={x:dock.x,y:dock.y+45}
+    stationPoint={x:dock.x+28,y:dock.y+80}
     station.style.left=`${stationPoint.x}px`;station.style.top=`${stationPoint.y}px`
-    if(w>=760){if(rocketTime!==null){if(animate)rocketTime+=dt;drawRocket(stationPoint.x+45,stationPoint.y,Math.min(1,rocketTime/2400));if(rocketTime>=2400)rocketTime=null}else drawRocket(stationPoint.x+45,stationPoint.y,0)}
+    if(w>=760){if(rocketTime!==null){if(animate)rocketTime+=dt;drawRocket(stationPoint.x+72,stationPoint.y-8,Math.min(1,rocketTime/2400));if(rocketTime>=2400)rocketTime=null}else drawRocket(stationPoint.x+72,stationPoint.y-8,0)}
     raf=requestAnimationFrame(frame)
   }
   renderUI();raf=requestAnimationFrame(frame)
