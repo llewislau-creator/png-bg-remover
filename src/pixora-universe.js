@@ -2,6 +2,7 @@ import { openPortraitStudio } from './portrait-studio.js'
 import { openLayerStudio } from './layer-studio.js'
 import { openPromptStudio } from './prompt-extractor.js'
 import './pixora-universe.css'
+import './studio-theme.css'
 import { openImageToPdf } from './image-to-pdf.js'
 import { openPrintStudio } from './print-studio.js'
 import { openPresentationStudio } from './presentation-studio.js'
@@ -72,6 +73,7 @@ if (!document.getElementById('pixora-universe-home')) {
   const pointers = new Map()
   let gesture = null
   const nav = home.querySelector('.pxu-nav-list')
+  const allTools=document.createElement('button');allTools.type='button';allTools.className='pxu-all-tools';home.querySelector('.pxu-nav').append(allTools);allTools.onclick=()=>toolDialog.showModal()
   for (const [i,p] of planets.entries()) {
     const button = document.createElement('button')
     button.type = 'button'
@@ -84,6 +86,7 @@ if (!document.getElementById('pixora-universe-home')) {
   function renderUI(){
     const p = planets[active], zh = lang==='zh'
     home.dataset.language=lang
+    allTools.textContent=zh?'查看全部 10 個工具 ↗':'View all 10 tools ↗'
     effects.textContent=zh?`動態效果 ${effectsEnabled?'開':'關'}`:`Effects ${effectsEnabled?'on':'off'}`
     effects.setAttribute('aria-pressed',String(effectsEnabled))
     toolDialog.setAttribute('aria-label',zh?'太空發射站工具選單':'Spaceport tool menu')
@@ -92,7 +95,11 @@ if (!document.getElementById('pixora-universe-home')) {
     launch.textContent=zh?'開始探索 ↗':'Launch exploration ↗'
     toolDialog.querySelector('h2').textContent=zh?'選擇你的目的地':'Choose your destination'
     toolDialog.querySelector('.pxu-dialog-close').textContent=zh?'關閉':'Close'
-    toolDialog.querySelector('.pxu-dialog-tools').replaceChildren(...planets.map((destination,i)=>{const button=document.createElement('button');button.type='button';button.textContent=(zh?destination.zh:destination.en)+' / '+(zh?destination.toolZh:destination.toolEn);button.onclick=()=>{toolDialog.close();select(i);home.querySelector('.pxu-enter').focus({preventScroll:true})};return button}))
+    toolDialog.querySelector('.pxu-dialog-tools').replaceChildren(...[
+      {title:zh?'修圖與圖片處理':'Photo editing',ids:['earth','mars','saturn','moon']},
+      {title:zh?'色彩與創作':'Color and design',ids:['mercury','venus','jupiter']},
+      {title:zh?'文件與排版':'Documents and layouts',ids:['uranus','neptune','pluto']}
+    ].map(group=>{const section=document.createElement('section');const heading=document.createElement('h3');heading.textContent=group.title;section.append(heading);for(const id of group.ids){const i=planets.findIndex(p=>p.id===id),destination=planets[i],button=document.createElement('button'),title=document.createElement('b'),summary=document.createElement('small');title.textContent=zh?destination.toolZh:destination.toolEn;summary.textContent=toolCopy[id].summary[zh?0:1];button.append(title,summary);button.onclick=()=>{toolDialog.close();select(i);home.querySelector('.pxu-enter').focus({preventScroll:true})};section.append(button)}return section}))
     text('.pxu-planet',zh?p.zh:p.en)
     text('.pxu-title',zh?p.toolZh:p.toolEn)
     text('.pxu-desc',toolCopy[p.id].description[zh?0:1])
@@ -104,7 +111,7 @@ if (!document.getElementById('pixora-universe-home')) {
     cutout.textContent=zh?'先使用 AI 去背 →':'Try AI Cutout →'
     text('.pxu-trust',p.id==='mercury'?(zh?'本機色調分析免費 · AI 辨識需啟用服務':'Free local color analysis · AI recognition requires setup'):(zh?'瀏覽器本機處理 · 免費使用 · 無需註冊':'Processed in your browser · Free to use · No account'))
     text('.pxu-local',p.id==='mercury'?(zh?'啟用 AI 辨識時，圖片會傳送至 OpenAI':'AI recognition sends images to OpenAI'):(zh?'圖片留在你的裝置':'Your images stay on your device'))
-    text('.pxu-nav-heading',zh?'選擇圖片工具':'Choose an image tool')
+    text('.pxu-nav-heading',zh?'常用工具':'Quick access')
     home.querySelector('.pxu-nav').setAttribute('aria-label',zh?'圖片工具':'Image tools')
     const touch=matchMedia('(pointer:coarse)').matches
     text('.pxu-help',zh?(touch?'單指旋轉 · 雙指縮放 · 點選行星':'拖曳探索 360° · 滾輪縮放 · 點擊行星'):(touch?'Drag to rotate · Pinch to zoom · Tap a planet':'Drag to explore 360° · Scroll to zoom · Select a planet'))
@@ -119,6 +126,7 @@ if (!document.getElementById('pixora-universe-home')) {
     text('.pxu-zoom',`${Math.round(zoom*100)}%`)
     nav.querySelectorAll('button').forEach((b,i)=>{
       b.classList.toggle('active',i===active)
+      b.hidden=![2,3,5,active].includes(i)
       b.setAttribute('aria-pressed',String(i===active))
       b.querySelector('span').textContent=zh?planets[i].toolZh:planets[i].toolEn
       b.querySelector('small').textContent=toolCopy[planets[i].id].summary[zh?0:1]
@@ -205,7 +213,7 @@ if (!document.getElementById('pixora-universe-home')) {
   function project(x,y,z){
     const xx=x*Math.cos(yaw)-z*Math.sin(yaw),zz=x*Math.sin(yaw)+z*Math.cos(yaw)
     const yy=y*Math.cos(pitch)-zz*Math.sin(pitch),depth=y*Math.sin(pitch)+zz*Math.cos(pitch)
-    const perspective=14/(14+depth),mobile=w<760,unit=Math.min(w*(mobile?.070:.049),h*(mobile?.068:.077))*zoom
+    const perspective=14/(14+depth),mobile=w<760,unit=Math.min(w*(mobile?.073:.057),h*(mobile?.073:.093))*zoom
     return {x:w*(mobile?.50:.61)+xx*unit*perspective,y:h*(mobile?.32:.47)+yy*unit*perspective,scale:unit*perspective,depth}
   }
   function body(p){
@@ -289,11 +297,11 @@ if (!document.getElementById('pixora-universe-home')) {
     const earth=positions[2],moon=positions[9],ma=rotation*5+.8
     Object.assign(moon,project(earth.worldX+Math.cos(ma)*.34,Math.sin(ma)*.10,earth.worldZ+Math.sin(ma)*.34))
     const sun={world:{id:'sun',color:'#ffb94c',radius:.32},index:-1,...project(0,0,0)}
-    hit=[sun,...positions].map(p=>({...p,r:Math.max(p.world.radius*p.scale,p.index===9?3:4)})).sort((a,b)=>b.depth-a.depth)
+    hit=[sun,...positions].map(p=>({...p,r:Math.max(p.world.radius*p.scale*(p.index===active?(w<760?1.8:2.4):1),p.index===9?3:4)})).sort((a,b)=>b.depth-a.depth)
     hit.forEach(body)
     const target=positions[active],animate=!reduced.matches&&!manualPaused&&!document.hidden&&!home.hasAttribute('inert')
     if(animate){flightTime+=dt;shipTravel+=dt}
-    const cruise=moving?flightTime*.0008:0,goal={x:target.worldX+Math.cos(cruise)*.55,z:target.worldZ+Math.sin(cruise)*.55,y:.3}
+    const cruise=moving?flightTime*.0008:0,goal={x:target.worldX+Math.cos(cruise)*.95,z:target.worldZ+Math.sin(cruise)*.95,y:.45}
     if(active===9){goal.x=earth.worldX+.55;goal.z=earth.worldZ+.2}
     if(!shipWorld||reduced.matches)shipWorld={...goal}
     const old=project(shipWorld.x,shipWorld.y,shipWorld.z),ease=animate?1-Math.exp(-dt*.003):0
