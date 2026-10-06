@@ -33,6 +33,17 @@ if (!document.getElementById('pixora-universe-home')) {
     <nav class="pxu-nav" aria-label="影像工具"><p class="pxu-nav-heading"></p><div class="pxu-nav-list"></div></nav>
     <footer class="pxu-bottom"><div><p class="pxu-help"></p><p class="pxu-note"></p></div><div class="pxu-controls"><button type="button" data-control="out">−</button><output class="pxu-zoom">100%</output><button type="button" data-control="in">＋</button><button type="button" data-control="reset"></button><button type="button" data-control="motion"></button></div></footer>`
   document.body.append(home)
+  const station=document.createElement('button')
+  station.className='pxu-station'
+  station.innerHTML=`<svg viewBox="0 0 80 48" aria-hidden="true"><g fill="#11374e" stroke="#88d6ef" stroke-width="1.2"><path d="M2 13h22v22H2zM56 13h22v22H56z"/><path d="M9 13v22m8-22v22M63 13v22m8-22v22M2 24h22m32 0h22"/><path d="M24 21h32v6H24z"/><ellipse cx="40" cy="24" rx="13" ry="17" fill="#d3edf4"/><ellipse cx="40" cy="24" rx="7" ry="11" fill="#1b536b"/></g><circle cx="40" cy="24" r="3" fill="#86f9db"/></svg><span></span>`
+  home.append(station)
+  const launch=document.createElement('button');launch.className='pxu-launch';home.append(launch)
+  const toolDialog=document.createElement('dialog');toolDialog.className='pxu-tool-dialog';toolDialog.innerHTML='<header><div><small>PIXORA / SPACEPORT</small><h2></h2></div><button class="pxu-dialog-close" type="button"></button></header><div class="pxu-dialog-tools"></div>';home.append(toolDialog)
+  let stationPoint={x:0,y:0},shipWorld=null,shipHeading=0,shipTravel=0,flightTime=0,rocketTime=null,manualPaused=false
+  station.onclick=()=>toolDialog.showModal()
+  toolDialog.querySelector('.pxu-dialog-close').onclick=()=>toolDialog.close()
+  toolDialog.setAttribute('aria-label','太空發射站工具選單')
+  launch.onclick=()=>{if(reduced.matches||w<760){rocketTime=null;toolDialog.showModal();return}rocketTime=0;manualPaused=false;moving=true;renderUI()}
   document.documentElement.classList.add('pxu-open')
   document.body.classList.add('pxu-open')
   let lang = 'zh'
@@ -55,6 +66,13 @@ if (!document.getElementById('pixora-universe-home')) {
   function text(selector,value){home.querySelector(selector).textContent=value}
   function renderUI(){
     const p = planets[active], zh = lang==='zh'
+    toolDialog.setAttribute('aria-label',zh?'太空發射站工具選單':'Spaceport tool menu')
+    station.setAttribute('aria-label',zh?'太空發射站：查看所有工具':'Spaceport: view all tools')
+    station.querySelector('span').textContent=zh?'發射站':'SPACEPORT'
+    launch.textContent=zh?'開始探索 ↗':'Launch exploration ↗'
+    toolDialog.querySelector('h2').textContent=zh?'選擇你的目的地':'Choose your destination'
+    toolDialog.querySelector('.pxu-dialog-close').textContent=zh?'關閉':'Close'
+    toolDialog.querySelector('.pxu-dialog-tools').replaceChildren(...planets.map((destination,i)=>{const button=document.createElement('button');button.type='button';button.textContent=(zh?destination.zh:destination.en)+' / '+(zh?destination.toolZh:destination.toolEn);button.onclick=()=>{toolDialog.close();select(i);home.querySelector('.pxu-enter').focus({preventScroll:true})};return button}))
     text('.pxu-planet',zh?p.zh:p.en)
     text('.pxu-title',zh?p.toolZh:p.toolEn)
     text('.pxu-desc',p.id==='pluto'?(zh?'為名片、海報與活動物料準備印刷稿。選擇尺寸、加入素材、檢查出血與解析度，再匯出 PDF。':'Prepare business cards, posters and event print layouts. Choose a size, add artwork, check bleed and resolution, then export PDF.'):p.id==='uranus'?(zh?'把圖片排成一份 PDF。調整頁面順序、紙張尺寸與檔案容量，全程留在你的瀏覽器。':'Arrange images into a PDF. Set page order, paper size and file size, all in your browser.'):p.available?(zh?'免費移除背景，保留你想要的主體。圖片直接在瀏覽器內處理，無需註冊。':'Remove backgrounds for free. Keep your subject, with images processed in your browser. No account required.'):(zh?`${p.toolZh}工具正在準備中。你可以繼續探索太陽系，或先使用免費 AI 去背。`:`${p.toolEn} is coming soon. Explore the solar system or try free AI background removal.`))
@@ -101,7 +119,7 @@ if (!document.getElementById('pixora-universe-home')) {
     home.querySelectorAll('[data-lang]').forEach(b=>{b.classList.toggle('active',b.dataset.lang===lang);b.setAttribute('aria-pressed',String(b.dataset.lang===lang))})
   }
   function pause(){moving=false;renderUI()}
-  function select(i){active=i;pause()}
+  function select(i){active=i;shipTravel=0;flightTime=0;pause()}
   function setZoom(value){zoom=Math.max(.55,Math.min(2.2,value));renderUI()}
   home.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;try{localStorage.setItem('pixora-lang',lang)}catch{}renderUI()})
   function enterTool(){
@@ -127,8 +145,8 @@ if (!document.getElementById('pixora-universe-home')) {
   home.querySelectorAll('[data-control]').forEach(b=>b.onclick=()=>{
     const c=b.dataset.control
     if(c==='in'||c==='out'){pause();setZoom(zoom*(c==='in'?1.15:1/1.15))}
-    if(c==='reset'){yaw=-.22;pitch=.62;zoom=1;active=2;moving=!reduced.matches;renderUI()}
-    if(c==='motion'){moving=!moving;renderUI()}
+    if(c==='reset'){yaw=-.22;pitch=.62;zoom=1;active=2;shipWorld=null;rocketTime=null;manualPaused=false;moving=!reduced.matches;renderUI()}
+    if(c==='motion'){moving=!moving;manualPaused=!moving;renderUI()}
   })
   function motionPreference(){if(reduced.matches)pause()}
   reduced.addEventListener('change',motionPreference)
@@ -202,6 +220,8 @@ if (!document.getElementById('pixora-universe-home')) {
     }
   }
   let lastTime=0,rotation=0
+  function drawShuttle(x,y,angle,scale,thrust){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale);ctx.shadowColor='#70dfff';ctx.shadowBlur=9;ctx.strokeStyle='#90d4e7';ctx.lineWidth=.8;if(thrust){const glow=ctx.createLinearGradient(-14,0,-31,0);glow.addColorStop(0,'#b9faff');glow.addColorStop(1,'#4fbaff00');ctx.fillStyle=glow;ctx.beginPath();ctx.moveTo(-12,-4);ctx.lineTo(-32,0);ctx.lineTo(-12,4);ctx.fill()}ctx.fillStyle='#477994';ctx.beginPath();ctx.moveTo(6,0);ctx.lineTo(-13,-15);ctx.lineTo(-8,-3);ctx.lineTo(-8,3);ctx.lineTo(-13,15);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#d8eef5';ctx.beginPath();ctx.moveTo(18,0);ctx.quadraticCurveTo(7,-7,-13,-5);ctx.lineTo(-13,5);ctx.quadraticCurveTo(7,7,18,0);ctx.fill();ctx.stroke();ctx.fillStyle='#153d55';ctx.beginPath();ctx.ellipse(6,0,4,3,0,0,Math.PI*2);ctx.fill();ctx.restore()}
+  function drawRocket(x,y,progress){ctx.save();ctx.translate(x,y-progress*160);ctx.globalAlpha=Math.min(1,(1-progress)*4);ctx.shadowColor='#6edaff';ctx.shadowBlur=9;ctx.fillStyle='#e6f5fa';ctx.beginPath();ctx.moveTo(0,-20);ctx.quadraticCurveTo(-8,-10,-6,11);ctx.lineTo(6,11);ctx.quadraticCurveTo(8,-10,0,-20);ctx.fill();ctx.fillStyle='#5cbde3';ctx.beginPath();ctx.arc(0,-4,3,0,6.28);ctx.fill();ctx.fillStyle='#789caf';ctx.beginPath();ctx.moveTo(-6,3);ctx.lineTo(-12,16);ctx.lineTo(-4,12);ctx.moveTo(6,3);ctx.lineTo(12,16);ctx.lineTo(4,12);ctx.fill();if(progress>0){ctx.fillStyle='#ffc47c';ctx.beginPath();ctx.moveTo(-4,12);ctx.lineTo(0,29+Math.sin(progress*80)*5);ctx.lineTo(4,12);ctx.fill()}ctx.restore()}
   function frame(t){
     if(destroyed||!home.isConnected)return
     const dt=Math.min(t-lastTime,50);lastTime=t
@@ -221,6 +241,20 @@ if (!document.getElementById('pixora-universe-home')) {
     const sun={world:{id:'sun',color:'#ffb94c',radius:.32},index:-1,...project(0,0,0)}
     hit=[sun,...positions].map(p=>({...p,r:Math.max(p.world.radius*p.scale,p.index===9?3:4)})).sort((a,b)=>b.depth-a.depth)
     hit.forEach(body)
+    const target=positions[active],animate=!reduced.matches&&!manualPaused&&!document.hidden&&!home.hasAttribute('inert')
+    if(animate){flightTime+=dt;shipTravel+=dt}
+    const cruise=moving?flightTime*.0008:0,goal={x:target.worldX+Math.cos(cruise)*.55,z:target.worldZ+Math.sin(cruise)*.55,y:.3}
+    if(active===9){goal.x=earth.worldX+.55;goal.z=earth.worldZ+.2}
+    if(!shipWorld||reduced.matches)shipWorld={...goal}
+    const old=project(shipWorld.x,shipWorld.y,shipWorld.z),ease=animate?1-Math.exp(-dt*.003):0
+    shipWorld.x+=(goal.x-shipWorld.x)*ease;shipWorld.z+=(goal.z-shipWorld.z)*ease;shipWorld.y+=(goal.y-shipWorld.y)*ease
+    const craft=project(shipWorld.x,shipWorld.y,shipWorld.z),distance=Math.hypot(craft.x-old.x,craft.y-old.y)
+    if(distance>.02)shipHeading=Math.atan2(craft.y-old.y,craft.x-old.x)
+    drawShuttle(craft.x,craft.y,shipHeading,w<760?.66:.9,animate&&(moving||shipTravel<1600))
+    const dock=project(earth.worldX+.7,.05,earth.worldZ-.5)
+    stationPoint={x:dock.x,y:dock.y+45}
+    station.style.left=`${stationPoint.x}px`;station.style.top=`${stationPoint.y}px`
+    if(w>=760){if(rocketTime!==null){if(animate)rocketTime+=dt;drawRocket(stationPoint.x+45,stationPoint.y,Math.min(1,rocketTime/2400));if(rocketTime>=2400)rocketTime=null}else drawRocket(stationPoint.x+45,stationPoint.y,0)}
     raf=requestAnimationFrame(frame)
   }
   renderUI();raf=requestAnimationFrame(frame)
