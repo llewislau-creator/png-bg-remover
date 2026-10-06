@@ -1,3 +1,4 @@
+import { openPromptStudio } from './prompt-extractor.js'
 import './pixora-universe.css'
 import { openImageToPdf } from './image-to-pdf.js'
 import { openPrintStudio } from './print-studio.js'
@@ -8,7 +9,7 @@ import { openVectorStudio } from './vector-studio.js'
 
 // Perspective-projected solar system. No external graphics runtime or image uploads.
 const planets = [
-  ['mercury','水星','Mercury','最佳化','Optimize','#a8a5a0',.75,.10,false],
+  ['mercury','水星','Mercury','圖片轉提示詞','Image to Prompt','#a8a5a0',.75,.10,true],
   ['venus','金星','Venus','色彩分析','Color Analyzer','#e4b777',1.12,.14,true],
   ['earth','地球','Earth','AI 去背','AI Cutout','#319bde',1.53,.17,true],
   ['mars','火星','Mars','清理','Cleanup','#cb6348',1.95,.12,false],
@@ -55,6 +56,7 @@ if (!document.getElementById('pixora-universe-home')) {
     text('.pxu-planet',zh?p.zh:p.en)
     text('.pxu-title',zh?p.toolZh:p.toolEn)
     text('.pxu-desc',p.id==='pluto'?(zh?'為名片、海報與活動物料準備印刷稿。選擇尺寸、加入素材、檢查出血與解析度，再匯出 PDF。':'Prepare business cards, posters and event print layouts. Choose a size, add artwork, check bleed and resolution, then export PDF.'):p.id==='uranus'?(zh?'把圖片排成一份 PDF。調整頁面順序、紙張尺寸與檔案容量，全程留在你的瀏覽器。':'Arrange images into a PDF. Set page order, paper size and file size, all in your browser.'):p.available?(zh?'免費移除背景，保留你想要的主體。圖片直接在瀏覽器內處理，無需註冊。':'Remove backgrounds for free. Keep your subject, with images processed in your browser. No account required.'):(zh?`${p.toolZh}工具正在準備中。你可以繼續探索太陽系，或先使用免費 AI 去背。`:`${p.toolEn} is coming soon. Explore the solar system or try free AI background removal.`))
+    if(p.id==='mercury')text('.pxu-desc',zh?'從照片整理中英文提示詞、負面提示詞、主色與光線。支援本機色調分析，接入 OpenAI 後可自動辨識主體與場景。':'Compose bilingual prompts, negative prompts, colors and lighting from photos. Local tone analysis works now; OpenAI enables subject and scene analysis.')
     const enter=home.querySelector('.pxu-enter')
     if(p.id==='moon')text('.pxu-desc',zh?'將標誌、圖示或線稿轉成可編輯的 SVG。調整色數、輪廓平滑與雜點過濾，全程在本機處理。':'Convert logos, icons or line art into editable SVG. Adjust colors, contours and noise filtering locally.')
     if(p.id==='venus')text('.pxu-desc',zh?'從圖片擷取主色，查看色碼與比例，建立你的色彩索引。圖片留在瀏覽器，可下載色票、CSS 或 JSON。':'Extract colors and proportions from an image. Keep your image in the browser and export palettes, CSS or JSON.')
@@ -62,6 +64,7 @@ if (!document.getElementById('pixora-universe-home')) {
     if(p.id==='neptune')text('.pxu-desc',zh?'輸入主題或匯入文字，建立大綱草稿。挑選配色、編輯內容與圖片，再匯出可編輯的 PowerPoint。':'Build an outline from a topic or text. Edit your slides and export editable PowerPoint.')
     enter.disabled=!p.available
     enter.textContent=p.id==='pluto'?(zh?'開啟印刷工作台 ↗':'Open Print Studio ↗'):p.id==='uranus'?(zh?'開啟 PDF 工作台 ↗':'Open PDF studio ↗'):p.available?(zh?'開始去背 ↗':'Start removing backgrounds ↗'):(zh?'即將推出':'Coming soon')
+    if(p.id==='mercury')enter.textContent=zh?'開啟提示詞工作台 ↗':'Open Prompt Studio ↗'
     const cutout=home.querySelector('.pxu-cutout')
     if(p.id==='moon')enter.textContent=zh?'開啟向量工作台 ↗':'Open Vector Studio ↗'
     if(p.id==='venus')enter.textContent=zh?'開啟色彩工作台 ↗':'Open Color Studio ↗'
@@ -69,8 +72,8 @@ if (!document.getElementById('pixora-universe-home')) {
     if(p.id==='neptune')enter.textContent=zh?'開啟簡報工作台 ↗':'Open Presentation Studio ↗'
     cutout.hidden=p.available
     cutout.textContent=zh?'先使用 AI 去背 →':'Try AI Cutout →'
-    text('.pxu-trust',zh?'本地處理 · 免費核心功能 · 無需帳號':'Local processing · Free core · No account')
-    text('.pxu-local',zh?'圖片留在你的裝置':'Your images stay on your device')
+    text('.pxu-trust',p.id==='mercury'?(zh?'本機分析免費 · AI 分析需服務設定':'Free local analysis · AI requires service setup'):(zh?'本地處理 · 免費核心功能 · 無需帳號':'Local processing · Free core · No account'))
+    text('.pxu-local',p.id==='mercury'?(zh?'AI 分析需傳送圖片至 OpenAI':'AI analysis sends an image to OpenAI'):(zh?'圖片留在你的裝置':'Your images stay on your device'))
     text('.pxu-nav-heading',zh?'探索影像工具':'Explore image tools')
     const touch=matchMedia('(pointer:coarse)').matches
     text('.pxu-help',zh?(touch?'單指旋轉 · 雙指縮放 · 點選行星':'拖曳探索 360° · 滾輪縮放 · 點擊行星'):(touch?'Drag to rotate · Pinch to zoom · Tap a planet':'Drag to explore 360° · Scroll to zoom · Select a planet'))
@@ -103,6 +106,7 @@ if (!document.getElementById('pixora-universe-home')) {
     document.getElementById('fileInput')?.focus({preventScroll:true})
   }
   home.querySelector('.pxu-enter').onclick=()=>{
+    if(planets[active].id==='mercury'){pause();openPromptStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='moon'){pause();openVectorStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='venus'){pause();openColorStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='jupiter'){pause();openFontStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
