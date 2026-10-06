@@ -1,5 +1,6 @@
 import pptxgen from 'pptxgenjs'
 import './presentation-studio.css'
+import './presentation-reference.css'
 
 const THEMES = {
   cosmos:{name:'Cosmos',bg:'050806',panel:'101713',text:'F7F8F7',muted:'AEB8B0',accent:'B7FF2A'},
@@ -20,12 +21,14 @@ const FRAMEWORKS = {
 const LAYOUTS = ['cover','bullets','split','section','stats','chart','quote']
 let studio = null
 let toastTimer = 0
+let returnFocus = null
+let exporting = false
 
 const state = {
   topic:'',
   framework:'business',
   count:8,
-  theme:'cosmos',
+  theme:'paper',
   selected:0,
   fileName:'presentation-studio',
   slides:[]
@@ -34,62 +37,15 @@ const state = {
 function escText(v=''){return String(v).replace(/\r/g,'').trim()}
 function safeName(v='presentation-studio'){return (v||'presentation-studio').replace(/[\\/:*?"<>|]+/g,'-').trim()||'presentation-studio'}
 function bodyLines(body=''){return escText(body).split('\n').map(s=>s.trim()).filter(Boolean).map(s=>s.replace(/^[-•*]\s*/,''))}
-function parseStats(body=''){
-  const out=[]
-  bodyLines(body).forEach((line,i)=>{
-    const m=line.match(/^(.{1,36}?)[\s|:：-]+([\d,.]+%?|\$?[\d,.]+[KMB]?)$/i)
-    if(m) out.push({label:m[1].trim(),value:m[2].trim()})
-    else if(i<3) out.push({label:line.slice(0,28),value:String((i+1)*25)+'%'})
-  })
-  while(out.length<3) out.push({label:['Reach','Efficiency','Impact'][out.length],value:['72%','1.8×','+34%'][out.length]})
-  return out.slice(0,3)
-}
-function parseChart(body=''){
-  const rows=[]
-  bodyLines(body).forEach((line,i)=>{
-    const m=line.match(/^(.{1,32}?)[\s|:：-]+([\d,.]+)$/)
-    if(m) rows.push({label:m[1].trim(),value:Number(m[2].replace(/,/g,''))||0})
-    else if(i<5) rows.push({label:line.slice(0,18),value:30+i*14})
-  })
-  if(!rows.length) return [{label:'A',value:46},{label:'B',value:72},{label:'C',value:58},{label:'D',value:88}]
-  return rows.slice(0,6)
-}
-function defaultBody(title,topic,index){
-  const t=topic||'your presentation'
-  const samples={
-    'Executive summary':`Clarify the decision this presentation should enable.\nSummarize the strongest signal around ${t}.\nDefine the recommended direction in one sentence.`,
-    'Problem / opportunity':`State the friction or unmet need clearly.\nQuantify why it matters now.\nShow what becomes possible if the issue is solved.`,
-    'Audience & insight':`Primary audience and context.\nObserved behaviour or constraint.\nDesign implication for ${t}.`,
-    'Proposed direction':`Focus on one coherent direction.\nPrioritize clarity over feature count.\nConnect every element to the intended outcome.`,
-    'Solution structure':`Core experience / offer.\nSupporting system or workflow.\nHow the parts reinforce each other.`,
-    'Value & impact':`Reach 72%\nEfficiency 1.8\nImpact 34`,
-    'Roadmap':`Phase 1 — validate the core.\nPhase 2 — expand the system.\nPhase 3 — optimize and scale.`,
-    'Next steps':`Confirm the decision owner.\nLock the first milestone.\nAssign next actions and review date.`
-  }
-  return samples[title]||`Frame ${title.toLowerCase()} around ${t}.\nUse one strong claim and two supporting points.\nKeep the slide focused on a single message (${index+1}).`
-}
-function layoutFor(title,index,count){
-  if(index===0) return 'cover'
-  if(index===count-1) return 'quote'
-  const s=title.toLowerCase()
-  if(s.includes('data')||s.includes('signal')||s.includes('finding')) return 'chart'
-  if(s.includes('value')||s.includes('impact')||s.includes('measure')) return 'stats'
-  if(s.includes('roadmap')||s.includes('structure')||s.includes('approach')) return 'split'
-  if(index===Math.floor(count/2)) return 'section'
-  return 'bullets'
-}
+function parseStats(body=''){return bodyLines(body).map(line=>{const m=line.match(/^(.+?)[|:：]\s*(.+)$/);return m?{label:m[1].trim(),value:m[2].trim()}:null}).filter(Boolean).slice(0,3)}
+function parseChart(body=''){return bodyLines(body).map(line=>{const m=line.match(/^(.+?)[|:：]\s*(-?[\d,.]+)$/);return m?{label:m[1].trim(),value:Number(m[2].replace(/,/g,''))}:null}).filter(x=>x&&Number.isFinite(x.value)&&x.value>=0).slice(0,6)}
+const OUTLINES={business:['簡報摘要','現況與機會','目標對象','建議方向','執行方案','預期成果','時程安排'],report:['報告摘要','背景與範圍','主要發現','資料與證據','變化原因','影響分析','建議事項'],pitch:['願景','問題','解決方案','產品介紹','目標市場','商業模式','合作需求'],education:['學習目標','課程背景','核心概念','重要方法','案例說明','練習活動','課程總結'],proposal:['提案目標','現況分析','設計原則','建議方案','工作項目','執行時程','成效衡量']}
+function layoutFor(title,index,count){return index===0?'cover':index===count-1?'quote':index===Math.floor(count/2)?'section':'bullets'}
 function makeDeck(topic,count,framework){
-  const clean=escText(topic)||'Untitled Presentation'
-  const core=FRAMEWORKS[framework]||FRAMEWORKS.business
-  const wanted=Math.max(4,Math.min(14,Number(count)||8))
-  const slides=[{title:clean,body:`A focused presentation draft · ${new Date().toLocaleDateString()}`,layout:'cover',kicker:'PRESENTATION STUDIO',image:null}]
-  const middle=wanted-2
-  for(let i=0;i<middle;i++){
-    const title=core[i%core.length]
-    slides.push({title,body:defaultBody(title,clean,i),layout:layoutFor(title,i+1,wanted),kicker:`${String(i+2).padStart(2,'0')} / ${clean}`,image:null})
-  }
-  slides.push({title:'Make the next decision clear.',body:`${clean}\nThank you.`,layout:'quote',kicker:'CLOSING',image:null})
-  return slides
+ const clean=escText(topic)||'未命名簡報',core=OUTLINES[framework]||OUTLINES.business,wanted=Math.max(4,Math.min(14,Number(count)||8));
+ const slides=[{title:clean,body:'請補充簡報目的與對象',layout:'cover',kicker:'PIXORA PRESENTATION',image:null}];
+ for(let i=0;i<wanted-2;i++){const title=core[i%core.length];slides.push({title,body:'請填寫「'+clean+'」的'+title+'。\n加入你的資料、觀點與具體例子。',layout:layoutFor(title,i+1,wanted),kicker:String(i+2).padStart(2,'0'),image:null})}
+ slides.push({title:'下一步',body:'請填寫待確認事項、負責人與日期。',layout:'quote',kicker:'NEXT STEPS',image:null});return slides
 }
 function parseImportedText(text){
   const src=String(text||'').replace(/\r/g,'').trim()
@@ -99,7 +55,7 @@ function parseImportedText(text){
   for(const block of blocks){
     const lines=block.split('\n').map(x=>x.trim()).filter(Boolean)
     if(!lines.length) continue
-    let title=lines[0].replace(/^#{1,6}\s*/,'').slice(0,90)
+    let title=lines[0].replace(/^#{1,6}\s*/,'')
     let body=lines.slice(1).join('\n')
     if(!body && title.length>90){body=title;title='Key point'}
     slides.push({title,body:body||'Add supporting detail here.',layout:'bullets',kicker:'IMPORTED CONTENT',image:null})
@@ -121,14 +77,17 @@ function showToast(msg){
   const el=document.querySelector('.ps-toast');if(!el)return
   el.textContent=msg;el.classList.add('is-on');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('is-on'),1800)
 }
-function openStudio(){
+export function openPresentationStudio(onReturn=null){
+  returnFocus=onReturn
+  document.getElementById('pixora-universe-home')?.setAttribute('inert','')
   if(studio){studio.style.display='grid';document.body.style.overflow='hidden';renderAll();return}
   studio=document.createElement('div')
   studio.id='presentation-studio'
+  studio.setAttribute('role','dialog');studio.setAttribute('aria-modal','true');studio.setAttribute('aria-label','簡報工作台')
   studio.innerHTML=`
     <header class="ps-topbar">
       <button class="ps-back" type="button">← 回到行星選單</button>
-      <div class="ps-brand"><b>JUPITER / PRESENTATION STUDIO</b><span>Generate · Style · Arrange · Export PPTX</span></div>
+      <div class="ps-brand"><b>PIXORA / 簡報工作台</b><span>海王星 · 大綱 / 模板 / PPTX</span></div>
       <button class="ps-export" type="button">DOWNLOAD .PPTX</button>
     </header>
     <div class="ps-shell">
@@ -146,9 +105,9 @@ function openStudio(){
     </div>
     <div class="ps-toast" role="status"></div>`
   document.body.appendChild(studio);document.body.style.overflow='hidden'
-  bindStudio();renderThemes();renderAll()
+  enhanceWorkspace();bindStudio();renderThemes();renderAll()
 }
-function closeStudio(){if(!studio)return;studio.style.display='none';document.body.style.overflow=''}
+function closeStudio(){if(!studio||exporting)return;studio.style.display='none';document.body.style.overflow='';document.getElementById('pixora-universe-home')?.removeAttribute('inert');returnFocus?.()}
 function bindStudio(){
   studio.querySelector('.ps-back').addEventListener('click',closeStudio)
   studio.querySelector('.ps-export').addEventListener('click',exportPptx)
@@ -156,22 +115,22 @@ function bindStudio(){
     state.topic=studio.querySelector('.ps-topic').value
     state.framework=studio.querySelector('.ps-framework').value
     state.count=Number(studio.querySelector('.ps-count').value)
-    state.slides=makeDeck(state.topic,state.count,state.framework);state.selected=0;renderAll();showToast(`${state.slides.length} slides generated`)
+    state.slides=makeDeck(state.topic,state.count,state.framework);state.selected=0;renderAll();showToast(`已建立 ${state.slides.length} 頁大綱草稿`)
   })
   studio.querySelector('.ps-import-trigger').addEventListener('click',()=>studio.querySelector('.ps-import').click())
   studio.querySelector('.ps-import').addEventListener('change',async e=>{
     const file=e.target.files?.[0];if(!file)return
-    const text=await file.text();const slides=parseImportedText(text)
+    if(file.size>1024*1024){showToast('文字檔請小於 1MB');return}const text=await file.text();const slides=parseImportedText(text)
     if(!slides.length){showToast('No usable text found');return}
-    state.slides=slides;state.selected=0;state.topic=file.name.replace(/\.[^.]+$/,'');studio.querySelector('.ps-topic').value=state.topic;renderAll();showToast(`${slides.length} slides imported`);e.target.value=''
+    state.slides=slides;state.selected=0;state.topic=file.name.replace(/\.[^.]+$/,'');studio.querySelector('.ps-topic').value=state.topic;renderAll();showToast(`已匯入 ${slides.length} 頁內容`);e.target.value=''
   })
   studio.querySelector('.ps-filename').addEventListener('input',e=>state.fileName=e.target.value)
   studio.querySelector('.ps-polish').addEventListener('click',()=>{
     if(!state.slides.length)return showToast('Generate or import a deck first')
-    state.slides.forEach((s,i)=>{s.layout=layoutFor(s.title,i,state.slides.length);s.kicker=s.kicker||`SLIDE ${String(i+1).padStart(2,'0')}`});renderAll();showToast('Deck layout polished')
+    state.slides.forEach((s,i)=>{s.layout=layoutFor(s.title,i,state.slides.length);s.kicker=s.kicker||`SLIDE ${String(i+1).padStart(2,'0')}`});renderAll();showToast('已套用建議版式')
   })
   studio.querySelector('.ps-add').addEventListener('click',()=>{
-    state.slides.push({title:'New slide',body:'Add your message here.',layout:'bullets',kicker:'NEW SLIDE',image:null});state.selected=state.slides.length-1;renderAll()
+    state.slides.push({title:'新投影片',body:'請加入內容。',layout:'bullets',kicker:'NEW SLIDE',image:null});state.selected=state.slides.length-1;renderAll()
   })
   studio.querySelectorAll('.ps-icon').forEach(btn=>btn.addEventListener('click',()=>{
     const s=state.slides[state.selected];if(!s)return
@@ -183,11 +142,11 @@ function renderThemes(){
   Object.entries(THEMES).forEach(([key,t])=>{
     const b=document.createElement('button');b.type='button';b.className='ps-theme'+(state.theme===key?' is-active':'');b.dataset.theme=key
     b.innerHTML=`<div class="ps-theme-swatch" style="--a:#${t.accent};--b:#${t.bg}"></div><b>${t.name}</b>`
-    b.addEventListener('click',()=>{state.theme=key;renderThemes();renderPreview();showToast(`${t.name} theme applied`)})
+    b.addEventListener('click',()=>{state.theme=key;renderThemes();translateUI();renderPreview();showToast(`${t.name} theme applied`)})
     box.appendChild(b)
   })
 }
-function renderAll(){renderSlideList();renderEditor();renderPreview()}
+function renderAll(){renderSlideList();renderEditor();renderPreview();translateUI();translateUI();studio.querySelector('.ps-export').disabled=!state.slides.length}
 function renderSlideList(){
   const list=studio.querySelector('.ps-slide-list');list.innerHTML=''
   state.slides.forEach((s,i)=>{
@@ -213,12 +172,12 @@ function renderEditor(){
   kicker.value=s.kicker||'';title.value=s.title||'';body.value=s.body||''
   ;[[kicker,'kicker'],[title,'title'],[body,'body']].forEach(([el,key])=>el.addEventListener('input',()=>{s[key]=el.value;renderPreview();renderSlideList()}))
   const grid=root.querySelector('.ps-layout-grid');LAYOUTS.forEach(layout=>{
-    const b=document.createElement('button');b.type='button';b.className='ps-layout'+(s.layout===layout?' is-active':'');b.textContent=layout.toUpperCase();b.addEventListener('click',()=>{s.layout=layout;renderEditor();renderPreview();renderSlideList()});grid.appendChild(b)
+    const b=document.createElement('button');b.type='button';b.className='ps-layout'+(s.layout===layout?' is-active':'');b.textContent=layout.toUpperCase();b.addEventListener('click',()=>{s.layout=layout;renderEditor();renderPreview();translateUI();renderSlideList();translateUI()});grid.appendChild(b)
   })
   const imgBox=root.querySelector('.ps-image-preview');if(s.image){imgBox.innerHTML='';const img=document.createElement('img');img.src=s.image.data;imgBox.appendChild(img)}
   root.querySelector('.ps-image-add').addEventListener('click',()=>root.querySelector('.ps-image-file').click())
-  root.querySelector('.ps-image-file').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;s.image=await loadImageFile(f);renderEditor();renderPreview()})
-  root.querySelector('.ps-image-remove').addEventListener('click',()=>{s.image=null;renderEditor();renderPreview()})
+  root.querySelector('.ps-image-file').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{if(f.size>20*1024*1024)throw new Error();s.image=await loadImageFile(f)}catch{showToast('圖片無法讀取，請使用 20MB 以下的圖片。');return}renderEditor();renderPreview();translateUI()})
+  root.querySelector('.ps-image-remove').addEventListener('click',()=>{s.image=null;renderEditor();renderPreview();translateUI()})
   root.querySelector('.ps-delete').addEventListener('click',()=>{state.slides.splice(state.selected,1);state.selected=Math.max(0,Math.min(state.selected,state.slides.length-1));renderAll()})
 }
 function loadImageFile(file){
@@ -243,7 +202,7 @@ function addImageContained(slide,img,x,y,w,h){
   slide.addImage({data:img.data,x:ix,y:iy,w:iw,h:ih})
 }
 function addBase(slide,t,index,total,kicker){
-  slide.background={color:t.bg};slide.addShape(pptxgen.ShapeType.rect,{x:0,y:0,w:13.333,h:.08,fill:{color:t.accent},line:{color:t.accent}})
+  slide.background={color:t.bg};slide.addShape('rect',{x:0,y:0,w:13.333,h:.08,fill:{color:t.accent},line:{color:t.accent}})
   slide.addText(kicker||'PRESENTATION STUDIO',{x:.8,y:.5,w:8.5,h:.28,fontFace:'Aptos',fontSize:10,bold:true,color:t.accent,charSpacing:1.4,margin:0})
   slide.addText(`${String(index+1).padStart(2,'0')} / ${String(total).padStart(2,'0')}`,{x:11.4,y:7.08,w:1.1,h:.2,fontFace:'Aptos',fontSize:8,bold:true,color:t.muted,align:'right',margin:0})
 }
@@ -251,33 +210,33 @@ function addTitle(slide,text,t,y=.95,size=30,w=10.9){slide.addText(text||'Untitl
 function addBody(slide,body,t,x=.82,y=2.3,w=7.8,h=3.5){const lines=bodyLines(body);slide.addText(lines.map(x=>'• '+x).join('\n'),{x,y,w,h,fontFace:'Aptos',fontSize:18,color:t.muted,breakLine:false,margin:0,paraSpaceAfterPt:12,fit:'shrink',valign:'top'})}
 async function exportPptx(){
   if(!state.slides.length)return showToast('Generate or import a deck first')
-  const button=studio.querySelector('.ps-export');button.disabled=true;button.textContent='BUILDING…'
+  const button=studio.querySelector('.ps-export');button.disabled=true;button.textContent='正在匯出…'
   try{
     const pptx=new pptxgen();pptx.layout='LAYOUT_WIDE';pptx.author='Solar Tool System';pptx.company='Solar Tool System';pptx.subject='Presentation Studio export';pptx.title=state.topic||state.slides[0]?.title||'Presentation';pptx.lang='zh-TW'
     const t=THEMES[state.theme]
     state.slides.forEach((s,i)=>{
       const slide=pptx.addSlide();addBase(slide,t,i,state.slides.length,s.kicker)
       if(s.layout==='cover'){
-        slide.addShape(pptxgen.ShapeType.rect,{x:8.75,y:.75,w:3.8,h:5.95,fill:{color:t.panel,transparency:5},line:{color:t.accent,transparency:72,width:1}})
-        addTitle(slide,s.title,t,1.45,38,7.3);slide.addShape(pptxgen.ShapeType.rect,{x:.82,y:2.86,w:.72,h:.07,fill:{color:t.accent},line:{color:t.accent}});slide.addText(s.body||'',{x:.82,y:3.18,w:6.7,h:1.3,fontFace:'Aptos',fontSize:18,color:t.muted,margin:0,fit:'shrink'})
+        slide.addShape('rect',{x:8.75,y:.75,w:3.8,h:5.95,fill:{color:t.panel,transparency:5},line:{color:t.accent,transparency:72,width:1}})
+        addTitle(slide,s.title,t,1.45,38,7.3);slide.addShape('rect',{x:.82,y:2.86,w:.72,h:.07,fill:{color:t.accent},line:{color:t.accent}});slide.addText(s.body||'',{x:.82,y:3.18,w:6.7,h:1.3,fontFace:'Aptos',fontSize:18,color:t.muted,margin:0,fit:'shrink'})
         if(s.image)addImageContained(slide,s.image,8.95,1.0,3.4,5.45)
       } else if(s.layout==='section'){
         slide.addText(String(i+1).padStart(2,'0'),{x:.8,y:1.15,w:1.5,h:.65,fontFace:'Aptos Display',fontSize:34,bold:true,color:t.accent,margin:0});addTitle(slide,s.title,t,3.25,42,10.8);slide.addText(s.body||'',{x:.82,y:4.75,w:8.6,h:1.1,fontFace:'Aptos',fontSize:17,color:t.muted,margin:0,fit:'shrink'})
       } else if(s.layout==='quote'){
-        slide.addShape(pptxgen.ShapeType.rect,{x:1.0,y:1.1,w:.09,h:4.9,fill:{color:t.accent},line:{color:t.accent}});slide.addText(s.title||'',{x:1.55,y:1.45,w:10.1,h:2.2,fontFace:'Aptos Display',fontSize:34,bold:true,color:t.text,margin:0,align:'center',valign:'mid',fit:'shrink'});slide.addText(s.body||'',{x:2.2,y:4.25,w:8.8,h:1.0,fontFace:'Aptos',fontSize:17,color:t.muted,align:'center',margin:0,fit:'shrink'})
+        slide.addShape('rect',{x:1.0,y:1.1,w:.09,h:4.9,fill:{color:t.accent},line:{color:t.accent}});slide.addText(s.title||'',{x:1.55,y:1.45,w:10.1,h:2.2,fontFace:'Aptos Display',fontSize:34,bold:true,color:t.text,margin:0,align:'center',valign:'mid',fit:'shrink'});slide.addText(s.body||'',{x:2.2,y:4.25,w:8.8,h:1.0,fontFace:'Aptos',fontSize:17,color:t.muted,align:'center',margin:0,fit:'shrink'})
       } else if(s.layout==='split'){
-        addTitle(slide,s.title,t,1.0,28,6.1);addBody(slide,s.body,t,.82,2.25,5.7,3.9);slide.addShape(pptxgen.ShapeType.roundRect,{x:7.15,y:1.05,w:5.15,h:5.55,rectRadius:.08,fill:{color:t.panel},line:{color:t.accent,transparency:70,width:1}});if(s.image)addImageContained(slide,s.image,7.42,1.32,4.61,5.0);else slide.addText('IMAGE / VISUAL',{x:7.65,y:3.52,w:4.0,h:.35,fontFace:'Aptos',fontSize:12,bold:true,color:t.muted,align:'center',margin:0})
+        addTitle(slide,s.title,t,1.0,28,6.1);addBody(slide,s.body,t,.82,2.25,5.7,3.9);slide.addShape('roundRect',{x:7.15,y:1.05,w:5.15,h:5.55,rectRadius:.08,fill:{color:t.panel},line:{color:t.accent,transparency:70,width:1}});if(s.image)addImageContained(slide,s.image,7.42,1.32,4.61,5.0);else slide.addText('IMAGE / VISUAL',{x:7.65,y:3.52,w:4.0,h:.35,fontFace:'Aptos',fontSize:12,bold:true,color:t.muted,align:'center',margin:0})
       } else if(s.layout==='stats'){
-        addTitle(slide,s.title,t,1.0,28,10.6);const stats=parseStats(s.body);stats.forEach((x,j)=>{const xx=.82+j*4.05;slide.addShape(pptxgen.ShapeType.roundRect,{x:xx,y:2.45,w:3.6,h:2.8,fill:{color:t.panel},line:{color:t.accent,transparency:70,width:1}});slide.addText(x.value,{x:xx+.25,y:2.9,w:3.05,h:.7,fontFace:'Aptos Display',fontSize:32,bold:true,color:t.accent,margin:0,align:'center'});slide.addText(x.label,{x:xx+.3,y:3.85,w:3.0,h:.7,fontFace:'Aptos',fontSize:15,color:t.muted,margin:0,align:'center',fit:'shrink'})})
+        addTitle(slide,s.title,t,1.0,28,10.6);const stats=parseStats(s.body);stats.forEach((x,j)=>{const xx=.82+j*4.05;slide.addShape('roundRect',{x:xx,y:2.45,w:3.6,h:2.8,fill:{color:t.panel},line:{color:t.accent,transparency:70,width:1}});slide.addText(x.value,{x:xx+.25,y:2.9,w:3.05,h:.7,fontFace:'Aptos Display',fontSize:32,bold:true,color:t.accent,margin:0,align:'center'});slide.addText(x.label,{x:xx+.3,y:3.85,w:3.0,h:.7,fontFace:'Aptos',fontSize:15,color:t.muted,margin:0,align:'center',fit:'shrink'})})
       } else if(s.layout==='chart'){
-        addTitle(slide,s.title,t,1.0,28,10.6);const data=parseChart(s.body),max=Math.max(...data.map(x=>x.value),1);data.forEach((x,j)=>{const yy=2.25+j*.68;slide.addText(x.label,{x:.82,y:yy,w:2.05,h:.26,fontFace:'Aptos',fontSize:11,color:t.muted,margin:0,fit:'shrink'});slide.addShape(pptxgen.ShapeType.rect,{x:3.0,y:yy+.02,w:7.6,h:.19,fill:{color:t.panel},line:{color:t.panel}});slide.addShape(pptxgen.ShapeType.rect,{x:3.0,y:yy+.02,w:Math.max(.12,7.6*x.value/max),h:.19,fill:{color:t.accent},line:{color:t.accent}});slide.addText(String(x.value),{x:10.85,y:yy,w:.85,h:.22,fontFace:'Aptos',fontSize:10,bold:true,color:t.text,align:'right',margin:0})})
+        addTitle(slide,s.title,t,1.0,28,10.6);const data=parseChart(s.body),max=Math.max(...data.map(x=>x.value),1);data.forEach((x,j)=>{const yy=2.25+j*.68;slide.addText(x.label,{x:.82,y:yy,w:2.05,h:.26,fontFace:'Aptos',fontSize:11,color:t.muted,margin:0,fit:'shrink'});slide.addShape('rect',{x:3.0,y:yy+.02,w:7.6,h:.19,fill:{color:t.panel},line:{color:t.panel}});slide.addShape('rect',{x:3.0,y:yy+.02,w:Math.max(.12,7.6*x.value/max),h:.19,fill:{color:t.accent},line:{color:t.accent}});slide.addText(String(x.value),{x:10.85,y:yy,w:.85,h:.22,fontFace:'Aptos',fontSize:10,bold:true,color:t.text,align:'right',margin:0})})
       } else {
-        addTitle(slide,s.title,t,1.0,28,10.8);slide.addShape(pptxgen.ShapeType.rect,{x:.82,y:2.08,w:.65,h:.06,fill:{color:t.accent},line:{color:t.accent}});addBody(slide,s.body,t,.82,2.45,s.image?6.4:10.2,3.75);if(s.image){slide.addShape(pptxgen.ShapeType.roundRect,{x:7.8,y:2.1,w:4.45,h:3.95,fill:{color:t.panel},line:{color:t.accent,transparency:76,width:1}});addImageContained(slide,s.image,8.0,2.3,4.05,3.55)}
+        addTitle(slide,s.title,t,1.0,28,10.8);slide.addShape('rect',{x:.82,y:2.08,w:.65,h:.06,fill:{color:t.accent},line:{color:t.accent}});addBody(slide,s.body,t,.82,2.45,s.image?6.4:10.2,3.75);if(s.image){slide.addShape('roundRect',{x:7.8,y:2.1,w:4.45,h:3.95,fill:{color:t.panel},line:{color:t.accent,transparency:76,width:1}});addImageContained(slide,s.image,8.0,2.3,4.05,3.55)}
       }
     })
-    await pptx.writeFile({fileName:safeName(state.fileName||state.topic)+'.pptx'});showToast('PowerPoint downloaded')
-  }catch(err){console.error(err);showToast('PPTX export failed — check browser console')}
-  finally{button.disabled=false;button.textContent='DOWNLOAD .PPTX'}
+    await pptx.writeFile({fileName:safeName(state.fileName||state.topic)+'.pptx'});showToast('PowerPoint 已匯出')
+  }catch(err){console.error(err);showToast('PPTX 匯出失敗，請檢查圖片或重試。')}
+  finally{exporting=false;studio.querySelectorAll('button,input,textarea,select').forEach(el=>el.disabled=false);button.textContent='匯出 PPTX'}
 }
 
 function wireJupiter(){
@@ -286,7 +245,18 @@ function wireJupiter(){
   if(!jupiter)return
   jupiter.dataset.status='active';jupiter.setAttribute('aria-label','JUPITER: PRESENTATION STUDIO')
   const title=jupiter.querySelector('.planet-label b'),meta=jupiter.querySelector('.planet-label span');if(title)title.textContent='05 / PRESENTATION STUDIO';if(meta)meta.textContent='JUPITER · CURRENT'
-  jupiter.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();openStudio()},true)
+  jupiter.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();openPresentationStudio()},true)
 }
 
 wireJupiter()
+
+const UI_TEXT={'DOWNLOAD .PPTX':'匯出 PPTX','Smart draft':'建立簡報','Structure':'簡報用途','Slides':'投影片','Business':'商務簡報','Report':'工作報告','Pitch':'募資提案','Education':'教學課件','Proposal':'企劃提案','GENERATE DECK':'建立大綱草稿','IMPORT TEXT / MARKDOWN':'匯入文字 / Markdown','Theme library':'模板配色','Quick insert':'插入符號','File':'檔案設定','PowerPoint filename':'PPTX 檔名','AUTO POLISH':'套用建議版式','+ ADD SLIDE':'新增一頁','Selected slide':'編輯目前頁面','Kicker':'頁面標籤','Title':'標題','Body / data':'內容 / 數據','Layout':'版式','Image':'圖片','No image':'尚未加入圖片','ADD / REPLACE IMAGE':'加入 / 更換圖片','DELETE SLIDE':'刪除此頁','Start with a topic':'從簡報主題開始','Generate a deck or import text to begin.':'輸入主題建立大綱，或匯入你的文字內容。','COVER':'封面','BULLETS':'重點','SPLIT':'圖文','SECTION':'章節','STATS':'指標','CHART':'長條圖','QUOTE':'結語','Cosmos':'宇宙','Paper':'簡約','Ocean':'海洋','Ember':'暖橙','Mono':'黑白'}
+function translateUI(){
+ const walker=document.createTreeWalker(studio,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode())){if(node.parentElement.closest('.ps-slide-preview,.ps-slide-meta'))continue;const value=node.nodeValue.trim();if(UI_TEXT[value])node.nodeValue=node.nodeValue.replace(value,UI_TEXT[value])}
+ studio.querySelectorAll('.ps-field').forEach((field,i)=>{const label=field.querySelector('label'),input=field.querySelector('input,textarea,select');if(label&&input){input.id='ps-field-'+i;label.htmlFor=input.id}})
+}
+function enhanceWorkspace(){
+ studio.querySelector('.ps-topic').setAttribute('aria-label','簡報主題');studio.querySelector('.ps-help').textContent='本機模板建立大綱草稿。請逐頁補充內容與來源，數據版式使用「名稱：數值」。';studio.querySelector('.ps-status').textContent='本機處理 · 可編輯 PPTX';
+ const hero=document.createElement('div');hero.className='ps-intro';hero.innerHTML='<small>NEPTUNE / PRESENTATION</small><h1>把你的想法，<span>整理成簡報。</span></h1><p>輸入主題或匯入文字，選擇模板後逐頁編輯。</p><div><button data-example="report">工作報告</button><button data-example="pitch">品牌提案</button><button data-example="education">教學課件</button></div>';studio.querySelector('.ps-main').prepend(hero);
+ hero.querySelectorAll('button').forEach(button=>button.onclick=()=>{studio.querySelector('.ps-framework').value=button.dataset.example;studio.querySelector('.ps-topic').value=button.textContent;studio.querySelector('.ps-topic').focus()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&studio.style.display!=='none')closeStudio()})
+}

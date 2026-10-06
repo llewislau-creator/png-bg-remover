@@ -1,0 +1,39 @@
+#presentation-studio{background:#fafaff;color:#282638;font-family:Inter,"Noto Sans TC","Microsoft JhengHei",sans-serif}
+#presentation-studio .ps-topbar{background:#fff;border-color:#e9e6f0}
+#presentation-studio .ps-shell{grid-template-columns:270px minmax(0,1fr) 300px;background:#fafaff}
+#presentation-studio .ps-sidebar,#presentation-studio .ps-inspector,#presentation-studio .ps-toolbar{background:#fff;border-color:#ece8f3}
+#presentation-studio .ps-section{border-color:#ece8f3}
+#presentation-studio .ps-section h3,#presentation-studio .ps-field label{color:#777187}
+#presentation-studio .ps-help,#presentation-studio .ps-brand span,#presentation-studio .ps-status{color:#888096}
+#presentation-studio .ps-main{background:linear-gradient(150deg,#eef5ff,#f8f2ff);grid-template-rows:auto auto minmax(0,1fr);overflow:auto}
+#presentation-studio .ps-intro{padding:30px 28px 24px;text-align:center}
+.ps-intro small{color:#8a77b4;font-size:10px;letter-spacing:.18em}.ps-intro h1{font-size:clamp(24px,2.7vw,40px);line-height:1.4;margin:12px 0}.ps-intro h1 span{color:#7847df}.ps-intro p{font-size:13px;color:#898294}.ps-intro div{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+#presentation-studio button{color:#514566;border-color:#e4dfef;background:#fff}
+#presentation-studio button:hover{border-color:#9061ed;background:#f5efff}
+#presentation-studio .ps-export,#presentation-studio .ps-btn.acid{background:linear-gradient(110deg,#6650ef,#ad4bea);border-color:transparent;color:#fff}
+#presentation-studio button:disabled{opacity:.45;cursor:default}
+#presentation-studio input,#presentation-studio textarea,#presentation-studio select{color:#383145;background:#fcfbff;border-color:#e4deee}
+#presentation-studio input:focus,#presentation-studio textarea:focus,#presentation-studio select:focus{outline:2px solid #cfb8fa;border-color:#925bea}
+#presentation-studio .ps-topic{border:2px solid #9972ee;background:#fff}
+#presentation-studio .ps-theme,#presentation-studio .ps-icon,#presentation-studio .ps-slide-item,#presentation-studio .ps-layout{background:#fbfaff;color:#625571;border-color:#e7e1f0}
+#presentation-studio .is-active{border-color:#9463eb;background:#f2eaff}
+#presentation-studio .ps-slide-meta span{color:#a18cac}.ps-slide-list{padding:0}
+#presentation-studio .ps-canvas-wrap{padding:20px;overflow:visible}
+#presentation-studio .ps-canvas{border-color:#e0d9e9;border-radius:8px;box-shadow:0 15px 45px #46327820;container-type:inline-size}
+#presentation-studio .ps-slide-preview{padding:7%;gap:2cqw;align-content:center}
+#presentation-studio .ps-copy{display:grid;gap:2cqw;min-width:0}
+#presentation-studio .ps-preview-title{font-size:5cqw;line-height:1.2;max-width:100%;overflow-wrap:anywhere}
+#presentation-studio .ps-preview-body{font-size:2.5cqw;line-height:1.5;max-width:100%}
+#presentation-studio .ps-preview-kicker{font-size:1.4cqw}
+#presentation-studio .ps-slide-preview:after{font-size:1.3cqw;right:4%;bottom:4%}
+#presentation-studio .ps-media-box{min-height:0;height:100%;border-radius:8px}
+#presentation-studio .ps-media-box img{object-fit:contain}
+#presentation-studio .ps-empty{color:#9990a9}#presentation-studio .ps-empty b{color:#574869}
+#presentation-studio .ps-image-preview{background:#faf7ff;border-color:#d6c9e9;color:#9988b0}
+#presentation-studio .ps-stat{padding:2cqw}#presentation-studio .ps-stat b{font-size:4cqw}#presentation-studio .ps-stat span{font-size:1.6cqw}
+#presentation-studio .ps-bar-row{font-size:1.7cqw;grid-template-columns:20% 1fr 10%}.ps-bars{gap:1.8cqw}
+#presentation-studio .ps-slide-preview.layout-section .ps-preview-title,#presentation-studio .ps-slide-preview.layout-quote .ps-preview-title{font-size:5.5cqw}
+@media(max-width:1100px){#presentation-studio .ps-shell{grid-template-columns:230px minmax(0,1fr)}#presentation-studio .ps-inspector{grid-column:1/-1;max-height:400px}#presentation-studio .ps-shell{overflow:auto}#presentation-studio .ps-sidebar{overflow:visible}#presentation-studio .ps-main{min-height:500px}}
+@media(max-width:760px){#presentation-studio{grid-template-rows:auto minmax(0,1fr)}#presentation-studio .ps-topbar{padding:10px;grid-template-columns:auto 1fr}.ps-topbar .ps-export{grid-column:1/-1}#presentation-studio .ps-shell{display:flex;flex-direction:column}#presentation-studio .ps-sidebar{order:0}#presentation-studio .ps-main{order:1;min-height:0;display:block;overflow:visible}#presentation-studio .ps-inspector{order:2;max-height:none;overflow:visible}.ps-sidebar .ps-section:not(:first-child){padding:12px 18px}.ps-intro{padding:24px 16px!important}#presentation-studio .ps-canvas{aspect-ratio:16/9}#presentation-studio .ps-canvas-wrap{padding:12px}#presentation-studio .ps-theme-grid{grid-template-columns:repeat(5,1fr)}#presentation-studio .ps-theme{padding:6px}#presentation-studio .ps-theme-swatch{height:25px}#presentation-studio .ps-slide-preview.layout-split{grid-template-columns:1.08fr .92fr}#presentation-studio .ps-slide-preview.layout-split .ps-media-box{display:grid}}
+#presentation-studio{z-index:12000}.ps-toast{z-index:12010}
+@media(max-width:760px){#presentation-studio .ps-sidebar,#presentation-studio .ps-main,#presentation-studio .ps-inspector{flex:none;min-height:auto}#presentation-studio .ps-intro button{border-radius:16px;padding:7px 12px;font-size:12px}}
