@@ -4,6 +4,7 @@ import { openPrintStudio } from './print-studio.js'
 import { openPresentationStudio } from './presentation-studio.js'
 import { openFontStudio } from './font-studio.js'
 import { openColorStudio } from './color-studio.js'
+import { openVectorStudio } from './vector-studio.js'
 
 // Perspective-projected solar system. No external graphics runtime or image uploads.
 const planets = [
@@ -16,7 +17,7 @@ const planets = [
   ['uranus','天王星','Uranus','圖片轉 PDF','Image to PDF','#87d7de',3.98,.18,true],
   ['neptune','海王星','Neptune','簡報工作台','Presentation Studio','#557ee4',4.65,.18,true],
   ['pluto','冥王星 · 矮行星','Pluto · Dwarf planet','印刷工作台','Print Studio','#aa9a91',5.25,.08,true],
-  ['moon','月球','Moon','精修','Refine','#c7d1db',0,.055,false],
+  ['moon','月球','Moon','圖片轉向量','Image to SVG','#c7d1db',0,.055,true],
 ].map(([id,zh,en,toolZh,toolEn,color,orbit,radius,available],i)=>({id,zh,en,toolZh,toolEn,color,orbit,radius,available,angle:i*2.399}))
 
 if (!document.getElementById('pixora-universe-home')) {
@@ -55,12 +56,14 @@ if (!document.getElementById('pixora-universe-home')) {
     text('.pxu-title',zh?p.toolZh:p.toolEn)
     text('.pxu-desc',p.id==='pluto'?(zh?'為名片、海報與活動物料準備印刷稿。選擇尺寸、加入素材、檢查出血與解析度，再匯出 PDF。':'Prepare business cards, posters and event print layouts. Choose a size, add artwork, check bleed and resolution, then export PDF.'):p.id==='uranus'?(zh?'把圖片排成一份 PDF。調整頁面順序、紙張尺寸與檔案容量，全程留在你的瀏覽器。':'Arrange images into a PDF. Set page order, paper size and file size, all in your browser.'):p.available?(zh?'免費移除背景，保留你想要的主體。圖片直接在瀏覽器內處理，無需註冊。':'Remove backgrounds for free. Keep your subject, with images processed in your browser. No account required.'):(zh?`${p.toolZh}工具正在準備中。你可以繼續探索太陽系，或先使用免費 AI 去背。`:`${p.toolEn} is coming soon. Explore the solar system or try free AI background removal.`))
     const enter=home.querySelector('.pxu-enter')
+    if(p.id==='moon')text('.pxu-desc',zh?'將標誌、圖示或線稿轉成可編輯的 SVG。調整色數、輪廓平滑與雜點過濾，全程在本機處理。':'Convert logos, icons or line art into editable SVG. Adjust colors, contours and noise filtering locally.')
     if(p.id==='venus')text('.pxu-desc',zh?'從圖片擷取主色，查看色碼與比例，建立你的色彩索引。圖片留在瀏覽器，可下載色票、CSS 或 JSON。':'Extract colors and proportions from an image. Keep your image in the browser and export palettes, CSS or JSON.')
     if(p.id==='jupiter')text('.pxu-desc',zh?'讓文字有自己的風格。挑選書法、金屬與霓虹特效，切換橫排或直排，再下載透明 PNG。':'Style your text with calligraphy, metallic and neon effects. Choose horizontal or vertical text and download transparent PNG.')
     if(p.id==='neptune')text('.pxu-desc',zh?'輸入主題或匯入文字，建立大綱草稿。挑選配色、編輯內容與圖片，再匯出可編輯的 PowerPoint。':'Build an outline from a topic or text. Edit your slides and export editable PowerPoint.')
     enter.disabled=!p.available
     enter.textContent=p.id==='pluto'?(zh?'開啟印刷工作台 ↗':'Open Print Studio ↗'):p.id==='uranus'?(zh?'開啟 PDF 工作台 ↗':'Open PDF studio ↗'):p.available?(zh?'開始去背 ↗':'Start removing backgrounds ↗'):(zh?'即將推出':'Coming soon')
     const cutout=home.querySelector('.pxu-cutout')
+    if(p.id==='moon')enter.textContent=zh?'開啟向量工作台 ↗':'Open Vector Studio ↗'
     if(p.id==='venus')enter.textContent=zh?'開啟色彩工作台 ↗':'Open Color Studio ↗'
     if(p.id==='jupiter')enter.textContent=zh?'開啟字體工作台 ↗':'Open Font Studio ↗'
     if(p.id==='neptune')enter.textContent=zh?'開啟簡報工作台 ↗':'Open Presentation Studio ↗'
@@ -100,6 +103,7 @@ if (!document.getElementById('pixora-universe-home')) {
     document.getElementById('fileInput')?.focus({preventScroll:true})
   }
   home.querySelector('.pxu-enter').onclick=()=>{
+    if(planets[active].id==='moon'){pause();openVectorStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='venus'){pause();openColorStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='jupiter'){pause();openFontStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='neptune'){pause();openPresentationStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
