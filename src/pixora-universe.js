@@ -51,6 +51,10 @@ if (!document.getElementById('pixora-universe-home')) {
   station.className='pxu-station'
   station.innerHTML=`<svg viewBox="0 0 160 100" aria-hidden="true"><defs><linearGradient id="pxu-alloy" x2=".3" y2="1"><stop stop-color="#e3eff4"/><stop offset=".45" stop-color="#647e91"/><stop offset="1" stop-color="#172c40"/></linearGradient><linearGradient id="pxu-panel" x2="1" y2="1"><stop stop-color="#163756"/><stop offset="1" stop-color="#062034"/></linearGradient></defs><g transform="translate(80 46) rotate(-18)"><ellipse rx="35" ry="23" fill="none" stroke="#182f42" stroke-width="8"/><ellipse rx="35" ry="23" fill="none" stroke="url(#pxu-alloy)" stroke-width="5"/><path d="M-29-15 29 15M-29 15 29-15" stroke="#59768a" stroke-width="2"/><path d="M-67-21h23v40h-23zM44-21h23v40H44z" fill="url(#pxu-panel)" stroke="#4b819f" stroke-width=".8"/><path d="M-59-21v40m8-40v40m103-40v40m8-40v40M-67-11h23m-23 10h23m-23 10h23m88-20h23m-23 10h23m-23 10h23" stroke="#3d6886" stroke-width=".5"/><path d="M-44 0h88" stroke="#8ba7b6" stroke-width="4"/><rect x="-10" y="-20" width="20" height="40" rx="8" fill="url(#pxu-alloy)" stroke="#aac5d4" stroke-width=".6"/><path d="M-9-7H9M-9 9H9" stroke="#253f54" stroke-width="3"/><rect x="-5" y="-4" width="10" height="7" rx="2" fill="#13283b"/><path d="M-4-1h8" stroke="#8be4ef"/><circle cy="-24" r="2" fill="#8ce6e0"/><circle cx="35" r="1.5" fill="#86e1eb"/></g><path d="M79 78v8m-19 0h38" stroke="#547689" stroke-width=".6"/></svg><span></span>`
   home.append(station)
+  const astronaut=document.createElement('button');astronaut.type='button';astronaut.className='pxu-astronaut';astronaut.setAttribute('aria-expanded','false')
+  astronaut.innerHTML=`<svg viewBox="0 0 90 120" aria-hidden="true"><defs><linearGradient id="pxu-suit" x2="1" y2="1"><stop stop-color="#f3f8fa"/><stop offset=".5" stop-color="#b9cbd6"/><stop offset="1" stop-color="#526d83"/></linearGradient><linearGradient id="pxu-visor" x2="1" y2="1"><stop stop-color="#dcb977"/><stop offset=".45" stop-color="#5e4930"/><stop offset="1" stop-color="#132839"/></linearGradient></defs><g transform="rotate(-12 45 60)" stroke="#6a899e" stroke-width="1"><rect x="25" y="42" width="40" height="43" rx="10" fill="#425c72"/><path d="M33 49 19 64 12 59M58 49 69 37 73 24" fill="none" stroke="#bed2df" stroke-width="13" stroke-linecap="round"/><path d="M35 78 29 99 20 104M54 78 59 97 71 100" fill="none" stroke="#bfd2de" stroke-width="14" stroke-linecap="round"/><rect x="27" y="42" width="35" height="40" rx="11" fill="url(#pxu-suit)"/><path d="M31 71h27" stroke="#4c728b" stroke-width="4"/><rect x="34" y="53" width="21" height="13" rx="3" fill="#284a61"/><path d="M38 57h12m-12 5h5" stroke="#9ce8ed" stroke-width="2"/><circle cx="44" cy="30" r="23" fill="url(#pxu-suit)"/><rect x="26" y="15" width="36" height="28" rx="13" fill="url(#pxu-visor)"/><path d="M32 21q8-5 16-3" fill="none" stroke="#fff4d0" stroke-width="2" opacity=".6"/><circle cx="20" cy="31" r="3" fill="#94d5e3"/><path d="M15 58 10 55M72 24 73 18" stroke="#e2edf0" stroke-width="8" stroke-linecap="round"/></g></svg><span hidden>Lewis</span>`
+  astronaut.onclick=()=>{const label=astronaut.querySelector('span');label.hidden=!label.hidden;astronaut.setAttribute('aria-expanded',String(!label.hidden))};home.append(astronaut)
+  const moonDog=document.createElement('div');moonDog.className='pxu-moon-dog';moonDog.setAttribute('role','img');moonDog.innerHTML=`<svg viewBox="0 0 90 80" aria-hidden="true"><defs><linearGradient id="pxu-dog-suit" x2="1" y2="1"><stop stop-color="#e1edf4"/><stop offset="1" stop-color="#69859b"/></linearGradient></defs><path d="M68 48q19-22 8-25" fill="none" stroke="#d7b68b" stroke-width="7" stroke-linecap="round"/><ellipse cx="53" cy="47" rx="25" ry="15" fill="url(#pxu-dog-suit)" stroke="#64859b"/><path d="M41 55v12m22-12v12" stroke="#a3bac9" stroke-width="8" stroke-linecap="round"/><circle cx="30" cy="30" r="25" fill="#bde8fc14" stroke="#9fd5e7" stroke-width="1.5"/><path d="M18 16 12 29 21 34M39 16 45 29 37 34" fill="#8e6747"/><ellipse cx="29" cy="29" rx="14" ry="17" fill="#d7b68b"/><ellipse cx="29" cy="37" rx="10" ry="7" fill="#efe0c5"/><circle cx="24" cy="28" r="1.8" fill="#172535"/><circle cx="34" cy="28" r="1.8" fill="#172535"/><path d="M26 34q3-3 6 0l-3 3z" fill="#26303c"/><path d="M20 9q10-4 19 2" fill="none" stroke="#e2f5ff" stroke-width="2" opacity=".6"/><rect x="43" y="36" width="11" height="14" rx="3" fill="#38576c"/><circle cx="48" cy="41" r="2" fill="#a3eaff"/><path d="M14 71h65" stroke="#9bb3c34d" stroke-width="2" stroke-linecap="round"/></svg>`;home.append(moonDog)
   const launch=document.createElement('button');launch.className='pxu-launch';home.append(launch)
   const effects=document.createElement('button');effects.type='button';effects.className='pxu-effects';home.querySelector('.pxu-status').prepend(effects)
   let effectsEnabled=true,ambientTime=0
@@ -86,6 +90,8 @@ if (!document.getElementById('pixora-universe-home')) {
   function renderUI(){
     const p = planets[active], zh = lang==='zh'
     home.dataset.language=lang
+    astronaut.setAttribute('aria-label',zh?'太空人：點擊顯示 Lewis':'Astronaut: click to reveal Lewis')
+    moonDog.setAttribute('aria-label',zh?'月球上的太空狗':'A space dog on the Moon')
     allTools.textContent=zh?'查看全部 10 個工具 ↗':'View all 10 tools ↗'
     effects.textContent=zh?`動態效果 ${effectsEnabled?'開':'關'}`:`Effects ${effectsEnabled?'on':'off'}`
     effects.setAttribute('aria-pressed',String(effectsEnabled))
@@ -295,10 +301,14 @@ if (!document.getElementById('pixora-universe-home')) {
       return {world:p,index,worldX:x,worldZ:z,...project(x,0,z)}
     })
     const earth=positions[2],moon=positions[9],ma=rotation*5+.8
-    Object.assign(moon,project(earth.worldX+Math.cos(ma)*.34,Math.sin(ma)*.10,earth.worldZ+Math.sin(ma)*.34))
+    Object.assign(moon,project(earth.worldX+Math.cos(ma)*.9,Math.sin(ma)*.20,earth.worldZ+Math.sin(ma)*.9))
     const sun={world:{id:'sun',color:'#ffb94c',radius:.32},index:-1,...project(0,0,0)}
-    hit=[sun,...positions].map(p=>({...p,r:Math.max(p.world.radius*p.scale*(p.index===active?(w<760?1.8:2.4):1),p.index===9?3:4)})).sort((a,b)=>b.depth-a.depth)
+    hit=[sun,...positions].map(p=>({...p,r:Math.max(p.world.radius*p.scale*(p.index===active?(w<760?1.8:2.4):1),p.index===9?(w<760?4:7):4)})).sort((a,b)=>b.depth-a.depth)
     hit.forEach(body)
+    const lunar=hit.find(p=>p.index===9)
+    moonDog.style.left=`${lunar.x}px`;moonDog.style.top=`${lunar.y-lunar.r+6}px`
+    const walker=project(earth.worldX-1.3,.8,earth.worldZ+.7)
+    astronaut.style.left=`${walker.x}px`;astronaut.style.top=`${walker.y+Math.sin(ambientTime*.001)*3}px`
     const target=positions[active],animate=!reduced.matches&&!manualPaused&&!document.hidden&&!home.hasAttribute('inert')
     if(animate){flightTime+=dt;shipTravel+=dt}
     const cruise=moving?flightTime*.0008:0,goal={x:target.worldX+Math.cos(cruise)*.95,z:target.worldZ+Math.sin(cruise)*.95,y:.45}
