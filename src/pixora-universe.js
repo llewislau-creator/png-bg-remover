@@ -58,6 +58,15 @@ if (!document.getElementById('pixora-universe-home')) {
   const launch=document.createElement('button');launch.className='pxu-launch';home.append(launch)
   const ufo=document.createElement('div');ufo.className='pxu-ufo';ufo.setAttribute('role','img');ufo.innerHTML=`<svg viewBox="0 0 120 70" aria-hidden="true"><defs><linearGradient id="pxu-ufo-metal" x2="0" y2="1"><stop stop-color="#cadce6"/><stop offset=".4" stop-color="#7794a9"/><stop offset="1" stop-color="#1c344a"/></linearGradient><radialGradient id="pxu-ufo-glass" cx=".35" cy=".2"><stop stop-color="#c1f4ff"/><stop offset=".5" stop-color="#437b98"/><stop offset="1" stop-color="#142f45"/></radialGradient></defs><ellipse cx="60" cy="50" rx="33" ry="7" fill="#7fdfff18"/><path d="M38 30q2-26 22-26t22 26" fill="url(#pxu-ufo-glass)" stroke="#86bed5"/><path d="M44 20q4-10 11-11" fill="none" stroke="#e5faff" stroke-width="2" opacity=".6"/><ellipse cx="60" cy="35" rx="51" ry="13" fill="url(#pxu-ufo-metal)" stroke="#90acbf"/><path d="M9 35q51 18 102 0" fill="none" stroke="#203e55" stroke-width="4"/><g fill="#96edf4"><ellipse cx="27" cy="39" rx="3" ry="1.8"/><ellipse cx="44" cy="43" rx="3" ry="1.8"/><ellipse cx="61" cy="44" rx="3" ry="1.8"/><ellipse cx="78" cy="42" rx="3" ry="1.8"/><ellipse cx="95" cy="38" rx="3" ry="1.8"/></g></svg>`;home.append(ufo)
   const effects=document.createElement('button');effects.type='button';effects.className='pxu-effects';home.querySelector('.pxu-status').prepend(effects)
+  const music=document.createElement('button');music.type='button';music.className='pxu-music';home.querySelector('.pxu-status').prepend(music)
+  const soundtrack=new Audio('/audio/home-ambient.m4a');soundtrack.loop=true;soundtrack.volume=.25;soundtrack.preload='none';soundtrack.hidden=true;home.append(soundtrack)
+  let musicFailed=false,musicStarting=false
+  function musicUI(){const zh=home.dataset.language!=='en';music.textContent=musicFailed?(zh?'音樂重試':'Retry music'):musicStarting?(zh?'音樂載入中':'Loading music'):soundtrack.paused?(zh?'♫ 開啟音樂':'♫ Play music'):(zh?'♫ 暫停音樂':'♫ Pause music');music.setAttribute('aria-pressed',String(!soundtrack.paused));music.setAttribute('aria-label',music.textContent);music.disabled=musicStarting}
+  music.onclick=async()=>{musicFailed=false;if(!soundtrack.paused){soundtrack.pause();return}musicStarting=true;musicUI();try{await soundtrack.play()}catch{musicFailed=true}finally{musicStarting=false;musicUI()}}
+  soundtrack.addEventListener('play',musicUI);soundtrack.addEventListener('pause',musicUI);soundtrack.addEventListener('error',()=>{musicFailed=true;musicUI()})
+  function stopMusic(){soundtrack.pause()}
+  document.addEventListener('visibilitychange',onMusicVisibility)
+  function onMusicVisibility(){if(document.hidden)stopMusic()}
   let effectsEnabled=true,ambientTime=0
   try{effectsEnabled=localStorage.getItem('pixora-effects')!=='off'}catch{}
   effects.onclick=()=>{effectsEnabled=!effectsEnabled;try{localStorage.setItem('pixora-effects',effectsEnabled?'on':'off')}catch{}renderUI()}
@@ -92,6 +101,7 @@ if (!document.getElementById('pixora-universe-home')) {
     const p = planets[active], zh = lang==='zh'
     mediaLink.href=zh?'/media':'/media?lang=en';mediaLink.textContent=zh?'影音下載 ↗':'Media downloads ↗';mediaLink.title=zh?'MP4 480p／720p · MP3 · 共用服務':'MP4 480p / 720p · MP3 · Shared service'
     home.dataset.language=lang
+    musicUI()
     ufo.setAttribute('aria-label',zh?'冥王星軌道附近的 UFO':'UFO near Pluto’s orbit')
     astronaut.setAttribute('aria-label',zh?'太空人：點擊顯示 Lewis':'Astronaut: click to reveal Lewis')
     moonDog.setAttribute('aria-label',zh?'太空狗：開啟私人影音工作台（需登入）':'Space dog: open private media workspace (sign-in required)');moonDog.title=zh?'私人影音工作台 · 需登入':'Private media workspace · Sign-in required'
@@ -146,6 +156,7 @@ if (!document.getElementById('pixora-universe-home')) {
   function setZoom(value){zoom=Math.max(.55,Math.min(2.2,value));renderUI()}
   home.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;try{localStorage.setItem('pixora-lang',lang)}catch{}renderUI()})
   function enterTool(){
+    stopMusic();document.removeEventListener('visibilitychange',onMusicVisibility);soundtrack.removeAttribute('src');soundtrack.load()
     destroyed=true;cancelAnimationFrame(raf);resizeObserver.disconnect();reduced.removeEventListener('change',motionPreference)
     home.remove();document.documentElement.classList.remove('pxu-open');document.body.classList.remove('pxu-open')
     // Restore keyboard focus as well as visibility when leaving the overlay.
@@ -153,6 +164,7 @@ if (!document.getElementById('pixora-universe-home')) {
     document.getElementById('fileInput')?.focus({preventScroll:true})
   }
   home.querySelector('.pxu-enter').onclick=()=>{
+    stopMusic()
     if(planets[active].id==='mars'){pause();openPortraitStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='saturn'){pause();openLayerStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='mercury'){pause();openPromptStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
