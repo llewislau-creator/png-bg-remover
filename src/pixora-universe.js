@@ -52,7 +52,7 @@ if (!document.getElementById('pixora-universe-home')) {
   home.append(station)
   const launch=document.createElement('button');launch.className='pxu-launch';home.append(launch)
   const effects=document.createElement('button');effects.type='button';effects.className='pxu-effects';home.querySelector('.pxu-status').prepend(effects)
-  let effectsEnabled=true,ambientTime=0,nebula=null
+  let effectsEnabled=true,ambientTime=0
   try{effectsEnabled=localStorage.getItem('pixora-effects')!=='off'}catch{}
   effects.onclick=()=>{effectsEnabled=!effectsEnabled;try{localStorage.setItem('pixora-effects',effectsEnabled?'on':'off')}catch{}renderUI()}
   const toolDialog=document.createElement('dialog');toolDialog.className='pxu-tool-dialog';toolDialog.innerHTML='<header><div><small>PIXORA / SPACEPORT</small><h2></h2></div><button class="pxu-dialog-close" type="button"></button></header><div class="pxu-dialog-tools"></div>';home.append(toolDialog)
@@ -162,16 +162,6 @@ if (!document.getElementById('pixora-universe-home')) {
     w=home.clientWidth;h=home.clientHeight
     const dpr=Math.min(devicePixelRatio||1,2)
     canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)
-    nebula=document.createElement('canvas');nebula.width=960;nebula.height=600
-    const n=nebula.getContext('2d')
-    for(let i=0;i<42;i++){
-      const x=350+i*14,y=280+Math.sin(i*.12)*150+(random(i+2100)-.5)*80,r=45+random(i+2300)*90,g=n.createRadialGradient(x,y,0,x,y,r)
-      g.addColorStop(0,i<20?'#527ae52b':'#a966d72b');g.addColorStop(.45,i<20?'#245dae18':'#783db018');g.addColorStop(1,'#263e7000');n.fillStyle=g;n.fillRect(x-r,y-r,r*2,r*2)
-    }
-    for(let i=0;i<65;i++){
-      const x=360+i*9,y=260+Math.sin(i*.076)*145+(random(i+2400)-.5)*38,r=12+random(i+2500)*38,g=n.createRadialGradient(x,y,0,x,y,r)
-      g.addColorStop(0,'#b6bded19');g.addColorStop(1,'#858ee500');n.fillStyle=g;n.fillRect(x-r,y-r,r*2,r*2)
-    }
   }
   const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(home);resize()
   canvas.addEventListener('wheel',e=>{e.preventDefault();pause();setZoom(zoom*Math.exp(-e.deltaY*.001))},{passive:false})
@@ -224,8 +214,6 @@ if (!document.getElementById('pixora-universe-home')) {
     if(world.id==='sun'){
       const pulse=1+Math.sin(ambientTime*.001)*.12,extent=r*5.8*pulse,halo=ctx.createRadialGradient(x,y,r*.6,x,y,extent)
       halo.addColorStop(0,'#ffd071bd');halo.addColorStop(.2,'#ffa13970');halo.addColorStop(.5,'#ed792526');halo.addColorStop(1,'#ffb45900');ctx.fillStyle=halo;ctx.beginPath();ctx.arc(x,y,extent,0,Math.PI*2);ctx.fill()
-      ctx.save();ctx.translate(x,y);ctx.rotate(ambientTime*.000035)
-      for(let i=0;i<16;i++){const a=i*Math.PI*2/16,length=r*(1.6+random(i+3200)*.8);ctx.strokeStyle=i%2?'#ffd57ca6':'#ff9d4a75';ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(Math.cos(a)*r*.9,Math.sin(a)*r*.9);ctx.quadraticCurveTo(Math.cos(a+.14)*length,Math.sin(a+.14)*length,Math.cos(a+.28)*r,Math.sin(a+.28)*r);ctx.stroke()}ctx.restore()
     }
     const gradient=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.04,x,y,r)
     gradient.addColorStop(0,world.id==='sun'?'#fff2b3':'#e7f8ff');gradient.addColorStop(.23,world.color);gradient.addColorStop(.7,world.color);gradient.addColorStop(1,world.id==='sun'?'#cf6a20':'#071321')
@@ -282,7 +270,6 @@ if (!document.getElementById('pixora-universe-home')) {
     if(effectsEnabled&&!reduced.matches&&!manualPaused&&!document.hidden&&!home.hasAttribute('inert'))ambientTime+=dt
     if(moving&&!document.hidden){yaw+=dt*.000025;rotation+=dt*.000008}
     ctx.clearRect(0,0,w,h)
-    if(nebula){ctx.save();ctx.globalAlpha=w<760?.65:1;const drift=Math.sin(ambientTime*.00004)*10;ctx.drawImage(nebula,-w*.08+Math.sin(yaw)*12,h*.02+drift,w*1.16,h*.94);ctx.restore()}
     for(let i=0;i<stars.length;i++){
       if(w<760&&i%2)continue
       const s=stars[i],layer=i%3,shift=layer===0?4:layer===1?13:28,drift=ambientTime*.0000008*layer

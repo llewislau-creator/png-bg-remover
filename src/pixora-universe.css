@@ -1,6 +1,6 @@
 html.pxu-open,body.pxu-open{overflow:hidden;background:#020810}
 body.pxu-open .shell,body.pxu-open #mobileBar,body.pxu-open #shortcutModal{visibility:hidden!important}
-#pixora-universe-home{position:fixed;inset:0;z-index:9999;overflow:hidden;background:radial-gradient(ellipse at 65% 44%,#102b42,#030e1a 55%,#02070e);color:#edf7ff;font-family:Arial,"Noto Sans TC","Microsoft JhengHei",sans-serif;isolation:isolate}
+#pixora-universe-home{position:fixed;inset:0;z-index:9999;overflow:hidden;background:#020305;color:#edf7ff;font-family:Arial,"Noto Sans TC","Microsoft JhengHei",sans-serif;isolation:isolate}
 #pixora-universe-home *{box-sizing:border-box}
 #pixora-universe-home button{font:inherit;cursor:pointer}
 #pixora-universe-home .pxu-nav button{line-height:1.15}
