@@ -38,6 +38,10 @@ if (!document.getElementById('pixora-universe-home')) {
   station.innerHTML=`<svg viewBox="0 0 160 100" aria-hidden="true"><defs><linearGradient id="pxu-alloy" x2=".3" y2="1"><stop stop-color="#e3eff4"/><stop offset=".45" stop-color="#647e91"/><stop offset="1" stop-color="#172c40"/></linearGradient><linearGradient id="pxu-panel" x2="1" y2="1"><stop stop-color="#163756"/><stop offset="1" stop-color="#062034"/></linearGradient></defs><g transform="translate(80 46) rotate(-18)"><ellipse rx="35" ry="23" fill="none" stroke="#182f42" stroke-width="8"/><ellipse rx="35" ry="23" fill="none" stroke="url(#pxu-alloy)" stroke-width="5"/><path d="M-29-15 29 15M-29 15 29-15" stroke="#59768a" stroke-width="2"/><path d="M-67-21h23v40h-23zM44-21h23v40H44z" fill="url(#pxu-panel)" stroke="#4b819f" stroke-width=".8"/><path d="M-59-21v40m8-40v40m103-40v40m8-40v40M-67-11h23m-23 10h23m-23 10h23m88-20h23m-23 10h23m-23 10h23" stroke="#3d6886" stroke-width=".5"/><path d="M-44 0h88" stroke="#8ba7b6" stroke-width="4"/><rect x="-10" y="-20" width="20" height="40" rx="8" fill="url(#pxu-alloy)" stroke="#aac5d4" stroke-width=".6"/><path d="M-9-7H9M-9 9H9" stroke="#253f54" stroke-width="3"/><rect x="-5" y="-4" width="10" height="7" rx="2" fill="#13283b"/><path d="M-4-1h8" stroke="#8be4ef"/><circle cy="-24" r="2" fill="#8ce6e0"/><circle cx="35" r="1.5" fill="#86e1eb"/></g><path d="M79 78v8m-19 0h38" stroke="#547689" stroke-width=".6"/></svg><span></span>`
   home.append(station)
   const launch=document.createElement('button');launch.className='pxu-launch';home.append(launch)
+  const effects=document.createElement('button');effects.type='button';effects.className='pxu-effects';home.querySelector('.pxu-status').prepend(effects)
+  let effectsEnabled=true,ambientTime=0,nebula=null
+  try{effectsEnabled=localStorage.getItem('pixora-effects')!=='off'}catch{}
+  effects.onclick=()=>{effectsEnabled=!effectsEnabled;try{localStorage.setItem('pixora-effects',effectsEnabled?'on':'off')}catch{}renderUI()}
   const toolDialog=document.createElement('dialog');toolDialog.className='pxu-tool-dialog';toolDialog.innerHTML='<header><div><small>PIXORA / SPACEPORT</small><h2></h2></div><button class="pxu-dialog-close" type="button"></button></header><div class="pxu-dialog-tools"></div>';home.append(toolDialog)
   let stationPoint={x:0,y:0},shipWorld=null,shipHeading=0,shipTravel=0,flightTime=0,rocketTime=null,manualPaused=false
   station.onclick=()=>toolDialog.showModal()
@@ -66,6 +70,8 @@ if (!document.getElementById('pixora-universe-home')) {
   function text(selector,value){home.querySelector(selector).textContent=value}
   function renderUI(){
     const p = planets[active], zh = lang==='zh'
+    effects.textContent=zh?`動態效果 ${effectsEnabled?'開':'關'}`:`Effects ${effectsEnabled?'on':'off'}`
+    effects.setAttribute('aria-pressed',String(effectsEnabled))
     toolDialog.setAttribute('aria-label',zh?'太空發射站工具選單':'Spaceport tool menu')
     station.setAttribute('aria-label',zh?'太空發射站：查看所有工具':'Spaceport: view all tools')
     station.querySelector('span').textContent=zh?'發射站':'SPACEPORT'
@@ -154,6 +160,9 @@ if (!document.getElementById('pixora-universe-home')) {
     w=home.clientWidth;h=home.clientHeight
     const dpr=Math.min(devicePixelRatio||1,2)
     canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)
+    nebula=document.createElement('canvas');nebula.width=640;nebula.height=400
+    const n=nebula.getContext('2d')
+    for(let i=0;i<32;i++){const x=300+random(i+2100)*330,y=40+random(i+2200)*300,r=55+random(i+2300)*100,g=n.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,i%3===0?'#7454a712':'#388ac414');g.addColorStop(1,'#263e7000');n.fillStyle=g;n.fillRect(x-r,y-r,r*2,r*2)}
   }
   const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(home);resize()
   canvas.addEventListener('wheel',e=>{e.preventDefault();pause();setZoom(zoom*Math.exp(-e.deltaY*.001))},{passive:false})
@@ -202,7 +211,13 @@ if (!document.getElementById('pixora-universe-home')) {
   }
   function body(p){
     const {x,y,r,world}=p
-    if(world.id==='sun'){const halo=ctx.createRadialGradient(x,y,r*.2,x,y,r*3.5);halo.addColorStop(0,'#ffc87599');halo.addColorStop(1,'#ffb45900');ctx.fillStyle=halo;ctx.beginPath();ctx.arc(x,y,r*3.5,0,Math.PI*2);ctx.fill()}
+    const sunPosition=project(0,0,0),lightAngle=Math.atan2(sunPosition.y-y,sunPosition.x-x)
+    if(world.id==='sun'){
+      const pulse=1+Math.sin(ambientTime*.0007)*.07,extent=r*4.5*pulse,halo=ctx.createRadialGradient(x,y,r*.8,x,y,extent)
+      halo.addColorStop(0,'#ffc87570');halo.addColorStop(.3,'#f8932930');halo.addColorStop(1,'#ffb45900');ctx.fillStyle=halo;ctx.beginPath();ctx.arc(x,y,extent,0,Math.PI*2);ctx.fill()
+      ctx.save();ctx.translate(x,y);ctx.rotate(ambientTime*.000035)
+      for(let i=0;i<14;i++){const a=i*Math.PI*2/14,length=r*(1.18+random(i+3200)*.5);ctx.strokeStyle=i%2?'#ffc85b65':'#ff8c3638';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(Math.cos(a)*r*.9,Math.sin(a)*r*.9);ctx.quadraticCurveTo(Math.cos(a+.14)*length,Math.sin(a+.14)*length,Math.cos(a+.28)*r,Math.sin(a+.28)*r);ctx.stroke()}ctx.restore()
+    }
     const gradient=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.04,x,y,r)
     gradient.addColorStop(0,world.id==='sun'?'#fff2b3':'#e7f8ff');gradient.addColorStop(.23,world.color);gradient.addColorStop(.7,world.color);gradient.addColorStop(1,world.id==='sun'?'#cf6a20':'#071321')
     ctx.fillStyle=gradient;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()
@@ -212,7 +227,14 @@ if (!document.getElementById('pixora-universe-home')) {
       ctx.strokeStyle='#ddf6ff77';ctx.lineWidth=Math.max(1,r*.04);for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(x,y+(i-1)*r*.35,r*.9,r*.12,-.3,0,Math.PI*2);ctx.stroke()}
     }
     if(world.id==='jupiter'||world.id==='saturn'){for(let i=-6;i<7;i++){ctx.fillStyle=i%2?'#76584744':'#fff1d733';ctx.fillRect(x-r,y+i*r*.14,r*2,r*.07)}}
+    if(world.id!=='sun'){
+      const lx=Math.cos(lightAngle),ly=Math.sin(lightAngle),shade=ctx.createLinearGradient(x+lx*r,y+ly*r,x-lx*r,y-ly*r)
+      shade.addColorStop(0,'#ffd9a316');shade.addColorStop(.35,'#03101a05');shade.addColorStop(.7,'#02091690');shade.addColorStop(1,'#01040cd9');ctx.fillStyle=shade;ctx.fillRect(x-r,y-r,r*2,r*2)
+    }else{
+      for(let i=0;i<24;i++){const a=random(i+3300)*6.28+ambientTime*.00004,d=Math.sqrt(random(i+3400))*r*.84;ctx.fillStyle=i%2?'#ffe5a63b':'#e9712727';ctx.beginPath();ctx.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,Math.max(.6,r*.06),0,6.28);ctx.fill()}
+    }
     ctx.restore()
+    if(world.id==='earth'){ctx.strokeStyle='#70ceff80';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(x,y,r+1.7,0,6.28);ctx.stroke()}
     if(world.id==='saturn'||world.id==='uranus'){ctx.strokeStyle=world.id==='saturn'?'#e5d3a8b0':'#a8f2ef80';ctx.lineWidth=Math.max(1,r*.10);ctx.beginPath();ctx.ellipse(x,y,r*1.9,r*.5,-.32,0,Math.PI*2);ctx.stroke()}
     if(p.index===active){ctx.strokeStyle='#80e6ff';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(x,y,r+6,0,Math.PI*2);ctx.stroke()}
     if(world.id!=='sun'&&(world.id!=='moon'||p.index===active)){
@@ -248,9 +270,18 @@ if (!document.getElementById('pixora-universe-home')) {
   function frame(t){
     if(destroyed||!home.isConnected)return
     const dt=Math.min(t-lastTime,50);lastTime=t
+    if(effectsEnabled&&!reduced.matches&&!manualPaused&&!document.hidden&&!home.hasAttribute('inert'))ambientTime+=dt
     if(moving&&!document.hidden){yaw+=dt*.000025;rotation+=dt*.000008}
     ctx.clearRect(0,0,w,h)
-    for(const s of stars){ctx.fillStyle=`rgba(170,220,250,${s.a})`;ctx.fillRect(s.x*w,s.y*h,1,1)}
+    if(nebula){ctx.save();ctx.globalAlpha=w<760?.65:1;const drift=Math.sin(ambientTime*.00004)*10;ctx.drawImage(nebula,-w*.08+Math.sin(yaw)*12,h*.02+drift,w*1.16,h*.94);ctx.restore()}
+    for(let i=0;i<stars.length;i++){
+      if(w<760&&i%2)continue
+      const s=stars[i],layer=i%3,shift=layer===0?4:layer===1?13:28,drift=ambientTime*.0000008*layer
+      const sx=((s.x*w+Math.sin(yaw)*shift+drift*w)%w+w)%w,sy=((s.y*h+Math.sin(pitch)*shift*.6)%h+h)%h
+      const alpha=s.a*(.8+.2*Math.sin(ambientTime*.0005+i)),size=layer===2?1.6:.8
+      ctx.fillStyle=`rgba(170,220,250,${alpha})`;ctx.beginPath();ctx.arc(sx,sy,size/2,0,6.28);ctx.fill()
+      if(i%31===0){ctx.strokeStyle=`rgba(183,226,255,${alpha*.35})`;ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(sx-3,sy);ctx.lineTo(sx+3,sy);ctx.moveTo(sx,sy-3);ctx.lineTo(sx,sy+3);ctx.stroke()}
+    }
     for(const p of planets.filter(p=>p.orbit)){
       ctx.beginPath();for(let i=0;i<=100;i++){const a=i/100*Math.PI*2,q=project(Math.cos(a)*p.orbit,0,Math.sin(a)*p.orbit);if(i===0)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y)}
       ctx.strokeStyle=p.id===planets[active].id?'#70dfff55':'#75b9dd22';ctx.lineWidth=1;ctx.stroke()
