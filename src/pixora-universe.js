@@ -86,9 +86,11 @@ if (!document.getElementById('pixora-universe-home')) {
     button.onclick = ()=>select(i)
     nav.append(button)
   }
+  const mediaLink=document.createElement('a');mediaLink.className='pxu-media-link';mediaLink.href='/media';nav.append(mediaLink)
   function text(selector,value){home.querySelector(selector).textContent=value}
   function renderUI(){
     const p = planets[active], zh = lang==='zh'
+    mediaLink.href=zh?'/media':'/media?lang=en';mediaLink.textContent=zh?'影音下載 ↗':'Media downloads ↗';mediaLink.title=zh?'MP4 480p／720p · MP3 · 共用服務':'MP4 480p / 720p · MP3 · Shared service'
     home.dataset.language=lang
     ufo.setAttribute('aria-label',zh?'冥王星軌道附近的 UFO':'UFO near Pluto’s orbit')
     astronaut.setAttribute('aria-label',zh?'太空人：點擊顯示 Lewis':'Astronaut: click to reveal Lewis')

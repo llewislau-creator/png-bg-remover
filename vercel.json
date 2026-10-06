@@ -4,6 +4,7 @@
   "framework": "vite",
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/media", "destination": "/api/media-workspace" },
     { "source": "/private", "destination": "/api/private-media" },
     { "source": "/zh-TW", "destination": "/" },
     { "source": "/en", "destination": "/" }
