@@ -1,3 +1,4 @@
+import { openPortraitStudio } from './portrait-studio.js'
 import { openLayerStudio } from './layer-studio.js'
 import { openPromptStudio } from './prompt-extractor.js'
 import './pixora-universe.css'
@@ -13,7 +14,7 @@ const planets = [
   ['mercury','水星','Mercury','圖片轉提示詞','Image to Prompt','#a8a5a0',.75,.10,true],
   ['venus','金星','Venus','色彩分析','Color Analyzer','#e4b777',1.12,.14,true],
   ['earth','地球','Earth','AI 去背','AI Cutout','#319bde',1.53,.17,true],
-  ['mars','火星','Mars','清理','Cleanup','#cb6348',1.95,.12,false],
+  ['mars','火星','Mars','人像修飾','Portrait Retouch','#cb6348',1.95,.12,true],
   ['jupiter','木星','Jupiter','字體特效','Font Effects','#d8b494',2.55,.29,true],
   ['saturn','土星','Saturn','圖片分層','Layer Studio','#ddc592',3.25,.24,true],
   ['uranus','天王星','Uranus','圖片轉 PDF','Image to PDF','#87d7de',3.98,.18,true],
@@ -59,6 +60,7 @@ if (!document.getElementById('pixora-universe-home')) {
     text('.pxu-desc',p.id==='pluto'?(zh?'為名片、海報與活動物料準備印刷稿。選擇尺寸、加入素材、檢查出血與解析度，再匯出 PDF。':'Prepare business cards, posters and event print layouts. Choose a size, add artwork, check bleed and resolution, then export PDF.'):p.id==='uranus'?(zh?'把圖片排成一份 PDF。調整頁面順序、紙張尺寸與檔案容量，全程留在你的瀏覽器。':'Arrange images into a PDF. Set page order, paper size and file size, all in your browser.'):p.available?(zh?'免費移除背景，保留你想要的主體。圖片直接在瀏覽器內處理，無需註冊。':'Remove backgrounds for free. Keep your subject, with images processed in your browser. No account required.'):(zh?`${p.toolZh}工具正在準備中。你可以繼續探索太陽系，或先使用免費 AI 去背。`:`${p.toolEn} is coming soon. Explore the solar system or try free AI background removal.`))
     if(p.id==='mercury')text('.pxu-desc',zh?'從照片整理中英文提示詞、負面提示詞、主色與光線。支援本機色調分析，接入 OpenAI 後可自動辨識主體與場景。':'Compose bilingual prompts, negative prompts, colors and lighting from photos. Local tone analysis works now; OpenAI enables subject and scene analysis.')
     if(p.id==='saturn')text('.pxu-desc',zh?'手動圈選素材，拆成可移動的透明圖層。匯入 AI 分層結果、調整順序與大小，再下載 PNG 或圖層 ZIP。全程本機處理，不設次數限制。':'Select regions into movable transparent layers. Import AI layers, edit their order and size, and export PNG or ZIP locally without usage quotas.')
+    if(p.id==='mars')text('.pxu-desc',zh?'用局部柔化與取樣筆刷手動修飾人像。調整色調、比較前後效果，再批次下載。圖片全程留在瀏覽器。':'Retouch portraits with local softening and a sample brush. Adjust colors, compare before and after, and export batches locally.')
     const enter=home.querySelector('.pxu-enter')
     if(p.id==='moon')text('.pxu-desc',zh?'將標誌、圖示或線稿轉成可編輯的 SVG。調整色數、輪廓平滑與雜點過濾，全程在本機處理。':'Convert logos, icons or line art into editable SVG. Adjust colors, contours and noise filtering locally.')
     if(p.id==='venus')text('.pxu-desc',zh?'從圖片擷取主色，查看色碼與比例，建立你的色彩索引。圖片留在瀏覽器，可下載色票、CSS 或 JSON。':'Extract colors and proportions from an image. Keep your image in the browser and export palettes, CSS or JSON.')
@@ -68,6 +70,7 @@ if (!document.getElementById('pixora-universe-home')) {
     enter.textContent=p.id==='pluto'?(zh?'開啟印刷工作台 ↗':'Open Print Studio ↗'):p.id==='uranus'?(zh?'開啟 PDF 工作台 ↗':'Open PDF studio ↗'):p.available?(zh?'開始去背 ↗':'Start removing backgrounds ↗'):(zh?'即將推出':'Coming soon')
     if(p.id==='mercury')enter.textContent=zh?'開啟提示詞工作台 ↗':'Open Prompt Studio ↗'
     if(p.id==='saturn')enter.textContent=zh?'開啟分層工作台 ↗':'Open Layer Studio ↗'
+    if(p.id==='mars')enter.textContent=zh?'開啟人像工作台 ↗':'Open Portrait Studio ↗'
     const cutout=home.querySelector('.pxu-cutout')
     if(p.id==='moon')enter.textContent=zh?'開啟向量工作台 ↗':'Open Vector Studio ↗'
     if(p.id==='venus')enter.textContent=zh?'開啟色彩工作台 ↗':'Open Color Studio ↗'
@@ -109,6 +112,7 @@ if (!document.getElementById('pixora-universe-home')) {
     document.getElementById('fileInput')?.focus({preventScroll:true})
   }
   home.querySelector('.pxu-enter').onclick=()=>{
+    if(planets[active].id==='mars'){pause();openPortraitStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='saturn'){pause();openLayerStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='mercury'){pause();openPromptStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
     if(planets[active].id==='moon'){pause();openVectorStudio(()=>home.querySelector('.pxu-enter')?.focus());return}
