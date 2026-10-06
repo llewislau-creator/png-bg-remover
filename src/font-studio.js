@@ -1,0 +1,58 @@
+import './font-studio.css'
+const styles=[
+{id:'ink',name:'墨韻書法',category:'書法',font:'"DFKai-SB","KaiTi",serif',colors:['#292621','#292621'],bg:'#eee6d6'},
+{id:'song',name:'典雅宋體',category:'書法',font:'"SimSun","PMingLiU",serif',colors:['#233e35','#233e35'],bg:'#e9eee6'},
+{id:'gold',name:'流光金屬',category:'質感',font:'"Microsoft JhengHei",sans-serif',colors:['#fff0a6','#a5691c','#ffe9a2'],bg:'#222119'},
+{id:'silver',name:'銀色未來',category:'質感',font:'Arial,"Microsoft JhengHei",sans-serif',colors:['#fafbff','#6c83a4','#eef4ff'],bg:'#182435'},
+{id:'neon',name:'霓虹光影',category:'潮流',font:'Arial,"Microsoft JhengHei",sans-serif',colors:['#bd7aff','#5deaff'],bg:'#150c28',glow:'#bd7aff'},
+{id:'pop',name:'活力撞色',category:'潮流',font:'"Microsoft JhengHei",sans-serif',colors:['#ffad25','#ff4481'],bg:'#f3edff',outline:'#432066'},
+{id:'ocean',name:'海洋漸層',category:'品牌',font:'"Microsoft JhengHei",sans-serif',colors:['#45dbd6','#1470b9'],bg:'#e1f4f1'},
+{id:'rose',name:'花漾柔光',category:'品牌',font:'"SimSun","PMingLiU",serif',colors:['#ed96ba','#9e5d9f'],bg:'#fff0f5'},
+{id:'mono',name:'極簡黑白',category:'品牌',font:'Arial,"Microsoft JhengHei",sans-serif',colors:['#171717','#171717'],bg:'#f6f6f6'},
+{id:'sunset',name:'落日餘暉',category:'質感',font:'"Microsoft JhengHei",sans-serif',colors:['#ffe39a','#ec694b','#993b88'],bg:'#281923'},
+{id:'outline',name:'空心輪廓',category:'潮流',font:'Arial,"Microsoft JhengHei",sans-serif',colors:['#6e49ca','#6e49ca'],bg:'#eee9fb',hollow:true},
+{id:'red',name:'朱砂題字',category:'書法',font:'"DFKai-SB","KaiTi",serif',colors:['#a3382e','#a3382e'],bg:'#f5e9d4'}]
+let panel=null,onReturn=null,timer=0
+const state={text:'靈感成字',style:'ink',vertical:false,transparent:true,size:1600,category:'全部',tab:'gallery',history:[],favorites:new Set()}
+try{state.favorites=new Set(JSON.parse(localStorage.getItem('pixora-font-favorites')||'[]'))}catch{}
+const chosen=()=>styles.find(s=>s.id===state.style)||styles[0]
+function notify(message){panel.querySelector('.fs-toast').textContent=message;clearTimeout(timer);timer=setTimeout(()=>panel.querySelector('.fs-toast').textContent='',3500)}
+export function openFontStudio(callback=null){
+ onReturn=callback;document.getElementById('pixora-universe-home')?.setAttribute('inert','');document.body.style.overflow='hidden'
+ if(panel){panel.hidden=false;panel.querySelector('#fs-text').focus();return}
+ panel=document.createElement('section');panel.id='font-studio';panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-label','字體特效工作台')
+ panel.innerHTML=`<header class="fs-header"><button class="fs-back">← 回到行星選單</button><div><b>PIXORA / 字體特效</b><small>木星 · 本機創作</small></div><button class="fs-download">下載 PNG</button></header><div class="fs-shell"><aside class="fs-controls"><h3>文字內容</h3><label for="fs-text">輸入你的文字</label><textarea id="fs-text" maxlength="48">靈感成字</textarea><p class="fs-counter"></p><div class="fs-direction"><button data-direction="horizontal">橫向</button><button data-direction="vertical">直向</button></div><h3>文字效果</h3><div class="fs-style-list"></div><h3>輸出設定</h3><label for="fs-size">圖片尺寸</label><select id="fs-size"><option value="800">800 × 800</option><option value="1600" selected>1600 × 1600</option><option value="2400">2400 × 2400</option></select><label class="fs-check"><input class="fs-transparent" type="checkbox" checked>透明背景</label><button class="fs-create">建立作品</button><p class="fs-note">本機字體與特效排版，尚未接入 AI 生成字形。書法效果依裝置字體顯示。</p></aside><main class="fs-main"><div class="fs-hero"><small>JUPITER / TYPE EXPLORER</small><h1>讓文字，<em>有自己的風格。</em></h1><p>選擇字體特效，將靈感變成你的下一個標題。</p><span>本機處理 · 無需帳號</span></div><section class="fs-work"><div class="fs-work-title"><div><b class="fs-selected"></b><small>即時预覽 · 不會上傳文字</small></div><button class="fs-favorite">收藏風格</button></div><div class="fs-canvas-wrap"><canvas class="fs-canvas" width="800" height="800" aria-label="字體特效預覽"></canvas></div></section><nav class="fs-tabs"><button data-tab="gallery">風格廣場</button><button data-tab="favorites">我的收藏</button><button data-tab="history">作品紀錄</button></nav><div class="fs-filters"></div><div class="fs-gallery"></div></main></div><p class="fs-toast" role="status" aria-live="polite"></p>`
+ document.body.append(panel)
+ panel.querySelector('.fs-back').onclick=close
+ panel.querySelector('#fs-text').oninput=e=>{state.text=e.target.value;renderPreview()}
+ panel.querySelectorAll('[data-direction]').forEach(b=>b.onclick=()=>{state.vertical=b.dataset.direction==='vertical';renderPreview()})
+ panel.querySelector('#fs-size').onchange=e=>state.size=Number(e.target.value)
+ panel.querySelector('.fs-transparent').onchange=e=>{state.transparent=e.target.checked;renderPreview()}
+ panel.querySelector('.fs-favorite').onclick=()=>{if(state.favorites.has(state.style))state.favorites.delete(state.style);else state.favorites.add(state.style);try{localStorage.setItem('pixora-font-favorites',JSON.stringify([...state.favorites]))}catch{}renderPreview();renderGallery()}
+ panel.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;renderGallery()})
+ panel.querySelector('.fs-create').onclick=()=>{if(!valid())return;state.history.unshift({text:state.text,style:state.style,vertical:state.vertical,transparent:state.transparent});state.history=state.history.slice(0,12);state.tab='history';renderGallery();notify('作品已加入本次工作階段的紀錄。')}
+ panel.querySelector('.fs-download').onclick=download
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)close()})
+ renderStyles();renderGallery();renderPreview();panel.querySelector('#fs-text').focus()
+}
+function close(){panel.hidden=true;document.body.style.overflow='';document.getElementById('pixora-universe-home')?.removeAttribute('inert');onReturn?.()}
+function valid(){if(!state.text.trim()){notify('請先輸入文字。');panel.querySelector('#fs-text').focus();return false}return true}
+function selectStyle(id){state.style=id;renderStyles();renderPreview()}
+function renderStyles(){const box=panel.querySelector('.fs-style-list');box.replaceChildren();styles.forEach(s=>{const b=document.createElement('button');b.textContent=s.name;b.style.fontFamily=s.font;b.className=s.id===state.style?'active':'';b.setAttribute('aria-pressed',String(s.id===state.style));b.onclick=()=>selectStyle(s.id);box.append(b)})}
+function draw(canvas,style,text,vertical,transparent){
+ const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);if(!transparent){ctx.fillStyle=style.bg;ctx.fillRect(0,0,w,h)}
+ const content=text.trim()||'輸入文字';let lines=vertical?content.split('\n').map(x=>Array.from(x)).filter(x=>x.length):content.split('\n').filter(x=>x.trim());if(!lines.length)lines=vertical?[Array.from(content)]:[content]
+ let fontSize=w*.19;const maxCharacters=Math.max(...lines.map(line=>Array.from(line).length));if(vertical)fontSize=Math.min(fontSize,h*.78/(maxCharacters*1.16),w*.78/(lines.length*1.3));else{fontSize=Math.min(fontSize,h*.75/(lines.length*1.3));ctx.font=`900 ${fontSize}px ${style.font}`;const widest=Math.max(...lines.map(line=>ctx.measureText(line).width));fontSize*=Math.min(1,w*.78/widest)}
+ ctx.font=`900 ${fontSize}px ${style.font}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';const gradient=ctx.createLinearGradient(0,h*.25,0,h*.75);style.colors.forEach((color,i)=>gradient.addColorStop(i/(style.colors.length-1),color));ctx.fillStyle=gradient;ctx.strokeStyle=style.outline||style.colors[0];ctx.lineWidth=fontSize*.025;if(style.glow){ctx.shadowColor=style.glow;ctx.shadowBlur=fontSize*.13}
+ function glyph(t,x,y){if(style.outline||style.hollow)ctx.strokeText(t,x,y);if(!style.hollow)ctx.fillText(t,x,y)}
+ if(vertical){lines.forEach((column,i)=>column.forEach((char,j)=>glyph(char,w/2+((lines.length-1)/2-i)*fontSize*1.3,h/2+(j-(column.length-1)/2)*fontSize*1.16)))}else lines.forEach((line,i)=>glyph(line,w/2,h/2+(i-(lines.length-1)/2)*fontSize*1.3))
+}
+function renderPreview(){draw(panel.querySelector('.fs-canvas'),chosen(),state.text,state.vertical,state.transparent);panel.querySelector('.fs-selected').textContent=chosen().name;panel.querySelector('.fs-counter').textContent=`${state.text.length} / 48 字元`;panel.querySelector('.fs-favorite').textContent=state.favorites.has(state.style)?'★ 已收藏':'☆ 收藏風格';panel.querySelectorAll('[data-direction]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.direction==='vertical')===state.vertical)));panel.querySelector('.fs-download').disabled=!state.text.trim();panel.querySelector('.fs-create').disabled=!state.text.trim()}
+function renderGallery(){
+ panel.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===state.tab)))
+ const filters=panel.querySelector('.fs-filters');filters.replaceChildren();if(state.tab!=='history')['全部','書法','質感','潮流','品牌'].forEach(category=>{const b=document.createElement('button');b.textContent=category;b.setAttribute('aria-pressed',String(state.category===category));b.onclick=()=>{state.category=category;renderGallery()};filters.append(b)})
+ const items=state.tab==='history'?state.history:styles.filter(s=>(state.category==='全部'||s.category===state.category)&&(state.tab!=='favorites'||state.favorites.has(s.id)))
+ const gallery=panel.querySelector('.fs-gallery');gallery.replaceChildren();if(!items.length){const p=document.createElement('p');p.className='fs-no-items';p.textContent=state.tab==='history'?'尚未建立作品。輸入文字後按「建立作品」。':'此分類尚無收藏。可在預覽區收藏喜歡的風格。';gallery.append(p)}
+ items.forEach(item=>{const s=state.tab==='history'?styles.find(s=>s.id===item.style):item;const card=document.createElement('button');card.className='fs-card';card.setAttribute('aria-label',state.tab==='history'?`開啟作品 ${item.text}`:`使用 ${s.name}`);const canvas=document.createElement('canvas');canvas.width=600;canvas.height=360;draw(canvas,s,state.tab==='history'?item.text:s.name,state.tab==='history'?item.vertical:false,false);const footer=document.createElement('span'),title=document.createElement('b'),action=document.createElement('small');title.textContent=state.tab==='history'?item.text:s.name;action.textContent='立即使用 ↗';footer.append(title,action);card.append(canvas,footer);card.onclick=()=>{if(state.tab==='history'){Object.assign(state,{text:item.text,vertical:item.vertical,transparent:item.transparent});panel.querySelector('#fs-text').value=state.text;panel.querySelector('.fs-transparent').checked=state.transparent}selectStyle(s.id);panel.querySelector('.fs-work').scrollIntoView({block:'nearest',behavior:'smooth'})};gallery.append(card)})
+}
+async function download(){if(!valid())return;const button=panel.querySelector('.fs-download');button.disabled=true;try{await document.fonts.ready;const canvas=document.createElement('canvas');canvas.width=canvas.height=state.size;draw(canvas,chosen(),state.text,state.vertical,state.transparent);const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw new Error();const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pixora-font-'+state.style+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);notify(`PNG 已匯出 · ${state.size} × ${state.size}`)}catch{notify('匯出失敗，請重試。')}finally{button.disabled=!state.text.trim()}}
