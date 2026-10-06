@@ -59,12 +59,16 @@ if (!document.getElementById('pixora-universe-home')) {
   const ufo=document.createElement('div');ufo.className='pxu-ufo';ufo.setAttribute('role','img');ufo.innerHTML=`<svg viewBox="0 0 120 70" aria-hidden="true"><defs><linearGradient id="pxu-ufo-metal" x2="0" y2="1"><stop stop-color="#cadce6"/><stop offset=".4" stop-color="#7794a9"/><stop offset="1" stop-color="#1c344a"/></linearGradient><radialGradient id="pxu-ufo-glass" cx=".35" cy=".2"><stop stop-color="#c1f4ff"/><stop offset=".5" stop-color="#437b98"/><stop offset="1" stop-color="#142f45"/></radialGradient></defs><ellipse cx="60" cy="50" rx="33" ry="7" fill="#7fdfff18"/><path d="M38 30q2-26 22-26t22 26" fill="url(#pxu-ufo-glass)" stroke="#86bed5"/><path d="M44 20q4-10 11-11" fill="none" stroke="#e5faff" stroke-width="2" opacity=".6"/><ellipse cx="60" cy="35" rx="51" ry="13" fill="url(#pxu-ufo-metal)" stroke="#90acbf"/><path d="M9 35q51 18 102 0" fill="none" stroke="#203e55" stroke-width="4"/><g fill="#96edf4"><ellipse cx="27" cy="39" rx="3" ry="1.8"/><ellipse cx="44" cy="43" rx="3" ry="1.8"/><ellipse cx="61" cy="44" rx="3" ry="1.8"/><ellipse cx="78" cy="42" rx="3" ry="1.8"/><ellipse cx="95" cy="38" rx="3" ry="1.8"/></g></svg>`;home.append(ufo)
   const effects=document.createElement('button');effects.type='button';effects.className='pxu-effects';home.querySelector('.pxu-status').prepend(effects)
   const music=document.createElement('button');music.type='button';music.className='pxu-music';home.querySelector('.pxu-status').prepend(music)
-  const soundtrack=new Audio('/audio/home-ambient.m4a');soundtrack.loop=true;soundtrack.volume=.25;soundtrack.preload='none';soundtrack.hidden=true;home.append(soundtrack)
-  let musicFailed=false,musicStarting=false
-  function musicUI(){const zh=home.dataset.language!=='en';music.textContent=musicFailed?(zh?'音樂重試':'Retry music'):musicStarting?(zh?'音樂載入中':'Loading music'):soundtrack.paused?(zh?'♫ 開啟音樂':'♫ Play music'):(zh?'♫ 暫停音樂':'♫ Pause music');music.setAttribute('aria-pressed',String(!soundtrack.paused));music.setAttribute('aria-label',music.textContent);music.disabled=musicStarting}
-  music.onclick=async()=>{musicFailed=false;if(!soundtrack.paused){soundtrack.pause();return}musicStarting=true;musicUI();try{await soundtrack.play()}catch{musicFailed=true}finally{musicStarting=false;musicUI()}}
+  const soundtrack=new Audio('/audio/home-ambient.m4a');soundtrack.loop=true;soundtrack.volume=0;soundtrack.preload='none';soundtrack.hidden=true;home.append(soundtrack)
+  let musicFailed=false,musicStarting=false,musicWanted=true,fadeTimer=0,musicAttempt=0
+  try{musicWanted=localStorage.getItem('pixora-music')!=='off'}catch{}
+  function musicUI(){const zh=home.dataset.language!=='en';music.textContent=musicFailed?(zh?'音樂重試':'Retry music'):musicStarting?(zh?'音樂載入中':'Loading music'):soundtrack.paused?(zh?'♫ 播放音樂':'♫ Play music'):(zh?'♫ 暫停音樂':'♫ Pause music');music.setAttribute('aria-pressed',String(!soundtrack.paused));music.setAttribute('aria-label',music.textContent);music.title=zh?'背景音樂 · 5 秒淡入 · 點擊播放或暫停':'Background music · 5-second fade-in · Play or pause';music.disabled=false}
+  function stopMusic(){musicAttempt++;musicStarting=false;clearInterval(fadeTimer);soundtrack.pause();soundtrack.volume=0;musicUI()}
+  async function startMusic(){if(musicStarting||!soundtrack.paused||document.hidden||!home.isConnected||home.inert)return;const attempt=++musicAttempt;musicFailed=false;musicStarting=true;soundtrack.volume=0;musicUI();try{await soundtrack.play();if(attempt!==musicAttempt)return;const began=performance.now();clearInterval(fadeTimer);fadeTimer=setInterval(()=>{soundtrack.volume=.25*Math.min(1,(performance.now()-began)/5000);if(soundtrack.volume>=.25)clearInterval(fadeTimer)},50)}catch(error){if(attempt===musicAttempt)musicFailed=error.name!=='NotAllowedError'}finally{if(attempt===musicAttempt){musicStarting=false;musicUI()}}}
+  music.onclick=()=>{if(musicStarting||!soundtrack.paused){musicWanted=false;stopMusic()}else{musicWanted=true;startMusic()}try{localStorage.setItem('pixora-music',musicWanted?'on':'off')}catch{}}
   soundtrack.addEventListener('play',musicUI);soundtrack.addEventListener('pause',musicUI);soundtrack.addEventListener('error',()=>{musicFailed=true;musicUI()})
-  function stopMusic(){soundtrack.pause()}
+  function unlockMusic(event){if(event.target.closest('button,a,input,select,textarea')||!musicWanted)return;startMusic()}
+  home.addEventListener('pointerdown',unlockMusic);home.addEventListener('keydown',unlockMusic)
   document.addEventListener('visibilitychange',onMusicVisibility)
   function onMusicVisibility(){if(document.hidden)stopMusic()}
   let effectsEnabled=true,ambientTime=0
@@ -341,5 +345,5 @@ if (!document.getElementById('pixora-universe-home')) {
     if(w>=760){if(rocketTime!==null){if(animate)rocketTime+=dt;drawRocket(stationPoint.x+72,stationPoint.y-8,Math.min(1,rocketTime/2400));if(rocketTime>=2400)rocketTime=null}else drawRocket(stationPoint.x+72,stationPoint.y-8,0)}
     raf=requestAnimationFrame(frame)
   }
-  renderUI();raf=requestAnimationFrame(frame)
+  renderUI();raf=requestAnimationFrame(frame);if(musicWanted)startMusic()
 }
