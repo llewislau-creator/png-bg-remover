@@ -13,3 +13,102 @@
 #font-studio .fs-style-list button{background:#142937!important;color:#e7f1f7!important;border:1px solid #3c5566!important;font-family:Arial,"Microsoft JhengHei",sans-serif!important;font-weight:600;font-size:12px!important;line-height:1.45;min-height:44px;padding:10px 6px!important;text-align:center;overflow-wrap:anywhere}#font-studio .fs-style-list button:hover{background:#203e52!important;color:#fff!important;border-color:#88c9df!important}#font-studio .fs-style-list button[aria-pressed="true"]{background:#245568!important;color:#fff!important;border-color:#8ee7f4!important;box-shadow:inset 3px 0 #8ee7f4!important}#font-studio .fs-style-list button:focus-visible{outline:2px solid #9be7f4;outline-offset:2px}
 
 #font-studio .hw-generated-preview{padding:16px;border:1px solid #5a8fa4;border-radius:10px;margin:18px 0}#font-studio .hw-generated-preview[hidden]{display:none}#font-studio .hw-generated-image{display:block;width:100%;max-width:600px;max-height:600px;object-fit:contain;background:repeating-conic-gradient(#eee 0% 25%,#fff 0% 50%) 0 0/20px 20px}#font-studio .hw-history a{display:block;color:#a3eaff;margin:12px 0}#font-studio .hw-history-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}#font-studio .hw-history-view{width:100%;padding:6px}#font-studio .hw-history-view img{width:100%;height:150px;object-fit:contain;background:#ddd}#font-studio .hw-history-view span{display:block;margin-top:8px;overflow-wrap:anywhere}#font-studio .hw-history-list article{padding:10px;border:1px solid #304756;border-radius:8px}#font-studio .hw-history-list small{display:block;color:#a4bfce;margin-top:8px}
+
+/* Focused typography workspace */
+#font-studio{background:#080f15!important;color:#e4edf4!important}
+#font-studio .fs-header{background:#0c1720!important;border-color:#24333f!important;padding:14px 22px}
+#font-studio .fs-header small{color:#98aaba!important}
+#font-studio .fs-shell{grid-template-columns:280px minmax(0,1fr)}
+#font-studio .fs-controls{background:#0e1923!important;border-color:#24333f!important;padding:24px 20px}
+#font-studio .fs-controls h3{font-size:14px;color:#e4edf4}
+#font-studio .fs-controls label{font-size:13px;color:#afbfce}
+#font-studio textarea,#font-studio select,#font-studio input[type=text]{background:#0a141e!important;color:#e5edf5!important;border:1px solid #344655!important;border-radius:8px;font-size:14px;padding:10px 12px}
+#font-studio .fs-controls textarea{height:116px;font-size:18px;line-height:1.7}
+#font-studio button{background:#142330!important;color:#dce8f3!important;border-color:#344655!important;min-height:38px;font-size:13px}
+#font-studio button:hover{background:#1b3243!important;border-color:#799cb4!important}
+#font-studio button[aria-pressed=true]{background:#203749!important;color:#a8e7f4!important;border-color:#81cedf!important}
+#font-studio button:disabled{opacity:.48}
+#font-studio [hidden]{display:none!important}
+#font-studio .fs-main{padding:24px 30px 40px;min-width:0}
+#font-studio .fs-hero{background:none!important;border:0;border-radius:0;padding:0 0 20px;display:flex;align-items:end;justify-content:space-between;gap:16px;max-width:1440px;margin:0 auto}
+#font-studio .fs-hero small{font-size:10px;color:#7a99ad;letter-spacing:.16em}
+#font-studio .fs-hero h1{font-size:26px;margin:8px 0 0;line-height:1.4}
+#font-studio .fs-hero p{margin:0;color:#90a5b7;font-size:13px}
+#font-studio .fs-workspace-nav{display:flex;gap:6px;border-bottom:1px solid #293b49;padding:0 0 14px;margin:0 auto 22px;max-width:1440px}
+#font-studio .fs-workspace-nav button{padding:10px 18px}
+#font-studio .fs-mode-description{font-size:12px;line-height:1.8;color:#8da4b7;margin:18px 0}
+#font-studio[data-workspace-mode=local] .fs-handwriting{display:none!important}
+#font-studio:not([data-workspace-mode=local]) .fs-work,#font-studio:not([data-workspace-mode=local]) .fs-tabs,#font-studio:not([data-workspace-mode=local]) .fs-gallery-tools,#font-studio:not([data-workspace-mode=local]) .fs-filters,#font-studio:not([data-workspace-mode=local]) .fs-gallery{display:none!important}
+#font-studio .fs-handwriting{background:none!important;border:0!important;padding:0;margin:0 auto;max-width:1440px}
+#font-studio .hw-ai-grid{display:grid;grid-template-columns:340px minmax(0,1fr);gap:22px;align-items:start}
+#font-studio .hw-reference-panel,#font-studio .hw-result-panel{min-width:0;background:#101d28;border:1px solid #2b3e4c;border-radius:14px;padding:22px}
+#font-studio .hw-panel-title span,#font-studio .hw-result-empty>span{font-size:10px;letter-spacing:.14em;color:#81a4b9}
+#font-studio .hw-panel-title h2,#font-studio .hw-panel-title h3,#font-studio .hw-result-empty h2{font-size:19px;line-height:1.4;margin:8px 0!important}
+#font-studio .fs-handwriting p{font-size:13px;line-height:1.7;color:#9fb2c2}
+#font-studio .hw-upload-label{border:1px dashed #496274;border-radius:8px;padding:14px;background:#0d1923;font-weight:600}
+#font-studio .fs-handwriting input[type=file]{font:inherit;width:100%;font-size:11px}
+#font-studio input[type=file]::file-selector-button{background:#244253;border:1px solid #52788a;border-radius:5px;color:#e4f5ff;padding:7px 10px;margin-right:8px}
+#font-studio .hw-file-help{font-size:11px;color:#819aaa}
+#font-studio .hw-reference{display:block;width:100%;max-width:100%;max-height:150px;background:#0a141c;border-radius:8px;margin:16px auto;object-fit:contain}
+#font-studio .fs-handwriting details{border-top:1px solid #293d4b;margin-top:18px;padding-top:14px}
+#font-studio summary{cursor:pointer;font-size:12px;color:#b3c9d9}
+#font-studio .hw-save-tools{display:grid;grid-template-columns:1fr auto;gap:8px}
+#font-studio .hw-save-tools label{min-width:0}
+#font-studio .hw-example-name{width:100%;padding:8px!important;font-size:12px!important}
+#font-studio .hw-example-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:20px}
+#font-studio .hw-example-heading h3{font-size:14px;margin:0}
+#font-studio .hw-example-heading small{color:#8da4b7;font-size:10px}
+#font-studio .hw-examples{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#font-studio .hw-examples article{min-width:0;background:#0c1720;padding:6px;border-color:#2d4150}
+#font-studio .hw-examples .hw-example-use{padding:0!important;overflow:hidden;border:1px solid transparent!important}
+#font-studio .hw-example-use img{height:68px;object-fit:contain}
+#font-studio .hw-example-use span{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#font-studio .hw-examples article>button:last-child{min-height:26px;padding:3px 8px;font-size:10px;color:#8ea7ba!important;background:none!important}
+#font-studio .hw-generation-actions{border-top:1px solid #2b3f4d;margin-top:20px;padding-top:8px}
+#font-studio .hw-consent-label{display:flex!important;gap:8px;align-items:start;line-height:1.7;font-size:11px!important;color:#a2b8c9}
+#font-studio input[type=checkbox]{accent-color:#8ad5e7;flex-shrink:0}
+#font-studio .hw-generate{width:100%;background:#97d9e7!important;color:#09212b!important;border-color:#97d9e7!important;padding:12px 14px;font-weight:700}
+#font-studio .hw-status,#font-studio .hw-example-status{font-size:12px!important;overflow-wrap:anywhere;min-height:20px}
+#font-studio .hw-status:empty,#font-studio .hw-example-status:empty{display:none}
+#font-studio .hw-result-panel{min-height:520px}
+#font-studio .hw-result-empty{text-align:center;min-height:470px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#font-studio .hw-empty-art{font-size:88px;color:#304a5b;line-height:1.5;font-family:serif;margin:10px}
+#font-studio .hw-result-empty small{font-size:12px;color:#7b96aa}
+#font-studio .hw-result-panel:has(.hw-generated-preview:not([hidden])) .hw-result-empty{display:none}
+#font-studio .hw-generated-preview{padding:0!important;border:0!important;margin:0!important;border-radius:0}
+#font-studio .hw-generated-image{max-width:100%;width:100%;height:360px;max-height:360px;margin:18px 0;object-fit:contain;border-radius:8px;background:repeating-conic-gradient(#203240 0% 25%,#182835 0% 50%) 0 0/20px 20px}
+#font-studio .hw-generated-caption{font-size:12px!important;color:#8da8bb!important}
+#font-studio .hw-result-tools{display:grid;grid-template-columns:1fr 1fr;gap:12px;border-top:1px solid #2b3f4d;padding-top:14px}
+#font-studio .hw-result-tools label{margin:0!important;display:flex;align-items:center;gap:10px;color:#b6cada;font-size:12px}
+#font-studio .hw-result-tools label:nth-of-type(3),#font-studio .hw-result-tools p{grid-column:1/-1}
+#font-studio .hw-result-tools p{margin:0;font-size:11px!important}
+#font-studio input[type=color]{width:48px;height:34px;padding:3px;background:#122431;border:1px solid #486374;border-radius:6px;cursor:pointer}
+#font-studio .hw-result-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:20px}
+#font-studio .hw-generated-download{background:#98dce9;color:#0a2834!important;text-decoration:none;border:1px solid #98dce9;border-radius:8px;padding:11px 20px;margin:0!important;font-size:14px;font-weight:700}
+#font-studio .hw-result-actions button{font-size:12px}
+#font-studio[data-workspace-mode=ai] .hw-history-collection{display:none}
+#font-studio[data-workspace-mode=history] .hw-reference-panel,#font-studio[data-workspace-mode=history] .hw-result-empty{display:none}
+#font-studio[data-workspace-mode=history] .hw-ai-grid{display:block}
+#font-studio[data-workspace-mode=history] .hw-generated-preview:not([hidden]){padding-bottom:28px!important;margin-bottom:28px!important;border-bottom:1px solid #2c4151!important}
+#font-studio .hw-history-collection{padding-top:4px}
+#font-studio .hw-history-list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+#font-studio .hw-history-list article{background:#0d1822;min-width:0;padding:12px}
+#font-studio .hw-history-view{padding:0!important;overflow:hidden;text-align:left}
+#font-studio .hw-history-view img{height:130px;background:repeating-conic-gradient(#203240 0% 25%,#182835 0% 50%) 0 0/16px 16px}
+#font-studio .hw-history-view span{font-size:12px;padding:0 10px 10px;line-height:1.7;overflow-wrap:anywhere}
+#font-studio .hw-history-list small{font-size:10px}
+#font-studio .hw-history-list a{font-size:12px}
+#font-studio .hw-history-list article>button{font-size:11px;min-height:30px;padding:5px 10px}
+#font-studio .fs-work,#font-studio .fs-tabs,#font-studio .fs-gallery-tools,#font-studio .fs-filters,#font-studio .fs-gallery{max-width:1200px;margin-left:auto;margin-right:auto}
+#font-studio .fs-work{background:#101d28!important;border-color:#2b3e4c!important}
+#font-studio .fs-work-title{border-color:#2b3e4c!important}
+#font-studio .fs-work-title b{color:#e1ecf5}
+#font-studio .fs-work-title small{color:#819eaf}
+#font-studio .fs-gallery{grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--gallery-card-size,210px)),1fr))}
+#font-studio .fs-note{color:#8aa4b8;font-size:11px}
+#font-studio .fs-local-controls input[type=file]{max-width:100%;font-size:11px}
+#font-studio .fs-local-controls .fs-style-list{display:none!important}
+#font-studio .fs-mode-description{border-top:1px solid #293c4c;padding-top:16px}
+@media(max-width:1100px){#font-studio .fs-shell{grid-template-columns:240px minmax(0,1fr)}#font-studio .fs-main{padding:20px}#font-studio .hw-ai-grid{grid-template-columns:290px minmax(0,1fr);gap:14px}#font-studio .hw-reference-panel,#font-studio .hw-result-panel{padding:16px}#font-studio .hw-result-tools{grid-template-columns:1fr}#font-studio .hw-result-tools label,#font-studio .hw-result-tools p{grid-column:1}}
+@media(max-width:900px){#font-studio .hw-ai-grid{grid-template-columns:1fr}#font-studio .hw-examples{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}#font-studio .fs-hero{display:block}#font-studio .fs-hero p{margin-top:8px}#font-studio .hw-reference{max-height:110px}#font-studio .hw-result-empty{min-height:300px}#font-studio .hw-result-panel{min-height:340px}}
+@media(max-width:760px){#font-studio .fs-shell{display:block;overflow:auto}#font-studio .fs-controls{border-right:0;border-bottom:1px solid #293c4c;padding:18px}#font-studio .fs-main{overflow:visible;padding:18px}#font-studio .fs-header{padding:12px}#font-studio .fs-hero h1{font-size:23px}#font-studio .fs-workspace-nav{gap:5px}#font-studio .fs-workspace-nav button{padding:9px 12px;font-size:12px}#font-studio .hw-generated-image{height:260px;max-height:260px}#font-studio .hw-result-tools{grid-template-columns:1fr}#font-studio .fs-preview-tools small{width:100%}}
