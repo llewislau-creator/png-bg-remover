@@ -1,15 +1,19 @@
 <!doctype html>
-<html lang="zh-TW">
+<html lang="zh-TW" class="pxu-open">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<meta name="theme-color" content="#f1efe7" />
+<meta name="theme-color" content="#020305" />
 <meta name="description" content="PNG / CUTOUT 是為設計工作流程而做的免費瀏覽器去背小工具。貼上、去背、檢查、複製透明 PNG。" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="PNG / CUTOUT — Designer background removal utility" />
 <meta property="og:description" content="Drop, remove, inspect, copy. A lightweight cutout utility for designers." />
 <title>PNG / CUTOUT — Designer background removal utility</title>
 <style>
+/* Apply before the module bundle loads to avoid flashing the cutout shell. */
+html.pxu-open,body.pxu-open{background:#020305!important;overflow:hidden}
+body.pxu-open .shell,body.pxu-open #mobileBar,body.pxu-open #shortcutModal{visibility:hidden!important}
+
 :root{--paper:#f1efe7;--panel:#f8f7f1;--canvas:#d9dad4;--ink:#11120f;--muted:#707169;--line:#b8baaf;--acid:#c9ff39;--red:#c44236;--green:#2c9c68;--blue:#3157e8;--sans:Inter,Arial,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.hidden{display:none!important}.shell{width:min(1520px,100%);margin:auto;border-inline:1px solid var(--line);min-height:100vh}.mono{font-family:var(--mono)}
 header{position:sticky;top:0;z-index:60;background:rgba(241,239,231,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.topbar{height:62px;display:grid;grid-template-columns:1fr auto auto}.top-cell{display:flex;align-items:center;padding:0 16px;border-right:1px solid var(--line)}.top-cell:last-child{border-right:0}.brand{font-weight:950;letter-spacing:-.8px;font-size:18px}.brand small{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.08em;color:var(--muted);margin-left:9px}.header-note{font-family:var(--mono);font-size:9px;color:var(--muted);gap:8px}.header-note i{width:8px;height:8px;border:1px solid var(--ink);border-radius:50%;background:var(--acid)}.lang{display:flex;border:1px solid var(--ink)}.lang button{border:0;background:transparent;padding:7px 9px;font-family:var(--mono);font-size:9px}.lang button.active{background:var(--ink);color:var(--paper)}
@@ -29,7 +33,7 @@ footer{background:var(--ink);color:var(--paper);display:flex;justify-content:spa
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
-<body>
+<body class="pxu-open">
 <div class="shell">
 <header><div class="topbar"><div class="top-cell"><a class="brand" href="#">PNG / CUTOUT <small>DESIGNER UTILITY</small></a></div><div class="top-cell header-note"><i></i><span data-i="localStatus">LOCAL PROCESSING · NO ACCOUNT</span></div><div class="top-cell"><div class="lang"><button id="zhBtn" class="active">繁中</button><button id="enBtn">EN</button></div></div></div></header>
 <main>
