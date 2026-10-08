@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/inject-art.cjs",
+    "build": "node scripts/test-handwriting.cjs && vite build && node scripts/inject-art.cjs",
     "preview": "vite preview"
   },
   "dependencies": {
