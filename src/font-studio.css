@@ -76,7 +76,7 @@
 #font-studio .hw-result-empty small{font-size:12px;color:#7b96aa}
 #font-studio .hw-result-panel:has(.hw-generated-preview:not([hidden])) .hw-result-empty{display:none}
 #font-studio .hw-generated-preview{padding:0!important;border:0!important;margin:0!important;border-radius:0}
-#font-studio .hw-generated-image{max-width:100%;width:100%;height:360px;max-height:360px;margin:18px 0;object-fit:contain;border-radius:8px;background:repeating-conic-gradient(#203240 0% 25%,#182835 0% 50%) 0 0/20px 20px}
+#font-studio .hw-generated-image{max-width:100%;width:100%;height:360px;max-height:360px;margin:18px 0;object-fit:contain;border-radius:8px;background:repeating-conic-gradient(#dce3e8 0% 25%,#f4f6f8 0% 50%) 0 0/20px 20px}
 #font-studio .hw-generated-caption{font-size:12px!important;color:#8da8bb!important}
 #font-studio .hw-result-tools{display:grid;grid-template-columns:1fr 1fr;gap:12px;border-top:1px solid #2b3f4d;padding-top:14px}
 #font-studio .hw-result-tools label{margin:0!important;display:flex;align-items:center;gap:10px;color:#b6cada;font-size:12px}
@@ -94,7 +94,7 @@
 #font-studio .hw-history-list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 #font-studio .hw-history-list article{background:#0d1822;min-width:0;padding:12px}
 #font-studio .hw-history-view{padding:0!important;overflow:hidden;text-align:left}
-#font-studio .hw-history-view img{height:130px;background:repeating-conic-gradient(#203240 0% 25%,#182835 0% 50%) 0 0/16px 16px}
+#font-studio .hw-history-view img{height:130px;background:repeating-conic-gradient(#dce3e8 0% 25%,#f4f6f8 0% 50%) 0 0/16px 16px}
 #font-studio .hw-history-view span{font-size:12px;padding:0 10px 10px;line-height:1.7;overflow-wrap:anywhere}
 #font-studio .hw-history-list small{font-size:10px}
 #font-studio .hw-history-list a{font-size:12px}
@@ -112,3 +112,5 @@
 @media(max-width:1100px){#font-studio .fs-shell{grid-template-columns:240px minmax(0,1fr)}#font-studio .fs-main{padding:20px}#font-studio .hw-ai-grid{grid-template-columns:290px minmax(0,1fr);gap:14px}#font-studio .hw-reference-panel,#font-studio .hw-result-panel{padding:16px}#font-studio .hw-result-tools{grid-template-columns:1fr}#font-studio .hw-result-tools label,#font-studio .hw-result-tools p{grid-column:1}}
 @media(max-width:900px){#font-studio .hw-ai-grid{grid-template-columns:1fr}#font-studio .hw-examples{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}#font-studio .fs-hero{display:block}#font-studio .fs-hero p{margin-top:8px}#font-studio .hw-reference{max-height:110px}#font-studio .hw-result-empty{min-height:300px}#font-studio .hw-result-panel{min-height:340px}}
 @media(max-width:760px){#font-studio .fs-shell{display:block;overflow:auto}#font-studio .fs-controls{border-right:0;border-bottom:1px solid #293c4c;padding:18px}#font-studio .fs-main{overflow:visible;padding:18px}#font-studio .fs-header{padding:12px}#font-studio .fs-hero h1{font-size:23px}#font-studio .fs-workspace-nav{gap:5px}#font-studio .fs-workspace-nav button{padding:9px 12px;font-size:12px}#font-studio .hw-generated-image{height:260px;max-height:260px}#font-studio .hw-result-tools{grid-template-columns:1fr}#font-studio .fs-preview-tools small{width:100%}}
+
+#font-studio[data-workspace-mode=history] .fs-shell{grid-template-columns:minmax(0,1fr)}#font-studio[data-workspace-mode=history] .fs-controls{display:none!important}
