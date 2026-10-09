@@ -1,5 +1,6 @@
 import {setupFontWorkspace} from './font-workspace.js'
 import {setupHandwriting} from './handwriting-studio.js'
+import {setupTypographyReferences} from './typography-references.js'
 import './font-studio.css'
 const styles=[
 {id:'ink',name:'墨韻書法',category:'書法',font:'"DFKai-SB","KaiTi",serif',colors:['#292621','#292621'],bg:'#eee6d6'},
@@ -73,6 +74,7 @@ export function openFontStudio(callback=null){
  setupHandwriting(panel,()=>({text:state.text,vertical:state.vertical,transparent:state.transparent}))
  setupFontWorkspace(panel)
  const fontSelect=panel.querySelector('#fs-font');for(const [value,label] of fontChoices){const option=document.createElement('option');option.value=value;option.textContent=label;fontSelect.append(option)}
+ setupTypographyReferences(panel)
  fontSelect.onchange=()=>{state.font=fontSelect.value;renderPreview()}
  panel.querySelector('#fs-font-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;if(file.size>20*1024*1024){notify('字體檔案請小於 20 MB。');return}try{const family='PixoraImported'+(++customFontCount),face=new FontFace(family,await file.arrayBuffer());await face.load();document.fonts.add(face);const option=document.createElement('option');option.value='"'+family+'",sans-serif';option.textContent=file.name; fontSelect.append(option);fontSelect.value=option.value;state.font=option.value;renderPreview();notify('字體已載入，可預覽及匯出 PNG。')}catch{notify('無法讀取此字體，請選擇有效的字體檔。')}finally{e.target.value=''}}
  function setPreviewZoom(value,pointer=null){const wrap=panel.querySelector('.fs-canvas-wrap'),canvas=panel.querySelector('.fs-canvas'),before=canvas.getBoundingClientRect(),origin=pointer?{x:(pointer.x-before.left)/before.width,y:(pointer.y-before.top)/before.height}:null;previewZoom=Math.max(.5,Math.min(3,value));panel.querySelector('.fs-preview-zoom').textContent=Math.round(previewZoom*100)+'%';panel.querySelector('.fs-preview-space').style.setProperty('--preview-size',310*previewZoom+'px');panel.querySelector('[data-preview-zoom="out"]').disabled=previewZoom<=.5;panel.querySelector('[data-preview-zoom="in"]').disabled=previewZoom>=3;if(origin){const after=canvas.getBoundingClientRect();wrap.scrollLeft+=after.left+origin.x*after.width-pointer.x;wrap.scrollTop+=after.top+origin.y*after.height-pointer.y}else if(value===1){wrap.scrollLeft=0;wrap.scrollTop=0}}
