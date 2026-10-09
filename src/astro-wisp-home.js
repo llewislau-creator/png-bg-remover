@@ -7,6 +7,8 @@ import { openFontStudio } from './font-studio.js'
 import { openImageToPdf } from './image-to-pdf.js'
 import { openPresentationStudio } from './presentation-studio.js'
 import { openPrintStudio } from './print-studio.js'
+// Keep the existing workbench visual overrides that the Universe entry previously imported.
+import './studio-theme.css'
 import './astro-wisp-home.css'
 
 // Astro Wisp is a visual guide. Actual image processing remains in existing Pixora tools.
