@@ -8,6 +8,7 @@ import { openFontStudio } from './font-studio.js';
 import { openColorStudio } from './color-studio.js';
 import { openVectorStudio } from './vector-studio.js';
 import './astro-wisp-home.css';
+import './studio-theme.css';
 
 (function bootstrapAstroWisp() {
   if (document.getElementById('pixora-universe-home')) return;
