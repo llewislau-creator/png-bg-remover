@@ -167,3 +167,18 @@ body.pxu-open .shell,body.pxu-open #mobileBar,body.pxu-open #shortcutModal{visib
 @media(prefers-reduced-motion:reduce){
   #pixora-universe-home,#pixora-universe-home *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
 }
+
+/* Permanent brand manifesto: both languages shown in the first-screen hero. */
+
+#pixora-universe-home .aw-copy h1{font-size:clamp(43px,5.3vw,76px);letter-spacing:-.052em;line-height:1.075;margin:18px 0 14px}
+#pixora-universe-home .aw-copy p.aw-brand-cn{font-size:clamp(16px,1.35vw,21px);line-height:1.6;letter-spacing:.025em;color:#ddd7ff;font-weight:680;margin:0 0 16px;max-width:560px;text-wrap:pretty}
+#pixora-universe-home .aw-copy p#aw-intro{font-size:14px;line-height:1.75;color:#b4bfdc}
+@media(max-width:820px){
+  #pixora-universe-home .aw-copy h1{font-size:clamp(40px,7.7vw,65px);margin:14px 0 10px}
+  #pixora-universe-home .aw-copy p.aw-brand-cn{font-size:17px;margin-bottom:12px}
+}
+@media(max-width:540px){
+  #pixora-universe-home .aw-copy h1{font-size:clamp(36px,9.3vw,48px);letter-spacing:-.055em}
+  #pixora-universe-home .aw-copy p.aw-brand-cn{font-size:15px;line-height:1.55;margin-bottom:11px}
+  #pixora-universe-home .aw-copy p#aw-intro{font-size:12px;line-height:1.7}
+}
