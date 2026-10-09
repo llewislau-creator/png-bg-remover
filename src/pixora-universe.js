@@ -43,7 +43,7 @@ if (!document.getElementById('pixora-universe-home')) {
   home.innerHTML = `<canvas class="pxu-canvas" tabindex="0" role="img"></canvas>
     <div class="pxu-shade"></div>
     <header class="pxu-top"><div class="pxu-brand">PIXORA<small>UNIVERSE / LOCAL IMAGE TOOLS</small></div><div class="pxu-status"><span class="pxu-local"></span><div class="pxu-lang"><button type="button" data-lang="zh">繁中</button><button type="button" data-lang="en">EN</button></div></div></header>
-    <div class="pxu-copy"><p class="pxu-kicker">YOUR LOCAL IMAGE UNIVERSE</p><p class="pxu-planet"></p><h1 class="pxu-title"></h1><p class="pxu-desc"></p><button type="button" class="pxu-enter"></button><button type="button" class="pxu-cutout"></button><p class="pxu-trust"></p></div>
+    <div class="pxu-copy"><p class="pxu-kicker">YOUR LOCAL IMAGE UNIVERSE</p><h1 class="pxu-manifesto">Reveal What<br><span>Could Be.</span></h1><p class="pxu-manifesto-zh" lang="zh-Hant">讓尚未被看見的可能性，逐漸顯現</p><p class="pxu-planet"></p><h2 class="pxu-title"></h2><p class="pxu-desc"></p><button type="button" class="pxu-enter"></button><button type="button" class="pxu-cutout"></button><p class="pxu-trust"></p></div>
     <nav class="pxu-nav" aria-label="影像工具"><p class="pxu-nav-heading"></p><div class="pxu-nav-list"></div></nav>
     <footer class="pxu-bottom"><div><p class="pxu-help"></p><p class="pxu-note"></p></div><div class="pxu-controls"><button type="button" data-control="out">−</button><output class="pxu-zoom">100%</output><button type="button" data-control="in">＋</button><button type="button" data-control="reset"></button><button type="button" data-control="motion"></button></div></footer>`
   document.body.append(home)
