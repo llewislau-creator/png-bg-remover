@@ -39,3 +39,30 @@ body.pxu-open .shell,body.pxu-open #mobileBar,body.pxu-open #shortcutModal{visib
 .pxu-media-link{display:block;color:#a3eaff;text-decoration:none;border-top:1px solid #83c8e02b;margin-top:10px;padding:12px 6px;font-size:12px;white-space:nowrap}.pxu-media-link:hover{background:#91d8ff12}.pxu-media-link:focus-visible{outline:2px solid #a3eaff;outline-offset:2px}@media(max-width:759px){.pxu-media-link{flex:0 0 125px;border-top:0;border-left:1px solid #83c8e02b;margin-top:0;padding:10px 12px;align-self:center}}
 
 .pxu-music{border:1px solid #354956;background:#0a1821;color:#a5dce8;border-radius:6px;padding:8px 11px;font:inherit;font-size:11px;cursor:pointer;white-space:nowrap}.pxu-music:hover,.pxu-music[aria-pressed="true"]{border-color:#81ddec;color:#e5faff}.pxu-music:focus-visible{outline:2px solid #81ddec;outline-offset:3px}.pxu-music:disabled{opacity:.6;cursor:wait}@media(max-width:600px){.pxu-status{flex-wrap:wrap;justify-content:flex-end;gap:6px}.pxu-music{padding:7px;font-size:10px}}
+
+/* Pixora brand manifesto: keep exploration controls and original tool descriptions intact. */
+
+#pixora-universe-home .pxu-copy{width:min(30vw,450px);max-width:450px}
+#pixora-universe-home .pxu-manifesto{font-size:clamp(30px,3.35vw,50px);line-height:1.06;letter-spacing:-.046em;font-weight:850;color:#f8faff;margin:0 0 12px;text-wrap:balance;text-shadow:0 8px 32px #0008}
+#pixora-universe-home .pxu-manifesto span{background:linear-gradient(100deg,#dcd5ff,#9de4ff 75%,#cbb8ff);background-clip:text;-webkit-background-clip:text;color:transparent}
+#pixora-universe-home .pxu-manifesto-zh{font-size:clamp(13px,1.12vw,16px);font-weight:650;line-height:1.75;letter-spacing:.04em;color:#d4e4f5;margin:0 0 25px;max-width:400px}
+#pixora-universe-home .pxu-planet{font-size:12px;margin-bottom:5px;color:#8ca9bd}
+#pixora-universe-home .pxu-title{font-size:clamp(22px,2.45vw,32px);letter-spacing:-.03em;line-height:1.25}
+#pixora-universe-home .pxu-desc{margin:12px 0 18px;font-size:13px;line-height:1.7}
+@media(max-width:1100px) and (min-width:760px){
+  #pixora-universe-home .pxu-copy{width:32vw}
+  #pixora-universe-home .pxu-manifesto{font-size:clamp(27px,3vw,38px)}
+  #pixora-universe-home .pxu-manifesto-zh{font-size:12px}
+}
+@media(max-width:759px){
+  #pixora-universe-home .pxu-copy{width:auto;max-width:none}
+  #pixora-universe-home .pxu-manifesto{font-size:clamp(28px,7.2vw,40px);margin-bottom:7px}
+  #pixora-universe-home .pxu-manifesto-zh{font-size:12px;line-height:1.5;margin:0 0 13px;max-width:330px}
+  #pixora-universe-home .pxu-title{font-size:23px;line-height:1.2}
+  #pixora-universe-home .pxu-desc{font-size:11px;line-height:1.55;margin:8px 0 12px;max-width:330px}
+}
+@media(max-height:700px) and (max-width:759px){
+  #pixora-universe-home .pxu-manifesto{font-size:clamp(26px,6.8vw,34px)}
+  #pixora-universe-home .pxu-manifesto-zh{font-size:11px;margin-bottom:9px}
+  #pixora-universe-home .pxu-desc{margin:6px 0 9px}
+}
