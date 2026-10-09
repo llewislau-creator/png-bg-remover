@@ -5,7 +5,7 @@ import './p1-enhancements.css'
 import './p1-enhancements.js'
 
 // Canonical Pixora homepage: Universe entry to all tools.
-import './pixora-universe.js'
+import './astro-wisp-home.js'
 
 // Auxiliary tools retained as part of Pixora and entered from the Universe homepage.
 import './image-to-pdf.js'
