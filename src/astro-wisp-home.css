@@ -30,6 +30,10 @@ body.pxu-open .shell,body.pxu-open #mobileBar,body.pxu-open #shortcutModal{visib
 #pixora-universe-home .aw-nav-tools,#pixora-universe-home .aw-motion{border:1px solid var(--aw-line);border-radius:13px;background:#ffffff0a;color:#f5f4ff;min-height:41px;padding:0 15px;font-size:13px;font-weight:650;transition:border-color .2s,background .2s}
 #pixora-universe-home .aw-nav-tools:hover,#pixora-universe-home .aw-motion:hover{border-color:#b0a9ff88;background:#c2baff20}
 #pixora-universe-home .aw-motion{min-width:41px;font-size:22px;padding:0}
+#pixora-universe-home .aw-music{display:inline-flex;justify-content:center;align-items:center;gap:6px;min-height:41px;border:1px solid var(--aw-line);border-radius:13px;background:#ffffff0a;color:#f5f4ff;padding:0 13px;white-space:nowrap;font-size:12px;font-weight:650;transition:background .2s,border-color .2s}
+#pixora-universe-home .aw-music:hover,#pixora-universe-home .aw-music[aria-pressed="true"]{background:#b9adff27;border-color:#aaa2ff84}
+#pixora-universe-home .aw-music:disabled{opacity:.72;cursor:wait}
+#pixora-universe-home .aw-music-icon{font-size:18px;line-height:1}
 #pixora-universe-home .aw-language{display:flex;border:1px solid var(--aw-line);border-radius:13px;overflow:hidden;background:#ffffff08;padding:3px;gap:2px}
 #pixora-universe-home .aw-language button{border:0;border-radius:9px;background:transparent;color:#b9bcda;padding:9px 12px;font-size:12px}
 #pixora-universe-home .aw-language button.active{background:#e5e1ff;color:#1c1939;font-weight:760}
@@ -132,6 +136,8 @@ body.pxu-open .shell,body.pxu-open #mobileBar,body.pxu-open #shortcutModal{visib
   #pixora-universe-home .aw-nav-tools{padding:0 9px;min-height:36px;font-size:11px}
   #pixora-universe-home .aw-language{padding:2px;border-radius:9px}
   #pixora-universe-home .aw-language button{padding:7px 6px;font-size:10px}
+  #pixora-universe-home .aw-music{min-height:36px;width:36px;padding:0;border-radius:9px}
+  #pixora-universe-home .aw-music-label{display:none}
   #pixora-universe-home .aw-motion{display:none}
   #pixora-universe-home .aw-hero{padding-top:27px}
   #pixora-universe-home .aw-copy h1{font-size:clamp(37px,10vw,50px);letter-spacing:-.06em}
