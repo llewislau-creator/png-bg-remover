@@ -29,7 +29,7 @@ const COPY = {
   zh:{
     subtitle:'YOUR VISUAL AI COMPANION', navTools:'所有工具', motion:'暫停動態', motionOff:'開啟動態', musicPlay:'播放音樂', musicPause:'暫停音樂', musicLoading:'音樂載入中', musicRetry:'重試音樂',
     kicker:'PIXORA / VISUAL WORKSPACE',
-    headline:'讓好點子，<br><span>輕鬆成形。</span>',
+    headline:'Reveal What<br><span>Could Be.</span>',
     intro:'Astro Wisp 是你的創作引導員。從去背、色彩到文件整理，選擇工具，立即開始。',
     uploadTitle:'把圖片交給 Astro Wisp', uploadHint:'拖放、點擊或貼上圖片 · PNG / JPG / WEBP / HEIC · 單檔上限 20 MB',
     uploadButton:'選擇圖片 →', uploadHelp:'圖片上傳後會直接進入既有去背工作台。',
@@ -41,7 +41,7 @@ const COPY = {
   en:{
     subtitle:'YOUR VISUAL AI COMPANION',navTools:'All tools', motion:'Pause motion', motionOff:'Enable motion', musicPlay:'Play music', musicPause:'Pause music', musicLoading:'Loading music', musicRetry:'Retry music',
     kicker:'PIXORA / VISUAL WORKSPACE',
-    headline:'Make room for<br><span>your best ideas.</span>',
+    headline:'Reveal What<br><span>Could Be.</span>',
     intro:'Meet Astro Wisp, your visual guide. Remove backgrounds, analyze colors, prepare documents and keep creating.',
     uploadTitle:'Give Astro Wisp an image',uploadHint:'Drop, click or paste · PNG / JPG / WEBP / HEIC · Up to 20 MB',
     uploadButton:'Choose an image →',uploadHelp:'Images open directly in the existing background removal studio.',
@@ -87,6 +87,7 @@ if (!document.getElementById('pixora-universe-home')) {
         '<div class="aw-copy">',
           '<div class="aw-kicker"><span class="aw-signal"></span><span id="aw-kicker"></span></div>',
           '<h1 id="aw-heading"></h1>',
+          '<p class="aw-brand-cn" lang="zh-Hant">讓尚未被看見的可能性，逐漸顯現</p>',
           '<p id="aw-intro"></p>',
           '<div class="aw-quick"><span id="aw-quick-label"></span><button type="button" data-tool="cutout">✦ <span data-short="cutout"></span></button><button type="button" data-tool="pdf">▤ <span data-short="pdf"></span></button><button type="button" data-tool="color">◉ <span data-short="color"></span></button></div>',
         '</div>',
