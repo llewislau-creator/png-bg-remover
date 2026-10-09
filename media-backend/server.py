@@ -1,6 +1,7 @@
 import asyncio, base64, datetime, ipaddress, json, os, re, shutil, subprocess, time, uuid
 from collections import defaultdict, deque
 from pathlib import Path
+from dotenv import load_dotenv
 from urllib.parse import urlparse
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
@@ -9,6 +10,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 ROOT=Path(__file__).resolve().parent
+load_dotenv(ROOT/".env")
 DATA=ROOT/"downloads"
 DATA.mkdir(exist_ok=True)
 ORIGIN=os.getenv("PIXORA_ORIGIN","https://usepixora.vercel.app").rstrip("/")
