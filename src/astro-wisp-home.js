@@ -196,7 +196,7 @@ import './studio-theme.css';
           <div class="aw-tools"></div>
         </section>
       </main>
-      <footer class="aw-footer"><span>© PIXORA · YOUR CREATIVE SPACE</span><span class="aw-footer-note"></span></footer>
+      <footer class="aw-footer"><span>© PIXORA · YOUR CREATIVE SPACE</span><span class="aw-footer-note"></span><a class="aw-private" href="/private"></a></footer>
     </div>
     <div class="aw-drop-veil" aria-hidden="true"><strong></strong></div>`;
   document.body.append(home);
@@ -265,6 +265,7 @@ import './studio-theme.css';
     $('.aw-replace').textContent = d.replace;
     $('.aw-go-tools').textContent = d.navTools;
     $('.aw-media').textContent = d.media;
+    $('.aw-private').textContent = lang === 'zh' ? '私人影音工作台 ↗' : 'Private media workspace ↗';
     $('.aw-section-label').textContent = d.allTools;
     $('#aw-tools-heading').textContent = d.titleTools;
     $('.aw-tools-lead').textContent = d.toolsLead;
