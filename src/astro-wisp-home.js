@@ -27,7 +27,7 @@ const TOOL_LIST = [
 
 const COPY = {
   zh:{
-    subtitle:'YOUR VISUAL AI COMPANION', navTools:'所有工具', motion:'暫停動態', motionOff:'開啟動態',
+    subtitle:'YOUR VISUAL AI COMPANION', navTools:'所有工具', motion:'暫停動態', motionOff:'開啟動態', musicPlay:'播放音樂', musicPause:'暫停音樂', musicLoading:'音樂載入中', musicRetry:'重試音樂',
     kicker:'PIXORA / VISUAL WORKSPACE',
     headline:'讓好點子，<br><span>輕鬆成形。</span>',
     intro:'Astro Wisp 是你的創作引導員。從去背、色彩到文件整理，選擇工具，立即開始。',
@@ -39,7 +39,7 @@ const COPY = {
     media:'影音下載 ↗',private:'個人空間 ↗',footer:'Made for real creative workflows.',skip:'跳至工具列表',loading:'開啟工具…'
   },
   en:{
-    subtitle:'YOUR VISUAL AI COMPANION',navTools:'All tools', motion:'Pause motion', motionOff:'Enable motion',
+    subtitle:'YOUR VISUAL AI COMPANION',navTools:'All tools', motion:'Pause motion', motionOff:'Enable motion', musicPlay:'Play music', musicPause:'Pause music', musicLoading:'Loading music', musicRetry:'Retry music',
     kicker:'PIXORA / VISUAL WORKSPACE',
     headline:'Make room for<br><span>your best ideas.</span>',
     intro:'Meet Astro Wisp, your visual guide. Remove backgrounds, analyze colors, prepare documents and keep creating.',
@@ -78,6 +78,7 @@ if (!document.getElementById('pixora-universe-home')) {
       '<div class="aw-nav-actions">',
         '<button class="aw-nav-tools" type="button" id="aw-open-tools"></button>',
         '<div class="aw-language" role="group" aria-label="Language"><button type="button" data-lang="zh">繁中</button><button type="button" data-lang="en">EN</button></div>',
+        '<button type="button" class="aw-music" id="aw-music" aria-pressed="false"><span aria-hidden="true" class="aw-music-icon">♫</span><span class="aw-music-label"></span></button>',
         '<button class="aw-motion" type="button" id="aw-motion" aria-pressed="true" aria-label="Toggle animation">◌</button>',
       '</div>',
     '</div>',
@@ -140,7 +141,8 @@ if (!document.getElementById('pixora-universe-home')) {
       '<footer class="aw-footer"><div><b>PIXORA</b><span id="aw-footer"></span></div><div class="aw-footer-links"><a href="/media" id="aw-media"></a><a href="/private" id="aw-private"></a></div><p id="aw-note"></p></footer>',
     '</main>',
     '</div>',
-    '<input type="file" id="aw-file" accept="image/png,image/jpeg,image/webp,image/heic,image/heif,.heic,.heif" hidden>'
+    '<input type="file" id="aw-file" accept="image/png,image/jpeg,image/webp,image/heic,image/heif,.heic,.heif" hidden>',
+    '<audio id="aw-audio" src="/audio/home-ambient.m4a" preload="none" loop hidden></audio>'
   ].join('')
   document.body.append(home)
   document.documentElement.classList.add('pxu-open')
@@ -148,6 +150,59 @@ if (!document.getElementById('pixora-universe-home')) {
   const $=selector=>home.querySelector(selector)
   const $$=selector=>[...home.querySelectorAll(selector)]
   const set=(selector,value)=>{const node=$(selector);if(node)node.textContent=value}
+  const bgm=$('#aw-audio')
+  const musicButton=$('#aw-music')
+  let musicStarting=false,musicFailed=false,musicFade=0,musicAttempt=0
+  bgm.volume=0
+  function updateMusicUI(){
+    const t=COPY[lang]
+    const playing=!bgm.paused
+    const label=musicStarting?t.musicLoading:musicFailed?t.musicRetry:playing?t.musicPause:t.musicPlay
+    musicButton.querySelector('.aw-music-label').textContent=label
+    musicButton.title=label
+    musicButton.setAttribute('aria-label',label)
+    musicButton.setAttribute('aria-pressed',String(playing))
+    musicButton.disabled=musicStarting
+  }
+  function stopMusic(){
+    musicAttempt++
+    if(musicFade)clearInterval(musicFade)
+    musicFade=0
+    bgm.pause()
+    bgm.volume=0
+    musicStarting=false
+    musicFailed=false
+    updateMusicUI()
+  }
+  async function playMusic(){
+    if(musicStarting||!bgm.paused)return
+    const attempt=++musicAttempt
+    musicStarting=true
+    musicFailed=false
+    bgm.volume=0
+    updateMusicUI()
+    try{
+      // Playback is initiated only from the user clicking the music control.
+      await bgm.play()
+      if(attempt!==musicAttempt){bgm.pause();return}
+      musicStarting=false
+      updateMusicUI()
+      const started=performance.now()
+      musicFade=window.setInterval(()=>{
+        if(attempt!==musicAttempt||bgm.paused){clearInterval(musicFade);musicFade=0;return}
+        bgm.volume=Math.min(.2, .2*(performance.now()-started)/5000)
+        if(bgm.volume>=.2){clearInterval(musicFade);musicFade=0}
+      },50)
+    }catch(error){
+      if(attempt!==musicAttempt)return
+      musicStarting=false
+      musicFailed=true
+      updateMusicUI()
+    }
+  }
+  musicButton.addEventListener('click',()=>{if(musicStarting||!bgm.paused)stopMusic();else playMusic()})
+  bgm.addEventListener('error',()=>{musicStarting=false;musicFailed=true;updateMusicUI()})
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&!bgm.paused)stopMusic()})
   function paint(){
     const t=COPY[lang]
     home.dataset.language=lang
@@ -183,6 +238,7 @@ if (!document.getElementById('pixora-universe-home')) {
     $$('[data-lang]').forEach(btn=>{btn.classList.toggle('active',btn.dataset.lang===lang);btn.setAttribute('aria-pressed',String(btn.dataset.lang===lang))})
     $('#aw-file').setAttribute('aria-label',t.uploadButton)
     $('#aw-upload').setAttribute('aria-label',t.uploadTitle+' — '+t.uploadHint)
+    updateMusicUI()
   }
   function agent(state,message){
     home.dataset.agentState=state
@@ -210,6 +266,7 @@ if (!document.getElementById('pixora-universe-home')) {
       original.files=transfer.files
     }catch(err){agent('error',COPY[lang].statusError);return}}
     agent('receiving',file?COPY[lang].statusReceive:'')
+    stopMusic()
     home.remove()
     document.documentElement.classList.remove('pxu-open')
     document.body.classList.remove('pxu-open')
@@ -223,6 +280,7 @@ if (!document.getElementById('pixora-universe-home')) {
     const tool=TOOL_LIST.find(item=>item.id===id)
     if(!tool)return
     if(!tool.fn){openCutout();return}
+    stopMusic()
     agent('curious')
     const anchor=button||$('#aw-open-tools')
     try{
