@@ -1,7 +1,7 @@
 import {sign,createPrivateKey,createHmac,randomUUID} from 'node:crypto'
 import {headers,origin} from '../lib/private-auth.js'
 export function backendUrl(){
- const raw=process.env.PUBLIC_MEDIA_BACKEND_URL;try{const u=new URL(raw);return u.protocol==='https:'&&/^[a-z0-9-]+\.trycloudflare\.com$/.test(u.hostname)&&!u.username&&!u.password&&!u.port?u.origin:null}catch{return null}
+ const raw=process.env.PUBLIC_MEDIA_BACKEND_URL;try{const u=new URL(raw);return u.protocol==='https:'&&/^[a-z0-9.-]+$/.test(u.hostname)&&u.hostname.includes('.')&&!u.hostname.endsWith('.localhost')&&!/^\d+\.\d+\.\d+\.\d+$/.test(u.hostname)&&!u.username&&!u.password&&!u.port?u.origin:null}catch{return null}
 }
 export default function handler(req,res){
  headers(res);res.setHeader('Content-Type','application/json');
