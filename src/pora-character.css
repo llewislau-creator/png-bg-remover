@@ -1,0 +1,108 @@
+/* PORA / The Little Possibility — technology-soft visual layer only. */
+#pixora-universe-home.pora-ready {
+  --aw-accent:#b8c4ff;
+  background:
+    radial-gradient(ellipse 53% 52% at 78% 25%, rgba(82,106,212,.29), transparent 82%),
+    radial-gradient(ellipse 47% 48% at 20% 44%, rgba(135,102,191,.15), transparent 80%),
+    #080d20;
+}
+#pixora-universe-home .pora-visual::before {
+  content:""; position:absolute; inset:4% 0 11%; pointer-events:none; opacity:.8;
+  background:
+    radial-gradient(ellipse 42% 43% at 51% 51%,rgba(244,193,255,.26),transparent 82%),
+    radial-gradient(ellipse 40% 50% at 53% 53%,rgba(102,175,253,.2),transparent 88%);
+  filter:blur(9px);
+}
+#pixora-universe-home .pora-visual::after {
+  content:""; position:absolute; inset:6% 2% 18%; border:1px solid rgba(165,200,255,.075);
+  border-radius:45% 55% 52% 48%; pointer-events:none; transform:rotate(-16deg);
+}
+#pixora-universe-home .pora-visual .aw-planet-glow {
+  background:radial-gradient(ellipse at center,rgba(153,137,249,.16) 0,rgba(75,112,211,.11) 40%,transparent 73%);
+}
+#pixora-universe-home .pora-visual .aw-character {
+  position:relative; z-index:2; width:min(100%,590px); max-height:485px;
+  aspect-ratio:1.28; margin-top:-76px;
+  filter:drop-shadow(0 27px 45px rgba(117,128,226,.21));
+}
+#pixora-universe-home .pora-svg { display:block; width:100%; height:auto; overflow:visible; }
+#pixora-universe-home .pora-svg .pora-art {
+  opacity:0; visibility:hidden; transform:translateY(9px) scale(.945);
+  transform-origin:50% 62%; transform-box:view-box;
+  transition:opacity .3s ease, transform .34s cubic-bezier(.2,.7,.22,1), visibility .34s;
+}
+#pixora-universe-home .pora-character[data-pora-form="base"] [data-pora-art="base"],
+#pixora-universe-home .pora-character[data-pora-form="star"] [data-pora-art="star"],
+#pixora-universe-home .pora-character[data-pora-form="speech"] [data-pora-art="speech"],
+#pixora-universe-home .pora-character[data-pora-form="cloud"] [data-pora-art="cloud"] {
+  opacity:1;visibility:visible;transform:translateY(0) scale(1);
+}
+#pixora-universe-home .pora-float-cube {transform-origin:347px 105px;animation:pora-cube-breathe 5.5s ease-in-out infinite}
+#pixora-universe-home .pora-tiny-stars {animation:pora-twinkle 4s ease-in-out infinite alternate}
+#pixora-universe-home .pora-outer-orbit {animation:pora-twinkle 7s ease-in-out infinite alternate}
+#pixora-universe-home .pora-visual .aw-stage-caption {
+  bottom:111px; font-size:10px; padding:7px 12px; color:#dce1ff; background:rgba(11,20,53,.62);
+  border-color:rgba(179,203,255,.24); backdrop-filter:blur(12px);
+}
+#pixora-universe-home .pora-switcher {
+  position:absolute;z-index:5;left:50%;bottom:3px;transform:translateX(-50%);
+  width:min(100%,560px);display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:0 8px; text-align:center;
+}
+#pixora-universe-home .pora-switcher-label {
+  font-size:10px; font-weight:750; letter-spacing:.13em; color:#cad4fb; text-transform:uppercase;
+}
+#pixora-universe-home .pora-switcher-buttons {
+  display:flex;align-items:center;justify-content:center;gap:7px;width:100%;
+}
+#pixora-universe-home .pora-form-button {
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;
+  min-height:42px;min-width:0;padding:9px 12px;border-radius:999px;
+  background:rgba(129,145,202,.12); border:1px solid rgba(195,205,255,.27);
+  color:#dce2ff; font-size:12px;font-weight:680;
+  transition:background .18s ease, border-color .18s ease,transform .18s ease, box-shadow .18s ease;
+  backdrop-filter:blur(12px);
+}
+#pixora-universe-home .pora-form-button>span:first-child{font-size:17px;line-height:1;color:#f7df9f}
+#pixora-universe-home .pora-form-button:hover {
+  border-color:rgba(239,227,255,.72);transform:translateY(-2px);background:rgba(180,166,244,.21);
+}
+#pixora-universe-home .pora-form-button.is-active{
+  background:linear-gradient(125deg,#e0ddff,#e2f5ff 68%,#ffe7ee);
+  border-color:rgba(255,255,255,.85);color:#33365d;
+  box-shadow:0 5px 23px rgba(151,175,245,.27);
+}
+#pixora-universe-home .pora-form-button.is-active>span:first-child {color:#8c78cf}
+#pixora-universe-home .pora-mode-caption{
+  margin:0;min-height:17px;font-size:11px;line-height:1.35;color:#bec9e8;
+}
+#pixora-universe-home .pora-character[data-pora-form="cloud"] .pora-outer-orbit{
+  opacity:.45;
+}
+@keyframes pora-cube-breathe {0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+@keyframes pora-twinkle {from{opacity:.38}to{opacity:1}}
+#pixora-universe-home.aw-paused .pora-float-cube,
+#pixora-universe-home.aw-paused .pora-tiny-stars,
+#pixora-universe-home.aw-paused .pora-outer-orbit{animation:none!important}
+
+@media(max-width:820px){
+  #pixora-universe-home .pora-visual.aw-visual{height:460px;max-width:590px}
+  #pixora-universe-home .pora-visual .aw-character{max-width:455px;max-height:355px;margin-top:-63px}
+  #pixora-universe-home .pora-visual .aw-stage-caption{bottom:112px}
+}
+@media(max-width:540px){
+  #pixora-universe-home .pora-visual.aw-visual{height:405px}
+  #pixora-universe-home .pora-visual .aw-character{max-width:350px;margin-top:-86px}
+  #pixora-universe-home .pora-switcher{gap:7px;bottom:2px}
+  #pixora-universe-home .pora-switcher-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-width:330px}
+  #pixora-universe-home .pora-form-button{min-height:39px;padding:8px 10px;white-space:normal;font-size:11px}
+  #pixora-universe-home .pora-form-button>span:first-child{font-size:15px}
+  #pixora-universe-home .pora-mode-caption{font-size:10px;max-width:300px}
+  #pixora-universe-home .pora-visual .aw-stage-caption{bottom:147px;font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+  #pixora-universe-home .pora-svg .pora-art{transition:none!important}
+  #pixora-universe-home .pora-float-cube,
+  #pixora-universe-home .pora-tiny-stars,
+  #pixora-universe-home .pora-outer-orbit{animation:none!important}
+}
